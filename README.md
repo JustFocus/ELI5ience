@@ -1,6 +1,7 @@
 # ELI5ience
 
-[Website Link][website] [Heroku link][heroku]
+- [Website Link][website] 
+- [Heroku link][heroku]
 
 [heroku]: eli5ience.herokuapp.com
 [website]: http://www.eli5ience.com/
