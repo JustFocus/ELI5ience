@@ -1,12 +1,12 @@
 # FresherNote
 
-[Heroku link][heroku] **NB:** This should be a link to your production site
+[Heroku link][heroku]
 
-[heroku]: http://www.herokuapp.com
+[heroku]: http://www.eli5ience.com/
 
 ## Minimum Viable Product
 
-FresherNote is a web application inspired by Evernote built using Ruby on Rails
+ELI5ience is a web application inspired by Evernote built using Ruby on Rails
 and React.js. FresherNote allows users to:
 
 <!-- This is a Markdown checklist. Use it to keep track of your
