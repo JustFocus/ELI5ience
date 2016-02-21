@@ -1,13 +1,14 @@
-# FresherNote
+# ELI5ience
 
-[Heroku link][heroku]
+[Website Link][website] [Heroku link][heroku]
 
-[heroku]: http://www.eli5ience.com/
+[heroku]: eli5ience.herokuapp.com
+[website]: http://www.eli5ience.com/
 
 ## Minimum Viable Product
 
-ELI5ience is a web application inspired by Evernote built using Ruby on Rails
-and React.js. FresherNote allows users to:
+ELI5ience is a web application inspired by Rap Genius built using Ruby on Rails
+and React.js. ELI5ience allows users to:
 
 <!-- This is a Markdown checklist. Use it to keep track of your
 progress. Put an x between the brackets for a checkmark: [x] -->
