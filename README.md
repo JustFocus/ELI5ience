@@ -16,10 +16,12 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 - [ ] Create an account
 - [ ] Log in / Log out
-- [ ] Create, read, edit, and delete notes
-- [ ] Organize notes within Notebooks
-- [ ] Tag notes with multiple tags
-- [ ] Apply complex styling to notes while editing
+- [ ] Create, read, edit, and delete articles
+- [ ] Create, read, edit, and delete comments on articles
+- [ ] Create, read, edit, and delete annotations on articles
+- [ ] Create, read, edit, and delete improvements on annotations
+- [ ] Vote on annotations
+
 
 ## Design Docs
 * [View Wireframes][views]
@@ -44,92 +46,90 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 - [ ] create `User` model
 - [ ] authentication
 - [ ] user signup/signin pages
+- [ ] user profile page
 - [ ] blank landing page after signin
 
-### Phase 2: Notes Model, API, and basic APIUtil (1.5 days)
+### Phase 2: Articles Model, API, and basic APIUtil (1 day)
 
-**Objective:** Notes can be created, read, edited and destroyed through
+**Objective:** Articles can be created, read, edited and destroyed through
 the API.
 
-- [ ] create `Note` model
+- [ ] create `Article` model
 - [ ] seed the database with a small amount of test data
-- [ ] CRUD API for notes (`NotesController`)
-- [ ] jBuilder views for notes
+- [ ] CRUD API for articles (`ArticlesController`)
+- [ ] jBuilder views for articles
 - [ ] setup Webpack & Flux scaffold
 - [ ] setup `APIUtil` to interact with the API
 - [ ] test out API interaction in the console.
 
-### Phase 3: Flux Architecture and Router (1.5 days)
+### Phase 3: Article CRUD (1 day)
 
-**Objective:** Notes can be created, read, edited and destroyed with the
+**Objective:** Articles can be created, read, edited and destroyed with the
 user interface.
 
-- [ ] setup the flux loop with skeleton files
-- [ ] setup React Router
-- implement each note component, building out the flux loop as needed.
-  - [ ] `NotesIndex`
-  - [ ] `NoteIndexItem`
-  - [ ] `NoteForm`
-- [ ] save Notes to the DB when the form loses focus or is left idle
-  after editing.
+- [ ] article creation page
+- [ ] main page w/ list of articles
+- [ ] article page
 
-### Phase 4: Start Styling (0.5 days)
+### Phase 4: Comments (0.5 day)
 
-**Objective:** Existing pages (including singup/signin) will look good.
+**Objective:** Comments belong to articles and can be viewed on articles.
+
+- [ ] create `Comment` model
+- build out API, Flux loop, and components for:
+  - [ ] Comment CRUD
+  - [ ] viewing comments on articles
+
+### Phase 5: Start Styling (0.5 day)
+
+**Objective:** Existing pages (sign up, sign in, profile, articles, and main page) will look good.
 
 - [ ] create a basic style guide
 - [ ] position elements on the page
 - [ ] add basic colors & styles
 
-### Phase 5: Notebooks (1 day)
+### Phase 6: Annotations Flux Architecture and Router (2.5 days)
 
-**Objective:** Notes belong to Notebooks, and can be viewed by notebook.
+**Objective:** Annotations belong to Articles, and can be viewed on articles.
 
-- [ ] create `Notebook` model
+- [ ] setup the flux loop with skeleton files
+- [ ] setup React Router
+- [ ] create `Annotation` model
 - build out API, Flux loop, and components for:
-  - [ ] Notebook CRUD
-  - [ ] adding notes requires a notebook
-  - [ ] moving notes to a different notebook
-  - [ ] viewing notes by notebook
+  - [ ] Annotation CRUD
+      - [ ] selecting text opens annotation form
+  - [ ] viewing annotation on articles
+  - [ ] modify article body to include links to Annotations
 - Use CSS to style new views
 
-Phase 3 adds organization to the Notes. Notes belong to a Notebook,
-which has its own `Index` view.
+### Phase 7: Improvements (0.5 day)
 
-### Phase 6: Tags (1.5 days)
+**Objective:** Improvements belong to annotations and can be viewed on annotations.
 
-**Objective:** Notes can be tagged with multiple tags, and tags are searchable.
-
-- [ ] create `Tag` model and join table
+- [ ] create `Improvement` model
 - build out API, Flux loop, and components for:
-  - [ ] fetching tags for notebook
-  - [ ] adding tags to notebook
-  - [ ] creating tags while adding to notebooks
-  - [ ] searching notebooks by tag
-- [ ] Style new elements
+  - [ ] Improvement CRUD
+  - [ ] viewing improvements on annotations
 
-### Phase 7: Allow Complex Styling in Notes (0.5 days)
+### Phase 8: Allow Complex Articles and Annotations (0.5 days)
 
-**objective:** Enable complex styling of notes.
+**objective:** Enable complex styling of articles and annotations.
 
-- [ ] Integrate `react-quill` (based on Quill.js).
-- [ ] Use Rails helpers to sanitize HTML before rendering.
-- [ ] Style the new Quill elements.
+- [ ] Integrate `markdown-js`
 
-### Phase 8: Styling Cleanup and Seeding (1 day)
+### Phase 9: Styling Cleanup and Seeding (1 day)
 
 **objective:** Make the site feel more cohesive and awesome.
 
+- [ ] Add Bootstrap elements.
 - [ ] Get feedback on my UI from others
 - [ ] Refactor HTML classes & CSS rules
 - [ ] Add modals, transitions, and other styling flourishes.
 
 ### Bonus Features (TBD)
-- [ ] Search through notes for blocks of text
-- [ ] Pagination / infinite scroll for Notes Index
-- [ ] Set reminders on notes
-- [ ] Changelogs for Notes
-- [ ] Multiple sessions
+- [ ] Search for articles by tags or name
+- [ ] Pagination / infinite scroll for Articles Index
+- [ ] File upload for annotations
 
 [phase-one]: ./docs/phases/phase1.md
 [phase-two]: ./docs/phases/phase2.md
