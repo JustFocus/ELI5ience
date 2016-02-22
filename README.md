@@ -38,7 +38,7 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 ## Implementation Timeline
 
-### Phase 1: Backend setup and User Authentication (0.5 days)
+### [Phase 1: Backend setup and User Authentication (0.5 days)][phase1]
 
 **Objective:** Functioning rails project with Authentication
 
@@ -100,7 +100,7 @@ user interface.
       - [ ] selecting text opens annotation form
   - [ ] viewing annotation on articles
   - [ ] modify article body to include links to Annotations
-- Use CSS to style new views
+- [ ] Use CSS to style new views
 
 ### Phase 7: Improvements (0.5 day)
 
