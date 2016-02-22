@@ -38,8 +38,8 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 ## Implementation Timeline
 
-### Phase 1: Backend setup and User Authentication (0.5 days)
-[details][phase1]
+### [Phase 1: Backend setup and User Authentication (0.5 days)][phase-one]
+[details][phase-one]
 **Objective:** Functioning rails project with Authentication
 
 - [ ] create new project
