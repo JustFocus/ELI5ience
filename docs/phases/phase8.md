@@ -1,4 +1,4 @@
-# Phase 5: Start Styling (0.5 day)
+# Phase 8: Allow Complex Articles and Annotations (0.5 days)
 
 ## Rails
 ### Models
@@ -7,18 +7,15 @@
 
 
 ### Views
-CSS
 
 ## Flux
 ### Views (React Components)
 
-
 ### Stores
 
-
 ### Actions
-
 
 ### ApiUtil
 
 ## Gems/Libraries
+* markdown-js

@@ -38,8 +38,8 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 ## Implementation Timeline
 
-### [Phase 1: Backend setup and User Authentication (0.5 days)][phase-one]
-[details][phase-one]
+### Phase 1: [Backend setup and User Authentication (0.5 days)][phase-one]
+
 **Objective:** Functioning rails project with Authentication
 
 - [ ] create new project
@@ -49,7 +49,7 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 - [ ] user profile page
 - [ ] blank landing page after signin
 
-### Phase 2: Articles Model, API, and basic APIUtil (1 day)
+### Phase 2: [Articles Model, API, and basic APIUtil (1 day)][phase-two]
 
 **Objective:** Articles can be created, read, edited and destroyed through
 the API.
@@ -62,16 +62,15 @@ the API.
 - [ ] setup `APIUtil` to interact with the API
 - [ ] test out API interaction in the console.
 
-### Phase 3: Article CRUD (1 day)
+### Phase 3: [Article CRUD (1 day)][phase-three]
 
-**Objective:** Articles can be created, read, edited and destroyed with the
-user interface.
+**Objective:** Articles can be created, read, edited and destroyed with the user interface.
 
 - [ ] article creation page
 - [ ] main page w/ list of articles
 - [ ] article page
 
-### Phase 4: Comments (0.5 day)
+### Phase 4: [Comments (0.5 day)][phase-four]
 
 **Objective:** Comments belong to articles and can be viewed on articles.
 
@@ -80,7 +79,7 @@ user interface.
   - [ ] Comment CRUD
   - [ ] viewing comments on articles
 
-### Phase 5: Start Styling (0.5 day)
+### Phase 5: [Start Styling (0.5 day)][phase-five]
 
 **Objective:** Existing pages (sign up, sign in, profile, articles, and main page) will look good.
 
@@ -88,7 +87,7 @@ user interface.
 - [ ] position elements on the page
 - [ ] add basic colors & styles
 
-### Phase 6: Annotations Flux Architecture and Router (2.5 days)
+### Phase 6: [Annotations Flux Architecture and Router (2 days)][phase-six]
 
 **Objective:** Annotations belong to Articles, and can be viewed on articles.
 
@@ -102,7 +101,7 @@ user interface.
   - [ ] modify article body to include links to Annotations
 - [ ] Use CSS to style new views
 
-### Phase 7: Improvements (0.5 day)
+### Phase 7: [Improvements (1 day)][phase-seven]
 
 **Objective:** Improvements belong to annotations and can be viewed on annotations.
 
@@ -111,17 +110,16 @@ user interface.
   - [ ] Improvement CRUD
   - [ ] viewing improvements on annotations
 
-### Phase 8: Allow Complex Articles and Annotations (0.5 days)
+### Phase 8: [Allow Complex Articles and Annotations (0.5 days)][phase-eight]
 
 **objective:** Enable complex styling of articles and annotations.
 
 - [ ] Integrate `markdown-js`
 
-### Phase 9: Styling Cleanup and Seeding (1 day)
+### Phase 9: [Styling Cleanup and Seeding (1 day)][phase-nine]
 
 **objective:** Make the site feel more cohesive and awesome.
 
-- [ ] Add Bootstrap elements.
 - [ ] Get feedback on my UI from others
 - [ ] Refactor HTML classes & CSS rules
 - [ ] Add modals, transitions, and other styling flourishes.
@@ -136,3 +134,7 @@ user interface.
 [phase-three]: ./docs/phases/phase3.md
 [phase-four]: ./docs/phases/phase4.md
 [phase-five]: ./docs/phases/phase5.md
+[phase-six]: ./docs/phases/phase6.md
+[phase-seven]: ./docs/phases/phase7.md
+[phase-eight]: ./docs/phases/phase8.md
+[phase-nine]: ./docs/phases/phase9.md
