@@ -11,6 +11,7 @@
 
 ## Article Landing Page
 ![article-landing]
+
 ## Article Detail Page
 ![article-detail]
 
