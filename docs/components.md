@@ -2,12 +2,14 @@
 
 * `App`
   * `SearchIndex`
-  * `NotebooksIndex`
-    * `NotebookIndexItem`
-  * `NotebookForm`
-  * `NotesIndex`
-    * `NoteForm`
-    * `NoteIndexItem`
-  * `NoteDetail`
-    * `NoteTags`
-    * `NoteEditArea`
+  * `ArticleIndex`
+  * `ArticleItem`
+    * `CommentsIndex`
+      * `CommentForm`
+    * `AnnotationItem`
+      * `AnnotationEditArea`
+      * `ImprovementsIndex`
+        * `ImprovementsForm`
+    * `AnnotationForm`
+    * `ArticleTags`
+  * `ArticleForm`

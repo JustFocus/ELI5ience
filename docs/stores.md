@@ -1,49 +1,69 @@
 # Flux Stores
 
-### NoteStore
+### ArticleStore
 
-Holds all persisted note data.
-
-##### Actions:
-- `receiveAllNotes`
-- `receiveSingleNote`
-- `removeNote`
-
-##### Listeners:
-- `NotesIndex` (passes to `NoteIndexItem` via props)
-- `NoteDetail`
-
-### NoteFormStore
-
-Holds un-persisted note data to send to the API.
+Holds all persisted article data.
 
 ##### Actions:
-- `receiveNoteFormParams`
+- `receiveAllArticles`
+- `receiveSingleArticle`
+- `removeArticle`
 
 ##### Listeners:
-- `NoteForm`
+- `ArticlesIndex` (passes to `ArticleIndexItem` via props)
+- `ArticleDetail`
 
-### NotebookStore
+### ArticleFormStore
 
-Holds all persisted notebook data.
+Holds un-persisted article data to send to the API.
 
 ##### Actions:
-- `receiveAllNotebooks`
-- `receiveSingleNotebook`
-- `removeNotebook`
+- `receiveArticleFormParams`
 
 ##### Listeners:
-- `NotebookIndex`
+- `ArticleForm`
 
-### NotebookFormStore
+### CommentFormStore
 
-Holds un-persisted notebook data to send to the API.
+Holds un-persisted comment data to send to the API.
 
 ##### Actions:
-- `receiveNotebookFormParams`
+- `receiveCommentFormParams`
 
 ##### Listeners:
-- `NotebookForm`
+- `CommentForm`
+
+### AnnotationStore
+
+Holds all persisted annotation data.
+
+##### Actions:
+- `receiveAllAnnotations`
+- `receiveSingleAnnotation`
+- `removeAnnotation`
+
+##### Listeners:
+- `AnnotationIndex`
+
+### AnnotationFormStore
+
+Holds un-persisted annotation data to send to the API.
+
+##### Actions:
+- `receiveAnnotationFormParams`
+
+##### Listeners:
+- `AnnotationForm`
+
+### ImprovementFormStore
+
+Holds un-persisted improvement data to send to the API.
+
+##### Actions:
+- `receiveImprovementFormParams`
+
+##### Listeners:
+- `ImprovementForm`
 
 ### SearchStore
 

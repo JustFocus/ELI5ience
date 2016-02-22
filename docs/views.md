@@ -1,22 +1,25 @@
 # View Wireframes
 
-## New User
-![new-user]
+## Sign Up
+![sign-up]
 
-## New Session
-![new-session]
+## Sign In
+![sign-in]
 
-## NotesIndex / NoteIndexItem / NoteForm
-![notes]
+## Main Page
+![main-page]
 
-## NotebooksIndex / NotebookIndexItem
-![notebooks]
+## Article Landing Page
+![article-landing]
+## Article Detail Page
+![article-detail]
 
-## NotebookForm
-![notebook-form]
+## Article Form
+![article-form]
 
-[new-user]: ./wireframes/new_user.png
-[new-session]: ./wireframes/new_session.png
-[notes]: ./wireframes/root_notes.png
-[notebooks]: ./wireframes/root_notebooks.png
-[notebook-form]: ./wireframes/notebook_form.png
+[sign-up]: ./wireframes/new_user.png
+[sign-in]: ./wireframes/new_session.png
+[main-page]: ./wireframes/root.png
+[article-landing]: ./wireframes/article-landing.png
+[article-detail]: ./wireframes/article-detail.png
+[article-form]: ./wireframes/article_form.png
