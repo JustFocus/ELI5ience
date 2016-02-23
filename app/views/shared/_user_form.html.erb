@@ -1,0 +1,49 @@
+<% action = (type == :new_user) ? users_url : session_index_url %>
+<% button_text = ( type == :new_user ) ? "Create Account" : "Log In" %>
+<% header = (type == :new_user) ? "Create Account" : "Log In" %>
+
+<header>
+	<h1>ELI5Science</h1>
+</header>
+
+<header>
+	<%= link_to "Create Account", new_user_url %>
+	<%= link_to "Article List", root_url %>
+	<%= link_to "Log In", new_session_url %>
+</header>
+
+<div class="login_form">
+	<h2><%= header %></h2>
+	<form action="<%= action %>" method="POST">
+		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+		<label>Username
+		</label><br>
+		<input type="text" name="user[username]" value="<%=@user.username%>">
+		<br>
+
+		<label>Password
+		</label><br>
+		<input type="password" name="user[password]" value="<%=@user.password%>">
+		<br>
+		<input type="submit" value=" <%= button_text %>">
+	</form>
+
+	<form action=" <%= session_index_url %>" method="POST">
+		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+		<input type="hidden" value="guest_user" name="user[username]">
+
+		<input type="hidden" value="guestpassword" name="user[password]">
+
+		<input type="submit" class="guest-submit" value="Login as Guest">
+	</form>
+
+</div>
+
+<% if flash[:errors] && !current_user %>
+  <div class="errors">
+    <% flash[:errors].each do |error| %>
+      <p><b><%= error %></b></p>
+    <% end %>
+  </div>
+<% end %>
