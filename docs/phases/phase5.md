@@ -1,4 +1,4 @@
-# Phase 5: Start Styling (0.5 day)
+# Phase 5: Start Styling (1 day)
 
 ## Rails
 ### Models

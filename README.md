@@ -38,7 +38,7 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 ## Implementation Timeline
 
-### Phase 1: [Backend setup and User Authentication (0.5 days)][phase-one]
+### Phase 1: [Backend setup and User Authentication (1 day)][phase-one]
 
 **Objective:** Functioning rails project with Authentication
 
@@ -62,7 +62,7 @@ the API.
 - [ ] setup `APIUtil` to interact with the API
 - [ ] test out API interaction in the console.
 
-### Phase 3: [Article CRUD (1 day)][phase-three]
+### Phase 3: [Article CRUD (2 days)][phase-three]
 
 **Objective:** Articles can be created, read, edited and destroyed with the user interface.
 
@@ -79,7 +79,7 @@ the API.
   - [ ] Comment CRUD
   - [ ] viewing comments on articles
 
-### Phase 5: [Start Styling (0.5 day)][phase-five]
+### Phase 5: [Start Styling (1 day)][phase-five]
 
 **Objective:** Existing pages (sign up, sign in, profile, articles, and main page) will look good.
 
@@ -110,13 +110,7 @@ the API.
   - [ ] Improvement CRUD
   - [ ] viewing improvements on annotations
 
-### Phase 8: [Allow Complex Articles and Annotations (0.5 days)][phase-eight]
-
-**objective:** Enable complex styling of articles and annotations.
-
-- [ ] Integrate `markdown-js`
-
-### Phase 9: [Styling Cleanup and Seeding (1 day)][phase-nine]
+### Phase 8: [Styling Cleanup and Seeding (1 day)][phase-nine]
 
 **objective:** Make the site feel more cohesive and awesome.
 
@@ -125,6 +119,7 @@ the API.
 - [ ] Add modals, transitions, and other styling flourishes.
 
 ### Bonus Features (TBD)
+- [ ] Complex styling of articles and annotations using markdown-js.
 - [ ] Search for articles by tags or name
 - [ ] Pagination / infinite scroll for Articles Index
 - [ ] File upload for annotations

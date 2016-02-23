@@ -1,4 +1,4 @@
-# Phase 3: Article CRUD (1 day)
+# Phase 3: Article CRUD (2 days)
 
 ## Rails
 

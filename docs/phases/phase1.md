@@ -1,4 +1,4 @@
-# Phase 1: Backend setup and User Authentication (0.5 days)
+# Phase 1: Backend setup and User Authentication (1 day)
 
 ## Rails
 ### Models

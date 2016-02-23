@@ -20,8 +20,13 @@ article_id       | integer   | not null, foreign key (references articles), inde
 selection_start  | integer   | not null
 selection_length | integer   | not null
 body             | text      | not null
-upvotes          | integer   | not null
-downvotes        | integer   | not null
+
+## votes
+column name      | data type | details
+-----------------|-----------|-----------------------
+id               | integer   | not null, primary key
+vote             | boolean   | not null
+user_id          | integer   | not null, foreign key (references users), indexed
 
 ## comments
 column name      | data type | details
@@ -49,7 +54,6 @@ name        | string    | not null
 column name    | data type | details
 ---------------|-----------|-----------------------
 id             | integer   | not null, primary key
-name           | string    | not null
 article_id     | integer   | not null, foreign key (references articles), indexed, unique [tag_id]
 tag_id         | integer   | not null, foreign key (references tags), indexed
 
