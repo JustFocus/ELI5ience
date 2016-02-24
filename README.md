@@ -14,8 +14,8 @@ and React.js. ELI5ience allows users to:
 <!-- This is a Markdown checklist. Use it to keep track of your
 progress. Put an x between the brackets for a checkmark: [x] -->
 
-- [ ] Create an account
-- [ ] Log in / Log out
+- [x] Create an account
+- [x] Log in / Log out
 - [ ] Create, read, edit, and delete articles
 - [ ] Create, read, edit, and delete comments on articles
 - [ ] Create, read, edit, and delete annotations on articles
@@ -42,12 +42,12 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 **Objective:** Functioning rails project with Authentication
 
-- [ ] create new project
-- [ ] create `User` model
-- [ ] authentication
-- [ ] user signup/signin pages
-- [ ] user profile page
-- [ ] blank landing page after signin
+- [x] create new project
+- [x] create `User` model
+- [x] authentication
+- [x] user signup/signin pages
+- [x] user profile page
+- [x] blank landing page after signin
 
 ### Phase 2: [Articles Model, API, and basic APIUtil (1 day)][phase-two]
 

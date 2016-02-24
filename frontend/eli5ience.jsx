@@ -28,7 +28,7 @@ var ReactRouter = require('react-router');
 // ReactDOM.render(<App />, root);
 
 ReactDOM.render(
-      <div>
+      <div style={{color: "white"}}> 
         <header><h1>ELI5Science React Main Page</h1></header>
       </div>,
       document.getElementById('content')

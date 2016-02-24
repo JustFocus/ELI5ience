@@ -73,7 +73,7 @@
 	
 	ReactDOM.render(React.createElement(
 	  'div',
-	  null,
+	  { style: { color: "white" } },
 	  React.createElement(
 	    'header',
 	    null,

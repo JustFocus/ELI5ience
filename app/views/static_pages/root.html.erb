@@ -17,7 +17,7 @@
 					<%= link_to "Welcome, " + current_user.username, user_url(@user.id) %><br>
 					<%= link_to( "Sign Out", session_url, method: :delete, class: 'btn btn-xs btn-default' )%> <br>
 				<% else %>
-					<%= link_to "Log In", new_session_url %> <br>
+					<%= link_to "Log In / Guest", new_session_url %> <br>
 					<%= link_to "Create Account", new_user_url %>
 				<% end %>
 			</form>
@@ -36,7 +36,6 @@
     </div>
 
 		<div id="content">TEST
-
 		</div>
 
 		<hr>
@@ -44,34 +43,40 @@
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4" style="
+    background-color: white;">
           <h2>Heading</h2>
           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" style="
+    background-color: white;">
           <h2>Heading</h2>
           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
        </div>
-        <div class="col-md-4">
+        <div class="col-md-4" style="
+    background-color: white;">
           <h2>Heading</h2>
           <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div>
       </div>
 			<div class="row">
-				<div class="col-md-4">
+				<div class="col-md-4" style="
+    background-color: white;">
 					<h2>Heading</h2>
 					<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
 					<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-4" style="
+    background-color: white;">
 					<h2>Heading</h2>
 					<p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
 					<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
 			 </div>
-				<div class="col-md-4">
+				<div class="col-md-4" style="
+    background-color: white;">
 					<h2>Heading</h2>
 					<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
 					<p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
