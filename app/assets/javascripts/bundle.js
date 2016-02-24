@@ -62,7 +62,7 @@
 	//   render: function(){
 	//     return (
 	//       <div>
-	//         <header><h1>ELI5Science</h1></header>
+	//         <header><h1>ELI5cience</h1></header>
 	//       </div>
 	//     );
 	//   }
@@ -80,7 +80,7 @@
 	    React.createElement(
 	      'h1',
 	      null,
-	      'ELI5Science'
+	      'ELI5Science React Main Page'
 	    )
 	  )
 	), document.getElementById('content'));

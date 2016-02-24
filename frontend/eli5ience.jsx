@@ -18,7 +18,7 @@ var ReactRouter = require('react-router');
 //   render: function(){
 //     return (
 //       <div>
-//         <header><h1>ELI5Science</h1></header>
+//         <header><h1>ELI5cience</h1></header>
 //       </div>
 //     );
 //   }
@@ -29,7 +29,7 @@ var ReactRouter = require('react-router');
 
 ReactDOM.render(
       <div>
-        <header><h1>ELI5Science</h1></header>
+        <header><h1>ELI5Science React Main Page</h1></header>
       </div>,
       document.getElementById('content')
 );

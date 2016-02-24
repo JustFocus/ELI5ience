@@ -1,10 +1,14 @@
-<% action = (type == :new_user) ? users_url : session_index_url %>
+<% action = (type == :new_user) ? users_url : session_url %>
 <% button_text = ( type == :new_user ) ? "Create Account" : "Log In" %>
 <% header = (type == :new_user) ? "Create Account" : "Log In" %>
 
-<header>
-	<h1>ELI5Science</h1>
-</header>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="<%= root_url  %>">ELI5cience</a> 
+		</div>
+	</div>
+</nav> <br>
 
 <header>
 	<%= link_to "Create Account", new_user_url %>
@@ -12,33 +16,59 @@
 	<%= link_to "Log In", new_session_url %>
 </header>
 
-<div class="login_form">
-	<h2><%= header %></h2>
-	<form action="<%= action %>" method="POST">
+<div class="container">
+
+	<form class="form-signin" action="<%= action %>" method="POST">
+		<h2 class="form-signin-heading"><%= header %></h2>
 		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-		<label>Username
-		</label><br>
-		<input type="text" name="user[username]" value="<%=@user.username%>">
-		<br>
+		<label for="inputEmail" class="sr-only" >Username
+		</label>
+		<input type="text"
+			id="inputEmail"
+			class="form-control"
+			placeholder="Username"
+			required autofocus
+			name="user[username]"
+			value="<%=@user.username%>">
 
-		<label>Password
-		</label><br>
-		<input type="password" name="user[password]" value="<%=@user.password%>">
+		<% if from_user %>
+			<label for="inputExpertise" class="sr-only">Expertise
+			</label>
+			<input type="text"
+				id="inputExpertise"
+				class="form-control"
+				placeholder="Expertise Eg: Engineering"
+				required autofocus
+				name="user[expertise]"
+				value="<%=@user.expertise%>">
+		<% end %>
+
+		<label for="inputPassword" class="sr-only">Password
+		</label>
+		<input type="password"
+			id="inputPassword"
+			class="form-control"
+			placeholder="Password"
+			required autofocus
+			name="user[password]"
+			value="<%=@user.password%>">
 		<br>
-		<input type="submit" value=" <%= button_text %>">
+		<input type="submit" class="btn btn-primary" value="<%= button_text %>">
 	</form>
-
-	<form action=" <%= session_index_url %>" method="POST">
+	<br>
+	<form action=" <%= session_url %>" method="POST">
 		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
 		<input type="hidden" value="guest_user" name="user[username]">
 
 		<input type="hidden" value="guestpassword" name="user[password]">
 
-		<input type="submit" class="guest-submit" value="Login as Guest">
+		<input type="submit" class="btn btn-success" class="guest-submit" value="Log In as Guest">
+
 	</form>
 
 </div>
+
 
 <% if flash[:errors] && !current_user %>
   <div class="errors">

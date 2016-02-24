@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ELI5ience</title>
+
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+
+  <title>ELI5ience</title>
+
 </head>
 <body>
 
@@ -11,9 +14,16 @@
 
   <%= flash[:errors].join("<br>").html_safe if flash[:errors] %>
 
-<%= yield %>
 
+
+  <%= yield %>
+
+  <footer class="navbar navbar-fixed-bottom">
+    <hr>
+    <p>2016 Colin McMahon</p>
+  </footer>
 
   <%= javascript_include_tag 'application' %>
+
 </body>
 </html>
