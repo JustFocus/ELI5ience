@@ -1,27 +1,63 @@
 var ApiActions = require('../actions/api_actions');
 
 var ApiUtil = {
-  fetchUsers: function(){
-    $.get('api/users', function(users){
-      ApiActions.receiveAll(users);
-    });
-  },
-  fetchUser: function(){
-    $.get('api/users/:id', function(user){
-      ApiActions.receiveAll(user);
-    });
-  },
-  createUser: function(data){
-    $.post('api/users', { user: data }, function(user) {
-      ApiActions.receiveAll([user]);
-    });
-  }
-  // TODO: Create Articles API
-  // createArticle: function(data) {
-  //   $.post('api/reviews', { review: data }, function (bench) {
-  //     ApiActions.receiveAll([bench]);
+  // TODO: Users API?
+  // fetchUsers: function(){
+  //   $.get('api/users', function(users){
+  //     ApiActions.receiveAll(users);
+  //   });
+  // },
+  // fetchUser: function(){
+  //   $.get('api/users/:id', function(user){
+  //     ApiActions.receiveAll(user);
+  //   });
+  // },
+  // createUser: function(data){
+  //   $.post('api/users', { user: data }, function(user) {
+  //     ApiActions.receiveAll([user]);
   //   });
   // }
+
+  createArticle: function(data) {
+    $.post('api/articles', { article: data }, function (article) {
+      ApiActions.receiveSingle([article]);
+    });
+  },
+  fetchArticles: function() {
+    $.get('api/articles', function(articles){
+      ApiActions.receiveAll(articles);
+    });
+  },
+  fetchArticle: function(id) {
+    $.get('api/articles/' + id, function(article){
+      ApiActions.receiveSingle(article);
+    });
+  },
+  removeArticle: function(id) {
+    $.ajax({
+      url: 'api/articles/' + id,
+      type: 'DELETE',
+      success: function(article){
+        ApiActions.removeSingle(article);
+      }
+    });
+  },
+  updateArticle: function(data) {
+    $.ajax({
+      url: 'api/articles/' + data.id,
+      data: {article: data.params},
+      type: 'PATCH',
+      success: function(article){
+        ApiActions.receiveSingle(article);
+      }
+    });
+  },
+
+  fetchUser: function(id) {
+    $.get('api/users/' + id, function(user){
+      ApiActions.receiveSingleUser(user);
+    });
+  },
 };
 
 module.exports = ApiUtil;

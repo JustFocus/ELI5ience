@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactRouter = require('react-router');
-var Review = require('./Review');
+var Article = require('./Article');
 
 var User = React.createClass({
 	render: function() {

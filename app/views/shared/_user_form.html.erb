@@ -1,6 +1,6 @@
-<% action = (type == :new_user) ? users_url : session_url %>
-<% button_text = ( type == :new_user ) ? "Create Account" : "Log In" %>
-<% header = (type == :new_user) ? "Create Account" : "Log In" %>
+<% action = (:from_user) ? users_url : session_url %>
+<% button_text = (:from_user) ? "Create Account" : "Log In" %>
+<% header = (:from_user) ? "Create Account" : "Log In" %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">

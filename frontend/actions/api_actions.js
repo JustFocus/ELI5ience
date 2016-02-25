@@ -1,13 +1,31 @@
 var AppDispatcher = require('../dispatcher/dispatcher');
-var UserConstants = require('../constants/user_constants');
+var ArticleConstants = require('../constants/article_constants');
 
 var ApiActions = {
-  receiveAll: function(users){
+  receiveAll: function(articles){
     AppDispatcher.dispatch({
-      actionType: UserConstants.USER_RECEIVED,
-      users: users
+      actionType: ArticleConstants.ARTICLES_RECEIVED,
+      articles: articles
     });
-  }
+  },
+  receiveSingle: function(article){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.ARTICLE_RECEIVED,
+      article: article
+    });
+  },
+  removeSingle: function(article){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.ARTICLE_REMOVED,
+      article: article
+    });
+  },
+  receiveSingleUser: function(user){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.USER_RECEIVED,
+      user: user
+    });
+  },
 };
 
 module.exports = ApiActions;

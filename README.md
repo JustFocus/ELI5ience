@@ -54,13 +54,13 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 **Objective:** Articles can be created, read, edited and destroyed through
 the API.
 
-- [ ] create `Article` model
-- [ ] seed the database with a small amount of test data
-- [ ] CRUD API for articles (`ArticlesController`)
-- [ ] jBuilder views for articles
-- [ ] setup Webpack & Flux scaffold
-- [ ] setup `APIUtil` to interact with the API
-- [ ] test out API interaction in the console.
+- [x] create `Article` model
+- [x] seed the database with a small amount of test data
+- [x] CRUD API for articles (`ArticlesController`)
+- [x] jBuilder views for articles
+- [x] setup Webpack & Flux scaffold
+- [x] setup `APIUtil` to interact with the API
+- [x] test out API interaction in the console.
 
 ### Phase 3: [Article CRUD (2 days)][phase-three]
 
