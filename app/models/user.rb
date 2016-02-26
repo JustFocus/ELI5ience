@@ -5,10 +5,9 @@ class User < ActiveRecord::Base
 	has_many :articles,
 	foreign_key: "author_id"
 
-	attr_reader :password
+	has_many :comments
 
-	# TODO: User Associations
-	# has_many :articles
+	attr_reader :password
 
 	after_initialize :ensure_session_token
 

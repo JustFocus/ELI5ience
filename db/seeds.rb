@@ -104,3 +104,45 @@ JIT compilation is a combination of the two traditional approaches to translatio
   author_id: 3,
   locked: false,
 )
+
+Comment.create!(
+  body: "Great article!",
+	user_id: "2",
+	article_id: "1",
+)
+
+Comment.create!(
+  body: "This is a comment",
+	user_id: "3",
+	article_id: "1",
+)
+
+Comment.create!(
+  body: "Thanks",
+	user_id: "1",
+	article_id: "1",
+)
+
+Comment.create!(
+  body: "I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste! I wrote a really long angry comment with copy paste!",
+	user_id: "3",
+	article_id: "2",
+)
+
+Comment.create!(
+  body: "Come check out my article",
+	user_id: "2",
+	article_id: "3",
+)
+
+Comment.create!(
+  body: "Test comment",
+	user_id: "1",
+	article_id: "4",
+)
+
+Comment.create!(
+  body: "Article 5 has a comment",
+	user_id: "1",
+	article_id: "5",
+)

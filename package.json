@@ -34,7 +34,8 @@
     "react": "^0.14.2",
     "react-addons-linked-state-mixin": "^0.14.2",
     "react-dom": "^0.14.2",
-    "react-router": "^1.0.0-rc4"
+    "react-router": "^1.0.0-rc4",
+    "webpack": "^1.12.2"
   },
   "engines": {
   "node": "4.1.1",
