@@ -9,23 +9,31 @@ var ArticleShow = React.createClass({
 
 	getInitialState: function() {
 		var articleId = this.props.params.articleId;
-		var authorId = null;
 		var article = this._findArticleById(articleId) || {};
-		var author = this._findAuthorById(authorId) || {};
-		return {article: article, author: author};
+		return {article: article};
 	},
 
 	componentDidMount: function () {
-		this.authorListener = ArticleStore.addListener(this._onChange);
-		ApiUtil.fetchUser();
+		// TODO: only fetch articles if we don't have user info in _findArticleById
+		this.articleListener = ArticleStore.addListener(this._onChange);
+		ApiUtil.fetchArticles();
 	},
 
 	componentWillUnmount: function() {
-		this.authorListener.remove();
+		this.articleListener.remove();
+	},
+
+	componentWillReceiveProps: function (propUpdate) {
+		this.setState({
+			articleId: propUpdate.params.articleId,
+			article: this._findArticleById(propUpdate.params.articleId)
+		});
 	},
 
 	_onChange: function () {
-		this.setState({ author: ArticleStore.authors() });
+		this.setState({
+			article: this._findArticleById(this.props.params.articleId) || {}
+		});
 	},
 
 	_findArticleById: function(id) {
@@ -38,36 +46,36 @@ var ArticleShow = React.createClass({
 		return foundArticle;
 	},
 
-	_findAuthorById: function(authorId) {
-		var foundAuthor;
-		ArticleStore.authors().forEach(function (author) {
-			if (authorId == this.state.article.author_id) {
-				foundAuthor = author;
-			}
-		}.bind(this));
-		return foundAuthor;
-	},
-
 	render: function() {
-		var article = this.props.article;
-
+		// var article = this.props.article;
 		return (
 			<div style={{backgroundColor: '#FFFFFF'}}>
 				<br></br>
 				<br></br>
-				{this.state.article.title}
+				<h1>
+					{this.state.article.title}
+				</h1>
 				<br></br>
 				<br></br>
-				{this.state.article.body}
+				<span>
+					{this.state.article.body}
+				</span>
 				<br></br>
 				<br></br>
 				{this.state.article.image_link}
 				<br></br>
 				{this.state.article.background_link}
 				<br></br>
-				{this.state.article.author_id}
-				<br></br>
-				{this.state.article.locked}
+				<span>
+					{this.state.article.author_id}
+					<br></br>
+					{this.state.article.locked}
+					<br></br>
+					<br></br>
+					{this.state.article.username}
+					<br></br>
+					{this.state.article.expertise}
+				</span>
 			</div>
 		);
 	}

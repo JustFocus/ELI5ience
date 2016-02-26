@@ -8,13 +8,12 @@ var IndexRoute = ReactRouter.IndexRoute;
 var ArticleShow = require('./components/ArticleShow');
 var ArticleForm = require('./components/ArticleForm');
 var ArticleIndex = require('./components/ArticleIndex');
+var UserShow = require('./components/UserShow');
 
 //TODO: Search
 // var Search = require('./components/Search');
 
 //TODO: Routing
-
-var root = document.getElementById('content');
 
 var App = React.createClass({
   render: function(){
@@ -26,7 +25,7 @@ var App = React.createClass({
   }
 });
 
-ReactDOM.render(<App />, root);
+// ReactDOM.render(<App />, root);
 
 // ReactDOM.render(
 //       <div style={{color: "white"}}>
@@ -43,11 +42,17 @@ var routes = (
   <Route path="/" component={App}>
     <IndexRoute component={ArticleIndex}/>
     <Route path="articles/new" component={ArticleForm}/>
+    <Route path="users/:userId" component={UserShow }/>
     <Route path="articles/:articleId" component={ArticleShow}>
     </Route>
   </Route>
 );
-ReactDOM.render(<Router>{routes}</Router>, root);
+
+window.loadApp = function () {
+  var root = document.getElementById('content');
+
+  ReactDOM.render(<Router>{routes}</Router>, root);
+};
 
 // TODO: Routing Future Routes
 // <Route path="annotation" component={AnnotationShow}>

@@ -4,24 +4,20 @@
 
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+  <%= javascript_include_tag 'application' %>
 
   <title>ELI5ience</title>
 
 </head>
 <body>
 
-  <!--TODO: user login/logout links  -->
-
   <%= flash[:errors].join("<br>").html_safe if flash[:errors] %>
-
-
 
   <%= yield %>
   <footer class="navbar navbar-fixed-bottom">
     <p>2016 Colin McMahon</p>
   </footer>
 
-  <%= javascript_include_tag 'application' %>
 
 </body>
 </html>

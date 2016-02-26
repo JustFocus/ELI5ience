@@ -54,13 +54,12 @@
 	var ArticleShow = __webpack_require__(237);
 	var ArticleForm = __webpack_require__(217);
 	var ArticleIndex = __webpack_require__(218);
+	var UserShow = __webpack_require__(238);
 	
 	//TODO: Search
 	// var Search = require('./components/Search');
 	
 	//TODO: Routing
-	
-	var root = document.getElementById('content');
 	
 	var App = React.createClass({
 	  displayName: 'App',
@@ -74,7 +73,7 @@
 	  }
 	});
 	
-	ReactDOM.render(React.createElement(App, null), root);
+	// ReactDOM.render(<App />, root);
 	
 	// ReactDOM.render(
 	//       <div style={{color: "white"}}>
@@ -92,13 +91,19 @@
 	  { path: '/', component: App },
 	  React.createElement(IndexRoute, { component: ArticleIndex }),
 	  React.createElement(Route, { path: 'articles/new', component: ArticleForm }),
+	  React.createElement(Route, { path: 'users/:userId', component: UserShow }),
 	  React.createElement(Route, { path: 'articles/:articleId', component: ArticleShow })
 	);
-	ReactDOM.render(React.createElement(
-	  Router,
-	  null,
-	  routes
-	), root);
+	
+	window.loadApp = function () {
+	  var root = document.getElementById('content');
+	
+	  ReactDOM.render(React.createElement(
+	    Router,
+	    null,
+	    routes
+	  ), root);
+	};
 	
 	// TODO: Routing Future Routes
 	// <Route path="annotation" component={AnnotationShow}>
@@ -24382,7 +24387,7 @@
 	
 	  createArticle: function (data) {
 	    $.post('api/articles', { article: data }, function (article) {
-	      ApiActions.receiveSingle([article]);
+	      ApiActions.receiveSingle(article);
 	    });
 	  },
 	  fetchArticles: function () {
@@ -24796,18 +24801,104 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var ReactRouter = __webpack_require__(159);
+	var ApiUtil = __webpack_require__(208);
+	var LinkedStateMixin = __webpack_require__(239);
+	var ArticleStore = __webpack_require__(219);
 	
 	var ArticleForm = React.createClass({
 		displayName: 'ArticleForm',
 	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
+		getInitialState: function () {
+			return {
+				title: "",
+				body: "",
+				imageLink: "",
+				backgroundLink: "",
+				article: null
+			};
+		},
+	
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var article = {
+				title: this.state.title,
+				body: this.state.body,
+				image_link: this.state.imageLink,
+				background_link: this.state.backgroundLink
+			};
+			ApiUtil.createArticle(article);
+		},
+		componentDidMount: function () {
+			this.articleStoreListener = ArticleStore.addListener(this._onChange);
+		},
+		componentWillUnmount: function () {
+			this.articleStoreListener.remove();
+		},
+		_onChange: function () {
+			this.setState({ article: ArticleStore.mostRecent() });
+			this.navigateToArticle();
+		},
+		navigateToArticle: function () {
+			this.props.history.pushState(null, "articles/" + this.state.article.id);
+		},
+		navigateToHome: function () {
+			this.props.history.pushState(null, "/");
+		},
+		handleCancel: function (event) {
+			event.preventDefault();
+			this.navigateToHome();
+		},
 		render: function () {
 			return React.createElement(
 				'div',
-				{ style: { backgroundColor: '#FFFFFF' } },
-				React.createElement('br', null),
-				React.createElement('br', null),
-				'ArticleForm'
+				null,
+				React.createElement(
+					'h3',
+					null,
+					'Create An Article!'
+				),
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement(
+						'label',
+						null,
+						'Title'
+					),
+					React.createElement('input', { type: 'text', valueLink: this.linkState('title') }),
+					React.createElement('br', null),
+					React.createElement(
+						'label',
+						null,
+						'Body'
+					),
+					React.createElement('input', { type: 'text', valueLink: this.linkState('body') }),
+					React.createElement('br', null),
+					React.createElement(
+						'label',
+						null,
+						'Image Url'
+					),
+					React.createElement('input', { type: 'text', valueLink: this.linkState('imageLink') }),
+					React.createElement('br', null),
+					React.createElement(
+						'label',
+						null,
+						'Background Url'
+					),
+					React.createElement('input', { type: 'text', valueLink: this.linkState('backgroundLink') }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'submit', value: 'Create article' })
+				),
+				React.createElement(
+					'button',
+					{ onClick: this.handleCancel },
+					'Cancel'
+				)
 			);
 		}
 	});
@@ -24860,6 +24951,10 @@
 	    this.props.history.pushState(null, "articles/" + article.id);
 	  },
 	
+	  newArticleClick: function () {
+	    this.props.history.pushState(null, "articles/new");
+	  },
+	
 	  render: function () {
 	    var handleClick = this.handleClick;
 	    return React.createElement(
@@ -24880,6 +24975,14 @@
 	            'p',
 	            null,
 	            'ELI5ience is a web application where users can post and annotate articles. '
+	          ),
+	          React.createElement(
+	            'a',
+	            {
+	              className: 'btn btn-xs btn-primary',
+	              onClick: this.newArticleClick,
+	              role: 'button' },
+	            'Create article »'
 	          )
 	        )
 	      ),
@@ -24937,21 +25040,24 @@
 	var ArticleStore = new Store(AppDispatcher);
 	
 	var CHANGE_EVENT = "change";
-	var _articles = [];
+	var _articles = {};
 	var _users = [];
 	
 	var resetArticles = function (articles) {
-	  _articles = articles.slice(0);
+	  _articles = {};
+	  for (var i = 0; i < articles.keys.length; i++) {
+	    _articles[articles[id]] = articles[id];
+	  }
+	  return _articles;
 	};
 	
 	var resetUser = function (user) {
-	  _users = user.slice(0);
+	  _users = [];
+	  _users = user;
 	};
 	
 	var resetArticle = function (article) {
-	  //TODO: this - necessary? should _articles be [] or {}
-	  // _articles.
-	  // _articles = articles.slice(0);
+	  _articles[article[id]] = article;
 	};
 	
 	var removeArticle = function (article) {
@@ -24960,12 +25066,16 @@
 	  // _articles = articles.slice(0);
 	};
 	
+	ArticleStore.mostRecent = function () {
+	  return _recentArticle;
+	};
+	
 	ArticleStore.all = function () {
 	  return _articles.slice(0);
 	};
 	
 	ArticleStore.authors = function () {
-	  return _users.slice(0);
+	  return _users;
 	};
 	
 	ArticleStore.__onDispatch = function (payload) {
@@ -31453,23 +31563,31 @@
 	
 		getInitialState: function () {
 			var articleId = this.props.params.articleId;
-			var authorId = null;
 			var article = this._findArticleById(articleId) || {};
-			var author = this._findAuthorById(authorId) || {};
-			return { article: article, author: author };
+			return { article: article };
 		},
 	
 		componentDidMount: function () {
-			this.authorListener = ArticleStore.addListener(this._onChange);
-			ApiUtil.fetchUser();
+			// TODO: only fetch articles if we don't have user info in _findArticleById
+			this.articleListener = ArticleStore.addListener(this._onChange);
+			ApiUtil.fetchArticles();
 		},
 	
 		componentWillUnmount: function () {
-			this.authorListener.remove();
+			this.articleListener.remove();
+		},
+	
+		componentWillReceiveProps: function (propUpdate) {
+			this.setState({
+				articleId: propUpdate.params.articleId,
+				article: this._findArticleById(propUpdate.params.articleId)
+			});
 		},
 	
 		_onChange: function () {
-			this.setState({ author: ArticleStore.authors() });
+			this.setState({
+				article: this._findArticleById(this.props.params.articleId) || {}
+			});
 		},
 	
 		_findArticleById: function (id) {
@@ -31482,42 +31600,345 @@
 			return foundArticle;
 		},
 	
-		_findAuthorById: function (authorId) {
-			var foundAuthor;
-			ArticleStore.authors().forEach(function (author) {
-				if (authorId == this.state.article.author_id) {
-					foundAuthor = author;
-				}
-			}.bind(this));
-			return foundAuthor;
-		},
-	
 		render: function () {
-			var article = this.props.article;
-	
+			// var article = this.props.article;
 			return React.createElement(
 				'div',
 				{ style: { backgroundColor: '#FFFFFF' } },
 				React.createElement('br', null),
 				React.createElement('br', null),
-				this.state.article.title,
+				React.createElement(
+					'h1',
+					null,
+					this.state.article.title
+				),
 				React.createElement('br', null),
 				React.createElement('br', null),
-				this.state.article.body,
+				React.createElement(
+					'span',
+					null,
+					this.state.article.body
+				),
 				React.createElement('br', null),
 				React.createElement('br', null),
 				this.state.article.image_link,
 				React.createElement('br', null),
 				this.state.article.background_link,
 				React.createElement('br', null),
-				this.state.article.author_id,
-				React.createElement('br', null),
-				this.state.article.locked
+				React.createElement(
+					'span',
+					null,
+					this.state.article.author_id,
+					React.createElement('br', null),
+					this.state.article.locked,
+					React.createElement('br', null),
+					React.createElement('br', null),
+					this.state.article.username,
+					React.createElement('br', null),
+					this.state.article.expertise
+				)
 			);
 		}
 	});
 	
 	module.exports = ArticleShow;
+
+/***/ },
+/* 238 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ArticleStore = __webpack_require__(219);
+	var ApiUtil = __webpack_require__(208);
+	
+	var User = React.createClass({
+		displayName: 'User',
+	
+	
+		getInitialState: function () {
+			return {
+				user: ArticleStore.authors(),
+				articles: ArticleStore.all()
+			};
+		},
+	
+		componentWillUnmount: function () {
+			this.articleStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.articleStoreListener = ArticleStore.addListener(this._onChange);
+			ApiUtil.fetchArticles();
+			ApiUtil.fetchUser(this.props.params.userId);
+		},
+	
+		_onChange: function () {
+			this.setState({
+				articles: ArticleStore.all(),
+				user: ArticleStore.authors()
+			});
+		},
+	
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement('br', null),
+				React.createElement('br', null),
+				this.state.user.username,
+				React.createElement('br', null),
+				this.state.user.expertise,
+				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement(
+					'ul',
+					null,
+					this.state.user.username + "'s'",
+					' Article List',
+					this.state.articles.map(function (article) {
+						return React.createElement(
+							'li',
+							{ key: article.id },
+							article.title
+						);
+					})
+				)
+			);
+		}
+	});
+	
+	module.exports = User;
+
+/***/ },
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(240);
+
+/***/ },
+/* 240 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule LinkedStateMixin
+	 * @typechecks static-only
+	 */
+	
+	'use strict';
+	
+	var ReactLink = __webpack_require__(241);
+	var ReactStateSetters = __webpack_require__(242);
+	
+	/**
+	 * A simple mixin around ReactLink.forState().
+	 */
+	var LinkedStateMixin = {
+	  /**
+	   * Create a ReactLink that's linked to part of this component's state. The
+	   * ReactLink will have the current value of this.state[key] and will call
+	   * setState() when a change is requested.
+	   *
+	   * @param {string} key state key to update. Note: you may want to use keyOf()
+	   * if you're using Google Closure Compiler advanced mode.
+	   * @return {ReactLink} ReactLink instance linking to the state.
+	   */
+	  linkState: function (key) {
+	    return new ReactLink(this.state[key], ReactStateSetters.createStateKeySetter(this, key));
+	  }
+	};
+	
+	module.exports = LinkedStateMixin;
+
+/***/ },
+/* 241 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactLink
+	 * @typechecks static-only
+	 */
+	
+	'use strict';
+	
+	/**
+	 * ReactLink encapsulates a common pattern in which a component wants to modify
+	 * a prop received from its parent. ReactLink allows the parent to pass down a
+	 * value coupled with a callback that, when invoked, expresses an intent to
+	 * modify that value. For example:
+	 *
+	 * React.createClass({
+	 *   getInitialState: function() {
+	 *     return {value: ''};
+	 *   },
+	 *   render: function() {
+	 *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
+	 *     return <input valueLink={valueLink} />;
+	 *   },
+	 *   _handleValueChange: function(newValue) {
+	 *     this.setState({value: newValue});
+	 *   }
+	 * });
+	 *
+	 * We have provided some sugary mixins to make the creation and
+	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
+	 */
+	
+	var React = __webpack_require__(2);
+	
+	/**
+	 * @param {*} value current value of the link
+	 * @param {function} requestChange callback to request a change
+	 */
+	function ReactLink(value, requestChange) {
+	  this.value = value;
+	  this.requestChange = requestChange;
+	}
+	
+	/**
+	 * Creates a PropType that enforces the ReactLink API and optionally checks the
+	 * type of the value being passed inside the link. Example:
+	 *
+	 * MyComponent.propTypes = {
+	 *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
+	 * }
+	 */
+	function createLinkTypeChecker(linkType) {
+	  var shapes = {
+	    value: typeof linkType === 'undefined' ? React.PropTypes.any.isRequired : linkType.isRequired,
+	    requestChange: React.PropTypes.func.isRequired
+	  };
+	  return React.PropTypes.shape(shapes);
+	}
+	
+	ReactLink.PropTypes = {
+	  link: createLinkTypeChecker
+	};
+	
+	module.exports = ReactLink;
+
+/***/ },
+/* 242 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactStateSetters
+	 */
+	
+	'use strict';
+	
+	var ReactStateSetters = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (component, funcReturningState) {
+	    return function (a, b, c, d, e, f) {
+	      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
+	      if (partialState) {
+	        component.setState(partialState);
+	      }
+	    };
+	  },
+	
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (component, key) {
+	    // Memoize the setters.
+	    var cache = component.__keySetters || (component.__keySetters = {});
+	    return cache[key] || (cache[key] = createStateKeySetter(component, key));
+	  }
+	};
+	
+	function createStateKeySetter(component, key) {
+	  // Partial state is allocated outside of the function closure so it can be
+	  // reused with every call, avoiding memory allocation when this function
+	  // is called.
+	  var partialState = {};
+	  return function stateKeySetter(value) {
+	    partialState[key] = value;
+	    component.setState(partialState);
+	  };
+	}
+	
+	ReactStateSetters.Mixin = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateSetter(function(xValue) {
+	   *     return {x: xValue};
+	   *   })(1);
+	   *
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (funcReturningState) {
+	    return ReactStateSetters.createStateSetter(this, funcReturningState);
+	  },
+	
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateKeySetter('x')(1);
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (key) {
+	    return ReactStateSetters.createStateKeySetter(this, key);
+	  }
+	};
+	
+	module.exports = ReactStateSetters;
 
 /***/ }
 /******/ ]);

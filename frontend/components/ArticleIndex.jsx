@@ -39,6 +39,10 @@ var ArticleIndex = React.createClass({
     this.props.history.pushState(null, "articles/" + article.id );
   },
 
+  newArticleClick: function() {
+    this.props.history.pushState(null, "articles/new");
+  },
+
 	render: function(){
     var handleClick = this.handleClick;
 		return(
@@ -47,6 +51,12 @@ var ArticleIndex = React.createClass({
           <div className="container">
             <h1>Welcome to ELI5ience!</h1>
             <p>ELI5ience is a web application where users can post and annotate articles. </p>
+            <a
+              className="btn btn-xs btn-primary"
+              onClick={this.newArticleClick}
+              role="button">
+              Create article &raquo;
+            </a>
           </div>
         </div>
 

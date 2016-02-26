@@ -22,6 +22,9 @@ class Api::ArticlesController < ApplicationController
 	end
 
   def create
+		article = params[:article]
+		article[:author_id] = current_user.id
+		#TODO: Add error if user is not logged in
     article = Article.create!(article_params)
     render json: article
   end

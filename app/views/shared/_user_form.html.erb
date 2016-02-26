@@ -1,6 +1,6 @@
-<% action = (:from_user) ? users_url : session_url %>
-<% button_text = (:from_user) ? "Create Account" : "Log In" %>
-<% header = (:from_user) ? "Create Account" : "Log In" %>
+<% action = (from_user) ? users_url : session_url %>
+<% button_text = (from_user) ? "Create Account" : "Log In"%>
+<% header = (from_user) ? "Create Account" : "Log In" %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
@@ -61,7 +61,7 @@
 
 		<input type="hidden" value="guest_user" name="user[username]">
 
-		<input type="hidden" value="guestpassword" name="user[password]">
+		<input type="hidden" value="guestguest" name="user[password]">
 
 		<input type="submit" class="btn btn-default" class="guest-submit" value="Log In as Guest">
 

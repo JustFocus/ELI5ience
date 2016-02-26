@@ -1,3 +1,29 @@
-<%= @user.username %>
-<br>
-<%= @user.expertise %>
+<section style={{backgroundColor: '#FFFFFF'}>
+	<%= render "shared/navbar"%>
+	<br>
+	<br>
+	<%= @user.username %>
+	<br>
+	<%= @user.expertise %>
+
+	<br>
+	<a
+		className="btn btn-xs btn-primary"
+		id="myDiv"
+		role="button">
+		Create article &raquo;
+	</a>
+</section>
+
+<section>
+	Article List
+	<%  %>
+</section>
+
+<script>
+	$('#myDiv').click(divFunction);
+
+	function divFunction(){
+	 window.location = '/#/articles/new'
+	}
+</script>

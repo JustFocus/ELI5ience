@@ -20,7 +20,7 @@ var ApiUtil = {
 
   createArticle: function(data) {
     $.post('api/articles', { article: data }, function (article) {
-      ApiActions.receiveSingle([article]);
+      ApiActions.receiveSingle(article);
     });
   },
   fetchArticles: function() {
