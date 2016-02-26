@@ -29,7 +29,16 @@ var User = React.createClass({
 		 });
 	},
 
+	handleClick: function (article) {
+		if (confirm("Are you sure you want to delete your " + article.title + " article?")) {
+			this.articleStoreListener = ArticleStore.addListener(this._onChange);
+			ApiUtil.removeArticle(article.id);
+			ApiUtil.fetchArticles();
+  	}
+  },
+
 	render: function() {
+		var handleClick = this.handleClick;
 		return (
 			<div>
 				<br></br>
@@ -43,7 +52,18 @@ var User = React.createClass({
 				<ul>
 					{this.state.user.username + "'s'"} Article List
 					{this.state.articles.map(function(article){
-						return (<li key={article.id}>{article.title}</li>);
+						var boundClick = handleClick.bind(null, article);
+						return (
+							<li key={article.id}>{article.title + "    "}
+								<a
+									className="btn btn-xs btn-danger"
+									onClick={boundClick}
+									article={article}
+									role="button">
+									Delete
+								</a>
+							</li>
+						);
 					})}
 				</ul>
 			</div>

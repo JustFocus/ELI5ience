@@ -25040,24 +25040,22 @@
 	var ArticleStore = new Store(AppDispatcher);
 	
 	var CHANGE_EVENT = "change";
-	var _articles = {};
-	var _users = [];
+	var _articles = [];
+	var _user = [];
+	var _recentArticle = null;
 	
 	var resetArticles = function (articles) {
-	  _articles = {};
-	  for (var i = 0; i < articles.keys.length; i++) {
-	    _articles[articles[id]] = articles[id];
-	  }
-	  return _articles;
+	  _articles = articles.slice(0);
 	};
 	
 	var resetUser = function (user) {
-	  _users = [];
-	  _users = user;
+	  _user = [];
+	  _user = user;
 	};
 	
 	var resetArticle = function (article) {
-	  _articles[article[id]] = article;
+	  _articles.push(article);
+	  _recentArticle = article;
 	};
 	
 	var removeArticle = function (article) {
@@ -25075,7 +25073,7 @@
 	};
 	
 	ArticleStore.authors = function () {
-	  return _users;
+	  return _user;
 	};
 	
 	ArticleStore.__onDispatch = function (payload) {
@@ -31680,7 +31678,16 @@
 			});
 		},
 	
+		handleClick: function (article) {
+			if (confirm("Are you sure you want to delete your " + article.title + " article?")) {
+				this.articleStoreListener = ArticleStore.addListener(this._onChange);
+				ApiUtil.removeArticle(article.id);
+				ApiUtil.fetchArticles();
+			}
+		},
+	
 		render: function () {
+			var handleClick = this.handleClick;
 			return React.createElement(
 				'div',
 				null,
@@ -31697,10 +31704,20 @@
 					this.state.user.username + "'s'",
 					' Article List',
 					this.state.articles.map(function (article) {
+						var boundClick = handleClick.bind(null, article);
 						return React.createElement(
 							'li',
 							{ key: article.id },
-							article.title
+							article.title + "    ",
+							React.createElement(
+								'a',
+								{
+									className: 'btn btn-xs btn-danger',
+									onClick: boundClick,
+									article: article,
+									role: 'button' },
+								'Delete'
+							)
 						);
 					})
 				)

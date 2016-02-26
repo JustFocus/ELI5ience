@@ -5,24 +5,22 @@ var AppDispatcher = require('../dispatcher/dispatcher');
 var ArticleStore = new Store(AppDispatcher);
 
 var CHANGE_EVENT = "change";
-var _articles = {};
-var _users = [];
+var _articles = [];
+var _user = [];
+var _recentArticle = null;
 
 var resetArticles = function(articles){
-  _articles = {};
-  for (var i = 0; i < articles.keys.length; i++) {
-    _articles[articles[id]] = articles[id];
-  }
-  return _articles
+  _articles = articles.slice(0);
 };
 
 var resetUser = function(user){
-  _users = [];
-  _users = user;
+  _user = [];
+  _user = user;
 };
 
 var resetArticle = function(article){
-	_articles[article[id]] = article;
+	_articles.push(article);
+  _recentArticle = article;
 };
 
 var removeArticle = function(article){
@@ -40,7 +38,7 @@ ArticleStore.all = function () {
 };
 
 ArticleStore.authors = function () {
-  return _users;
+  return _user;
 };
 
 ArticleStore.__onDispatch = function (payload) {
