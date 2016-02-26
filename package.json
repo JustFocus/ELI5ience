@@ -35,7 +35,10 @@
     "react-addons-linked-state-mixin": "^0.14.2",
     "react-dom": "^0.14.2",
     "react-router": "^1.0.0-rc4",
-    "webpack": "^1.12.2"
+    "webpack": "^1.12.2",
+    "babel-core": "^6.2.0",
+    "babel-loader": "^6.2.0",
+    "babel-preset-react": "^6.1.18"
   },
   "engines": {
   "node": "4.1.1",
