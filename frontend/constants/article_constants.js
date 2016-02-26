@@ -3,6 +3,7 @@ var ArticleConstants = {
   ARTICLES_RECEIVED: "ARTICLES_RECEIVED",
   ARTICLE_REMOVED: "ARTICLE_REMOVED",
   USER_RECEIVED: "USER_RECEIVED",
+  COMMENT_RECEIVED: "USER_RECEIVED",
 };
 
 module.exports = ArticleConstants;

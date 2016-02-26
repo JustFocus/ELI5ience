@@ -18,6 +18,21 @@ var ApiUtil = {
   //   });
   // }
 
+  createComment: function(data) {
+    $.post('api/comments', { comment: data }, function (comment) {
+      ApiActions.receiveSingle(comment);
+    });
+  },
+  removeComment: function(id) {
+    $.ajax({
+      url: 'api/comments/' + id,
+      type: 'DELETE',
+      success: function(comment){
+        ApiActions.removeSingle(comment);
+      }
+    });
+  },
+
   createArticle: function(data) {
     $.post('api/articles', { article: data }, function (article) {
       ApiActions.receiveSingle(article);

@@ -3,13 +3,14 @@ var ReactRouter = require('react-router');
 var ApiUtil = require('../utils/api_util');
 var ArticleForm = require('./ArticleForm');
 var ArticleStore = require('../stores/article');
-
+var CommentForm = require('./CommentForm');
+var CommentIndex = require('./CommentIndex.jsx');
 
 var ArticleShow = React.createClass({
 
 	getInitialState: function() {
 		var articleId = this.props.params.articleId;
-		var article = this._findArticleById(articleId) || {};
+		var article = this._findArticleById(articleId) || {comments:  []};
 		return {article: article};
 	},
 
@@ -43,11 +44,14 @@ var ArticleShow = React.createClass({
 				foundArticle = article;
 			}
 		}.bind(this));
+
 		return foundArticle;
+
 	},
 
 	render: function() {
 		// var article = this.props.article;
+		var handleClick = this.handleClick;
 		return (
 			<div style={{backgroundColor: '#FFFFFF'}}>
 				<br></br>
@@ -75,6 +79,17 @@ var ArticleShow = React.createClass({
 					{this.state.article.username}
 					<br></br>
 					{this.state.article.expertise}
+				</span>
+				<br></br>
+				<br></br>
+				<span>
+					<CommentForm articleId={this.props.params.articleId} />
+
+				</span>
+				<br></br>
+				<br></br>
+				<span>
+					<CommentIndex comments={this.state.article.comments}/>
 				</span>
 			</div>
 		);

@@ -1,5 +1,5 @@
 class Comment < ActiveRecord::Base
-	validates :user_id, :article_id, presence: true
+	validates :body, :user_id, :article_id, presence: true
 
 	belongs_to :user
 

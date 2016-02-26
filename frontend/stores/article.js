@@ -29,6 +29,15 @@ var removeArticle = function(article){
   // _articles = articles.slice(0);
 };
 
+var insertComment = function(comment) {
+  _articles.forEach(function(article){
+    if (article.id === comment.article_id) {
+      article.comments.push(comment);
+    }
+  })
+  return _articles;
+};
+
 ArticleStore.mostRecent = function() {
   return _recentArticle;
 };
@@ -44,19 +53,23 @@ ArticleStore.authors = function () {
 ArticleStore.__onDispatch = function (payload) {
   switch(payload.actionType) {
     case ArticleConstants.ARTICLES_RECEIVED:
-      var result = resetArticles(payload.articles);
+      resetArticles(payload.articles);
       ArticleStore.__emitChange();
       break;
 		case ArticleConstants.ARTICLE_RECEIVED:
-			result = resetArticle(payload.article);
+			resetArticle(payload.article);
 			ArticleStore.__emitChange();
 			break;
 		case ArticleConstants.ARTICLE_REMOVED:
-			result = removeArticle(payload.article);
+			removeArticle(payload.article);
 			ArticleStore.__emitChange();
 			break;
     case ArticleConstants.USER_RECEIVED:
-      result = resetUser(payload.user);
+      resetUser(payload.user);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.COMMENT_RECEIVED:
+      insertComment(payload.comment);
       ArticleStore.__emitChange();
       break;
   }

@@ -1,6 +1,6 @@
 class Api::ArticlesController < ApplicationController
 	def index
-    @articles = Article.includes(:user)
+    @articles = Article.includes(:user, :comments)
 
 			# TODO: search
 	    # if(bounds)
@@ -17,7 +17,7 @@ class Api::ArticlesController < ApplicationController
   end
 
 	def show
-		article = Article.find_by(id: params[:id])
+		article = Article.includes(:comments).find_by(id: params[:id])
 		render json: article
 	end
 

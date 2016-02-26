@@ -11,7 +11,7 @@ class Api::CommentsController < ApplicationController
 
   def create
 		comment = params[:comment]
-		comment[:author_id] = current_user.id
+		comment[:user_id] = current_user.id
 		#TODO: Add error if user is not logged in
     comment = Comment.create!(comment_params)
     render json: comment

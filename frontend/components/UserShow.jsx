@@ -17,9 +17,11 @@ var User = React.createClass({
 	},
 
 	componentDidMount: function () {
+		// this.articleStoreUserListener = ArticleStore.addListener();
 		this.articleStoreListener = ArticleStore.addListener(this._onChange);
-		ApiUtil.fetchArticles();
 		ApiUtil.fetchUser(this.props.params.userId);
+		ApiUtil.fetchArticles();
+		// ApiUtil.fetchArticles();
 	},
 
 	_onChange: function () {
@@ -43,6 +45,7 @@ var User = React.createClass({
 
 	render: function() {
 		var handleClick = this.handleClick;
+		var user = this.state.user;
 		return (
 			<div>
 				<br></br>
@@ -69,18 +72,20 @@ var User = React.createClass({
 
 					{this.state.articles.map(function(article){
 						var boundClick = handleClick.bind(null, article);
-						return (
-							<li key={article.id}>{article.title + "    "}
-								<a
-									className="btn btn-xs btn-danger"
-									onClick={boundClick}
-									article={article}
-									role="button">
-									Delete
-								</a>
-							</li>
-						);
-					})}
+						if (article.author_id === this.state.user.id) {
+							return (
+								<li key={article.id}>{article.title + "    "}
+									<a
+										className="btn btn-xs btn-danger"
+										onClick={boundClick}
+										article={article}
+										role="button">
+										Delete
+									</a>
+								</li>
+							);
+						}
+					}.bind(this))}
 				</ul>
 			</div>
 		);

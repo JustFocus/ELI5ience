@@ -24385,6 +24385,21 @@
 	  //   });
 	  // }
 	
+	  createComment: function (data) {
+	    $.post('api/comments', { comment: data }, function (comment) {
+	      ApiActions.receiveSingle(comment);
+	    });
+	  },
+	  removeComment: function (id) {
+	    $.ajax({
+	      url: 'api/comments/' + id,
+	      type: 'DELETE',
+	      success: function (comment) {
+	        ApiActions.removeSingle(comment);
+	      }
+	    });
+	  },
+	
 	  createArticle: function (data) {
 	    $.post('api/articles', { article: data }, function (article) {
 	      ApiActions.receiveSingle(article);
@@ -24459,6 +24474,12 @@
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.USER_RECEIVED,
 	      user: user
+	    });
+	  },
+	  receiveSingleComment: function (comment) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.COMMENT_RECEIVED,
+	      comment: comment
 	    });
 	  }
 	};
@@ -24789,7 +24810,8 @@
 	  ARTICLE_RECEIVED: "ARTICLE_RECEIVED",
 	  ARTICLES_RECEIVED: "ARTICLES_RECEIVED",
 	  ARTICLE_REMOVED: "ARTICLE_REMOVED",
-	  USER_RECEIVED: "USER_RECEIVED"
+	  USER_RECEIVED: "USER_RECEIVED",
+	  COMMENT_RECEIVED: "USER_RECEIVED"
 	};
 	
 	module.exports = ArticleConstants;
@@ -25064,6 +25086,15 @@
 	  // _articles = articles.slice(0);
 	};
 	
+	var insertComment = function (comment) {
+	  _articles.forEach(function (article) {
+	    if (article.id === comment.article_id) {
+	      article.comments.push(comment);
+	    }
+	  });
+	  return _articles;
+	};
+	
 	ArticleStore.mostRecent = function () {
 	  return _recentArticle;
 	};
@@ -25079,19 +25110,23 @@
 	ArticleStore.__onDispatch = function (payload) {
 	  switch (payload.actionType) {
 	    case ArticleConstants.ARTICLES_RECEIVED:
-	      var result = resetArticles(payload.articles);
+	      resetArticles(payload.articles);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.ARTICLE_RECEIVED:
-	      result = resetArticle(payload.article);
+	      resetArticle(payload.article);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.ARTICLE_REMOVED:
-	      result = removeArticle(payload.article);
+	      removeArticle(payload.article);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.USER_RECEIVED:
-	      result = resetUser(payload.user);
+	      resetUser(payload.user);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.COMMENT_RECEIVED:
+	      insertComment(payload.comment);
 	      ArticleStore.__emitChange();
 	      break;
 	  }
@@ -31554,6 +31589,8 @@
 	var ApiUtil = __webpack_require__(208);
 	var ArticleForm = __webpack_require__(217);
 	var ArticleStore = __webpack_require__(219);
+	var CommentForm = __webpack_require__(243);
+	var CommentIndex = __webpack_require__(245);
 	
 	var ArticleShow = React.createClass({
 		displayName: 'ArticleShow',
@@ -31561,7 +31598,7 @@
 	
 		getInitialState: function () {
 			var articleId = this.props.params.articleId;
-			var article = this._findArticleById(articleId) || {};
+			var article = this._findArticleById(articleId) || { comments: [] };
 			return { article: article };
 		},
 	
@@ -31595,11 +31632,13 @@
 					foundArticle = article;
 				}
 			}.bind(this));
+	
 			return foundArticle;
 		},
 	
 		render: function () {
 			// var article = this.props.article;
+			var handleClick = this.handleClick;
 			return React.createElement(
 				'div',
 				{ style: { backgroundColor: '#FFFFFF' } },
@@ -31634,6 +31673,20 @@
 					this.state.article.username,
 					React.createElement('br', null),
 					this.state.article.expertise
+				),
+				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement(
+					'span',
+					null,
+					React.createElement(CommentForm, { articleId: this.props.params.articleId })
+				),
+				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement(
+					'span',
+					null,
+					React.createElement(CommentIndex, { comments: this.state.article.comments })
 				)
 			);
 		}
@@ -31666,9 +31719,11 @@
 		},
 	
 		componentDidMount: function () {
+			// this.articleStoreUserListener = ArticleStore.addListener();
 			this.articleStoreListener = ArticleStore.addListener(this._onChange);
-			ApiUtil.fetchArticles();
 			ApiUtil.fetchUser(this.props.params.userId);
+			ApiUtil.fetchArticles();
+			// ApiUtil.fetchArticles();
 		},
 	
 		_onChange: function () {
@@ -31692,6 +31747,7 @@
 	
 		render: function () {
 			var handleClick = this.handleClick;
+			var user = this.state.user;
 			return React.createElement(
 				'div',
 				null,
@@ -31721,21 +31777,23 @@
 					React.createElement('br', null),
 					this.state.articles.map(function (article) {
 						var boundClick = handleClick.bind(null, article);
-						return React.createElement(
-							'li',
-							{ key: article.id },
-							article.title + "    ",
-							React.createElement(
-								'a',
-								{
-									className: 'btn btn-xs btn-danger',
-									onClick: boundClick,
-									article: article,
-									role: 'button' },
-								'Delete'
-							)
-						);
-					})
+						if (article.author_id === this.state.user.id) {
+							return React.createElement(
+								'li',
+								{ key: article.id },
+								article.title + "    ",
+								React.createElement(
+									'a',
+									{
+										className: 'btn btn-xs btn-danger',
+										onClick: boundClick,
+										article: article,
+										role: 'button' },
+									'Delete'
+								)
+							);
+						}
+					}.bind(this))
 				)
 			);
 		}
@@ -31972,6 +32030,143 @@
 	};
 	
 	module.exports = ReactStateSetters;
+
+/***/ },
+/* 243 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ApiUtil = __webpack_require__(208);
+	var LinkedStateMixin = __webpack_require__(239);
+	var ArticleStore = __webpack_require__(219);
+	
+	var CommentForm = React.createClass({
+		displayName: 'CommentForm',
+	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
+		getInitialState: function () {
+			return {
+				body: "",
+				articleId: this.props.articleId,
+				user_id: ""
+			};
+		},
+	
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var comment = {
+				body: this.state.body,
+				article_id: this.state.articleId
+			};
+			ApiUtil.createComment(comment);
+			ApiUtil.fetchArticles();
+		},
+	
+		componentWillReceiveProps: function (propUpdate) {
+			this.setState({
+				body: "",
+				articleId: this.props.articleId,
+				user_id: ""
+			});
+		},
+	
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement('br', null),
+					React.createElement('input', {
+						type: 'text',
+						placeholder: 'Add a comment...',
+						valueLink: this.linkState('body')
+					}),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'submit', value: 'Post' })
+				)
+			);
+		}
+	});
+	
+	module.exports = CommentForm;
+
+/***/ },
+/* 244 */,
+/* 245 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ApiUtil = __webpack_require__(208);
+	var ArticleStore = __webpack_require__(219);
+	
+	var CommentIndex = React.createClass({
+		displayName: 'CommentIndex',
+	
+	
+		getInitialState: function () {
+			return { comments: this.props.comments };
+		},
+	
+		handleClick: function (comment) {
+			if (confirm("Are you sure you want to delete your comment?")) {
+				ApiUtil.removeComment(comment.id);
+				ApiUtil.fetchArticles();
+			}
+		},
+	
+		componentWillReceiveProps: function () {
+			this.setState({
+				comments: this.props.comments
+			});
+		},
+	
+		render: function () {
+			var handleClick = this.handleClick;
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'ul',
+					null,
+					' Comments',
+					this.props.comments.map(function (comment) {
+						var boundClick = handleClick.bind(null, comment);
+						return React.createElement(
+							'li',
+							{ key: comment.id },
+							comment.username,
+							React.createElement('br', null),
+							comment.expertise,
+							React.createElement('br', null),
+							comment.body,
+							React.createElement('br', null),
+							comment.created_at,
+							React.createElement('br', null),
+							comment.body,
+							React.createElement('br', null),
+							React.createElement(
+								'a',
+								{
+									className: 'btn btn-xs btn-danger',
+									onClick: boundClick,
+									comment: comment,
+									role: 'button' },
+								'Delete'
+							)
+						);
+					})
+				)
+			);
+		}
+	});
+	
+	module.exports = CommentIndex;
 
 /***/ }
 /******/ ]);

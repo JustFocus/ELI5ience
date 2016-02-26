@@ -26,6 +26,12 @@ var ApiActions = {
       user: user
     });
   },
+  receiveSingleComment: function(comment){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.COMMENT_RECEIVED,
+      comment: comment
+    });
+  },
 };
 
 module.exports = ApiActions;
