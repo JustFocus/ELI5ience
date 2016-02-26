@@ -31686,6 +31686,10 @@
 			}
 		},
 	
+		newArticleClick: function () {
+			this.props.history.pushState(null, "articles/new");
+		},
+	
 		render: function () {
 			var handleClick = this.handleClick;
 			return React.createElement(
@@ -31699,10 +31703,22 @@
 				React.createElement('br', null),
 				React.createElement('br', null),
 				React.createElement(
+					'a',
+					{
+						className: 'btn btn-xs btn-primary',
+						onClick: this.newArticleClick,
+						role: 'button' },
+					'Create article »'
+				),
+				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement(
 					'ul',
 					null,
 					this.state.user.username + "'s'",
-					' Article List',
+					' Article List:',
+					React.createElement('br', null),
+					React.createElement('br', null),
 					this.state.articles.map(function (article) {
 						var boundClick = handleClick.bind(null, article);
 						return React.createElement(

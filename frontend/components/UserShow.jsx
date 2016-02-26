@@ -37,6 +37,10 @@ var User = React.createClass({
   	}
   },
 
+	newArticleClick: function() {
+		this.props.history.pushState(null, "articles/new");
+	},
+
 	render: function() {
 		var handleClick = this.handleClick;
 		return (
@@ -47,10 +51,22 @@ var User = React.createClass({
 				<br></br>
 				{this.state.user.expertise}
 				<br></br>
-
 				<br></br>
+
+				<a
+					className="btn btn-xs btn-primary"
+					onClick={this.newArticleClick}
+					role="button">
+					Create article &raquo;
+				</a>
+				<br></br>
+				<br></br>
+
 				<ul>
-					{this.state.user.username + "'s'"} Article List
+					{this.state.user.username + "'s'"} Article List:
+					<br></br>
+					<br></br>
+
 					{this.state.articles.map(function(article){
 						var boundClick = handleClick.bind(null, article);
 						return (
