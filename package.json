@@ -1,8 +1,8 @@
 {
-  "name": "BenchBnb",
+  "name": "ELI5ience",
   "version": "1.0.0",
-  "description": "air bnb for benches!",
-  "main": "index.js",
+  "description": "ELI5 annotated articles!",
+  "main": "package.json.js",
   "directories": {
     "test": "test"
   },
