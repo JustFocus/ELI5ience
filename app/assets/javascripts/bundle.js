@@ -24400,6 +24400,12 @@
 	    });
 	  },
 	
+	  fetchSessions: function () {
+	    $.get('api/session', function (sessions) {
+	      ApiActions.receiveSessions(sessions);
+	    });
+	  },
+	
 	  createArticle: function (data) {
 	    $.post('api/articles', { article: data }, function (article) {
 	      ApiActions.receiveSingle(article);
@@ -24480,6 +24486,12 @@
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.COMMENT_RECEIVED,
 	      comment: comment
+	    });
+	  },
+	  receiveSessions: function (sessions) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.SESSIONS_RECEIVED,
+	      sessions: [sessions]
 	    });
 	  }
 	};
@@ -31701,6 +31713,7 @@
 	var React = __webpack_require__(1);
 	var ReactRouter = __webpack_require__(159);
 	var ArticleStore = __webpack_require__(219);
+	var SessionStore = __webpack_require__(246);
 	var ApiUtil = __webpack_require__(208);
 	
 	var User = React.createClass({
@@ -31710,7 +31723,8 @@
 		getInitialState: function () {
 			return {
 				user: ArticleStore.authors(),
-				articles: ArticleStore.all()
+				articles: ArticleStore.all(),
+				sessions: SessionStore.all()
 			};
 		},
 	
@@ -31721,15 +31735,18 @@
 		componentDidMount: function () {
 			// this.articleStoreUserListener = ArticleStore.addListener();
 			this.articleStoreListener = ArticleStore.addListener(this._onChange);
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
 			ApiUtil.fetchUser(this.props.params.userId);
 			ApiUtil.fetchArticles();
+			ApiUtil.fetchSessions();
 			// ApiUtil.fetchArticles();
 		},
 	
 		_onChange: function () {
 			this.setState({
 				articles: ArticleStore.all(),
-				user: ArticleStore.authors()
+				user: ArticleStore.authors(),
+				sessions: SessionStore.all()
 			});
 		},
 	
@@ -31748,6 +31765,8 @@
 		render: function () {
 			var handleClick = this.handleClick;
 			var user = this.state.user;
+			var delButton;
+	
 			return React.createElement(
 				'div',
 				null,
@@ -31778,19 +31797,24 @@
 					this.state.articles.map(function (article) {
 						var boundClick = handleClick.bind(null, article);
 						if (article.author_id === this.state.user.id) {
+							if (this.state.sessions.length > 0) {
+								if (this.state.sessions[0].id === this.state.user.id) {
+									delButton = React.createElement(
+										'a',
+										{
+											className: 'btn btn-xs btn-danger',
+											onClick: boundClick,
+											article: article,
+											role: 'button' },
+										'Delete'
+									);
+								}
+							}
 							return React.createElement(
 								'li',
 								{ key: article.id },
 								article.title + "    ",
-								React.createElement(
-									'a',
-									{
-										className: 'btn btn-xs btn-danger',
-										onClick: boundClick,
-										article: article,
-										role: 'button' },
-									'Delete'
-								)
+								delButton
 							);
 						}
 					}.bind(this))
@@ -32038,7 +32062,6 @@
 	var React = __webpack_require__(1);
 	var ApiUtil = __webpack_require__(208);
 	var LinkedStateMixin = __webpack_require__(239);
-	var ArticleStore = __webpack_require__(219);
 	
 	var CommentForm = React.createClass({
 		displayName: 'CommentForm',
@@ -32103,7 +32126,6 @@
 	var React = __webpack_require__(1);
 	var ReactRouter = __webpack_require__(159);
 	var ApiUtil = __webpack_require__(208);
-	var ArticleStore = __webpack_require__(219);
 	
 	var CommentIndex = React.createClass({
 		displayName: 'CommentIndex',
@@ -32144,8 +32166,6 @@
 							React.createElement('br', null),
 							comment.expertise,
 							React.createElement('br', null),
-							comment.body,
-							React.createElement('br', null),
 							comment.created_at,
 							React.createElement('br', null),
 							comment.body,
@@ -32167,6 +32187,37 @@
 	});
 	
 	module.exports = CommentIndex;
+
+/***/ },
+/* 246 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(220).Store;
+	var SessionConstants = __webpack_require__(214);
+	var AppDispatcher = __webpack_require__(210);
+	
+	var SessionStore = new Store(AppDispatcher);
+	
+	var _sessions = [];
+	
+	var resetSessions = function (sessions) {
+	  _sessions = sessions.slice(0);
+	};
+	
+	SessionStore.all = function () {
+	  return _sessions.slice(0);
+	};
+	
+	SessionStore.__onDispatch = function (payload) {
+	  switch (payload.actionType) {
+	    case SessionConstants.SESSIONS_RECEIVED:
+	      resetSessions(payload.sessions);
+	      SessionStore.__emitChange();
+	      break;
+	  }
+	};
+	
+	module.exports = SessionStore;
 
 /***/ }
 /******/ ]);

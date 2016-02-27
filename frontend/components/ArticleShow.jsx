@@ -84,7 +84,6 @@ var ArticleShow = React.createClass({
 				<br></br>
 				<span>
 					<CommentForm articleId={this.props.params.articleId} />
-
 				</span>
 				<br></br>
 				<br></br>

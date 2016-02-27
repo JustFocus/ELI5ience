@@ -1,7 +1,6 @@
 var React = require('react');
 var ReactRouter = require('react-router');
 var ApiUtil = require('../utils/api_util');
-var ArticleStore = require('../stores/article');
 
 var CommentIndex = React.createClass({
 
@@ -33,7 +32,6 @@ var CommentIndex = React.createClass({
 							<li key={comment.id}>
 								{comment.username}<br></br>
 								{comment.expertise}<br></br>
-								{comment.body}<br></br>
 								{comment.created_at}<br></br>
 								{comment.body}<br></br>
 								<a

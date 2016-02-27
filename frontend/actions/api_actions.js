@@ -32,6 +32,12 @@ var ApiActions = {
       comment: comment
     });
   },
+  receiveSessions: function(sessions){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.SESSIONS_RECEIVED,
+      sessions: [sessions]
+    });
+  },
 };
 
 module.exports = ApiActions;
