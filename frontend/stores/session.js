@@ -7,7 +7,11 @@ var SessionStore = new Store(AppDispatcher);
 var _sessions = [];
 
 var resetSessions = function(sessions){
-  _sessions = sessions.slice(0);
+  if (sessions[0] !== null){
+    _sessions = sessions.slice(0);
+  } else{
+    _sessions = [];
+  }
 };
 
 SessionStore.all = function () {

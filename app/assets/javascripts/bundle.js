@@ -31730,6 +31730,7 @@
 	
 		componentWillUnmount: function () {
 			this.articleStoreListener.remove();
+			this.sessionStoreListener.remove();
 		},
 	
 		componentDidMount: function () {
@@ -32126,30 +32127,51 @@
 	var React = __webpack_require__(1);
 	var ReactRouter = __webpack_require__(159);
 	var ApiUtil = __webpack_require__(208);
+	var SessionStore = __webpack_require__(246);
 	
 	var CommentIndex = React.createClass({
 		displayName: 'CommentIndex',
 	
 	
 		getInitialState: function () {
-			return { comments: this.props.comments };
+			return {
+				comments: this.props.comments,
+				sessions: SessionStore.all()
+			};
+		},
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({
+				sessions: SessionStore.all()
+			});
 		},
 	
 		handleClick: function (comment) {
 			if (confirm("Are you sure you want to delete your comment?")) {
 				ApiUtil.removeComment(comment.id);
 				ApiUtil.fetchArticles();
+				ApiUtil.fetchSessions();
 			}
 		},
 	
 		componentWillReceiveProps: function () {
 			this.setState({
-				comments: this.props.comments
+				comments: this.props.comments,
+				sessions: SessionStore.all()
 			});
 		},
 	
 		render: function () {
 			var handleClick = this.handleClick;
+			var delButton;
 			return React.createElement(
 				'div',
 				null,
@@ -32159,6 +32181,19 @@
 					' Comments',
 					this.props.comments.map(function (comment) {
 						var boundClick = handleClick.bind(null, comment);
+						if (this.state.sessions.length > 0) {
+							if (this.state.sessions[0].id === comment.user_id) {
+								delButton = React.createElement(
+									'a',
+									{
+										className: 'btn btn-xs btn-danger',
+										onClick: boundClick,
+										comment: comment,
+										role: 'button' },
+									'Delete'
+								);
+							}
+						}
 						return React.createElement(
 							'li',
 							{ key: comment.id },
@@ -32170,17 +32205,9 @@
 							React.createElement('br', null),
 							comment.body,
 							React.createElement('br', null),
-							React.createElement(
-								'a',
-								{
-									className: 'btn btn-xs btn-danger',
-									onClick: boundClick,
-									comment: comment,
-									role: 'button' },
-								'Delete'
-							)
+							delButton
 						);
-					})
+					}.bind(this))
 				)
 			);
 		}
@@ -32201,7 +32228,11 @@
 	var _sessions = [];
 	
 	var resetSessions = function (sessions) {
-	  _sessions = sessions.slice(0);
+	  if (sessions[0] !== null) {
+	    _sessions = sessions.slice(0);
+	  } else {
+	    _sessions = [];
+	  }
 	};
 	
 	SessionStore.all = function () {

@@ -8,6 +8,7 @@ json.expertise article.user.expertise
 json.comments article.comments do |comment|
 	json.id comment.id
 	json.body comment.body
+	json.user_id comment.user_id
 	json.created_at comment.created_at
 	json.username comment.user.username
 	json.expertise comment.user.expertise

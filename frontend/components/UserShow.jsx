@@ -16,6 +16,7 @@ var User = React.createClass({
 
 	componentWillUnmount: function() {
 		this.articleStoreListener.remove();
+		this.sessionStoreListener.remove();
 	},
 
 	componentDidMount: function () {
