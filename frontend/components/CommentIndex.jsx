@@ -11,6 +11,7 @@ var CommentIndex = React.createClass({
 			sessions: SessionStore.all()
 		};
 	},
+
 	componentWillUnmount: function() {
 		this.sessionStoreListener.remove();
 	},

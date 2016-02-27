@@ -32139,6 +32139,7 @@
 				sessions: SessionStore.all()
 			};
 		},
+	
 		componentWillUnmount: function () {
 			this.sessionStoreListener.remove();
 		},
