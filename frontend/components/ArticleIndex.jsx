@@ -52,7 +52,7 @@ var ArticleIndex = React.createClass({
             <h1>Welcome to ELI5ience!</h1>
             <p>ELI5ience is a web application where users can post and annotate articles. </p>
             <a
-              className="btn btn-xs btn-primary"
+              className="btn btn-xs btn-success"
               onClick={this.newArticleClick}
               role="button">
               Create article &raquo;
@@ -72,7 +72,7 @@ var ArticleIndex = React.createClass({
                 <p>{article.body.slice(0, 300) + "..."}</p>
                 <p>
                   <a
-                    className="btn btn-xs btn-primary"
+                    className="btn btn-xs btn-primary btn-view-main"
                     onClick={boundClick}
                     article={article}
                     role="button">

@@ -24890,48 +24890,73 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement('br', null),
 				React.createElement(
-					'h3',
-					null,
-					'Create An Article!'
-				),
-				React.createElement(
-					'form',
-					{ onSubmit: this.handleSubmit },
+					'div',
+					{ className: 'panel-heading user-pro-panel-heading' },
 					React.createElement(
-						'label',
-						null,
-						'Title'
+						'h3',
+						{ className: 'panel-title' },
+						'Create An Article!'
 					),
-					React.createElement('input', { type: 'text', valueLink: this.linkState('title') }),
 					React.createElement('br', null),
 					React.createElement(
-						'label',
-						null,
-						'Body'
+						'form',
+						{ className: 'form-signin', onSubmit: this.handleSubmit },
+						React.createElement(
+							'label',
+							{ className: 'sr-only' },
+							'Title'
+						),
+						React.createElement('input', {
+							type: 'text',
+							className: 'form-control',
+							placeholder: 'Title',
+							required: true, autofocus: true,
+							valueLink: this.linkState('title') }),
+						React.createElement('br', null),
+						React.createElement(
+							'label',
+							{ className: 'sr-only' },
+							'Body'
+						),
+						React.createElement('textarea', {
+							className: 'form-control',
+							placeholder: 'Body',
+							required: true, autofocus: true,
+							valueLink: this.linkState('body') }),
+						React.createElement('br', null),
+						React.createElement(
+							'label',
+							{ className: 'sr-only' },
+							'Image Url'
+						),
+						React.createElement('input', {
+							type: 'text',
+							className: 'form-control',
+							placeholder: 'Image URL',
+							valueLink: this.linkState('imageLink') }),
+						React.createElement(
+							'label',
+							{ className: 'sr-only' },
+							'Background Url'
+						),
+						React.createElement('input', {
+							type: 'text',
+							className: 'form-control',
+							placeholder: 'Background URL',
+							valueLink: this.linkState('backgroundLink') }),
+						React.createElement('br', null),
+						React.createElement('input', { className: 'btn btn-xs btn-success user-create-art', type: 'submit', value: 'Create article' })
 					),
-					React.createElement('input', { type: 'text', valueLink: this.linkState('body') }),
-					React.createElement('br', null),
 					React.createElement(
-						'label',
-						null,
-						'Image Url'
-					),
-					React.createElement('input', { type: 'text', valueLink: this.linkState('imageLink') }),
-					React.createElement('br', null),
-					React.createElement(
-						'label',
-						null,
-						'Background Url'
-					),
-					React.createElement('input', { type: 'text', valueLink: this.linkState('backgroundLink') }),
-					React.createElement('br', null),
-					React.createElement('input', { type: 'submit', value: 'Create article' })
-				),
-				React.createElement(
-					'button',
-					{ onClick: this.handleCancel },
-					'Cancel'
+						'a',
+						{
+							className: 'btn btn-xs btn-danger user-cancel',
+							onClick: this.handleCancel,
+							role: 'button' },
+						'Cancel'
+					)
 				)
 			);
 		}
@@ -25013,7 +25038,7 @@
 	          React.createElement(
 	            'a',
 	            {
-	              className: 'btn btn-xs btn-primary',
+	              className: 'btn btn-xs btn-success',
 	              onClick: this.newArticleClick,
 	              role: 'button' },
 	            'Create article »'
@@ -25046,7 +25071,7 @@
 	              React.createElement(
 	                'a',
 	                {
-	                  className: 'btn btn-xs btn-primary',
+	                  className: 'btn btn-xs btn-primary btn-view-main',
 	                  onClick: boundClick,
 	                  article: article,
 	                  role: 'button' },
@@ -31751,7 +31776,7 @@
 			});
 		},
 	
-		handleClick: function (article) {
+		handleDelClick: function (article) {
 			if (confirm("Are you sure you want to delete your " + article.title + " article?")) {
 				this.articleStoreListener = ArticleStore.addListener(this._onChange);
 				ApiUtil.removeArticle(article.id);
@@ -31759,12 +31784,17 @@
 			}
 		},
 	
+		handleArticleClick: function (article) {
+			this.props.history.pushState(null, "articles/" + article.id);
+		},
+	
 		newArticleClick: function () {
 			this.props.history.pushState(null, "articles/new");
 		},
 	
 		render: function () {
-			var handleClick = this.handleClick;
+			var handleDelClick = this.handleDelClick;
+			var handleArticleClick = this.handleArticleClick;
 			var user = this.state.user;
 			var delButton;
 	
@@ -31773,52 +31803,120 @@
 				null,
 				React.createElement('br', null),
 				React.createElement('br', null),
-				this.state.user.username,
-				React.createElement('br', null),
-				this.state.user.expertise,
-				React.createElement('br', null),
-				React.createElement('br', null),
 				React.createElement(
-					'a',
-					{
-						className: 'btn btn-xs btn-primary',
-						onClick: this.newArticleClick,
-						role: 'button' },
-					'Create article »'
+					'div',
+					{ className: 'panel-heading user-pro-panel-heading' },
+					React.createElement(
+						'h3',
+						{ className: 'panel-title' },
+						'Profile:'
+					),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'row' },
+						React.createElement(
+							'div',
+							{ className: 'col-sm-4' },
+							React.createElement(
+								'ul',
+								{ className: 'list-group' },
+								React.createElement(
+									'li',
+									{ className: 'list-group-item user-list' },
+									React.createElement(
+										'strong',
+										null,
+										'Username:'
+									),
+									' ',
+									this.state.user.username
+								),
+								React.createElement(
+									'li',
+									{ className: 'list-group-item user-list' },
+									React.createElement(
+										'strong',
+										null,
+										'Expertise:'
+									),
+									' ',
+									this.state.user.expertise
+								)
+							)
+						)
+					)
 				),
 				React.createElement('br', null),
 				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement('br', null),
 				React.createElement(
-					'ul',
-					null,
-					this.state.user.username + "'s'",
-					' Article List:',
-					React.createElement('br', null),
-					React.createElement('br', null),
-					this.state.articles.map(function (article) {
-						var boundClick = handleClick.bind(null, article);
-						if (article.author_id === this.state.user.id) {
-							if (this.state.sessions.length > 0) {
-								if (this.state.sessions[0].id === this.state.user.id) {
-									delButton = React.createElement(
-										'a',
-										{
-											className: 'btn btn-xs btn-danger',
-											onClick: boundClick,
-											article: article,
-											role: 'button' },
-										'Delete'
-									);
-								}
-							}
-							return React.createElement(
-								'li',
-								{ key: article.id },
-								article.title + "    ",
-								delButton
-							);
-						}
-					}.bind(this))
+					'div',
+					{ className: 'ELI-panel' },
+					React.createElement(
+						'div',
+						{ className: 'panel panel-primary user-panel-primary' },
+						React.createElement(
+							'div',
+							{ className: 'panel-heading user-panel-heading' },
+							React.createElement(
+								'h3',
+								{ className: 'panel-title' },
+								this.state.user.username + "'s",
+								' Articles:'
+							)
+						),
+						React.createElement(
+							'div',
+							{ className: 'panel-body' },
+							React.createElement(
+								'a',
+								{
+									className: 'btn btn-xs btn-success user-create-art',
+									onClick: this.newArticleClick,
+									role: 'button' },
+								'Create article »'
+							),
+							React.createElement(
+								'div',
+								{ className: 'list-group' },
+								this.state.articles.map(function (article) {
+									var boundDelClick = handleDelClick.bind(null, article);
+									var boundArticleClick = handleArticleClick.bind(null, article);
+									if (article.author_id === this.state.user.id) {
+										if (this.state.sessions.length > 0) {
+											if (this.state.sessions[0].id === this.state.user.id) {
+												delButton = React.createElement(
+													'a',
+													{
+														className: 'btn btn-xs btn-danger user-del',
+														onClick: boundDelClick,
+														article: article,
+														role: 'button' },
+													'Delete'
+												);
+											}
+										}
+										return React.createElement(
+											'div',
+											{ key: article.id },
+											React.createElement(
+												'a',
+												{
+													href: "#/articles/" + article.id,
+													onClick: this.boundArticleClick,
+													className: 'list-group-item'
+												},
+												article.title
+											),
+											delButton
+										);
+									}
+								}.bind(this))
+							)
+						)
+					)
 				)
 			);
 		}

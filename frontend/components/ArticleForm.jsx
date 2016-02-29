@@ -53,25 +53,51 @@ var ArticleForm = React.createClass({
 	},
 	render: function(){
     return (
-        <div>
-          <h3>Create An Article!</h3>
-          <form onSubmit={this.handleSubmit}>
-            <label>Title</label>
-            <input type="text" valueLink={this.linkState('title')}/>
+			<div>
+				<br></br>
+				<div className="panel-heading user-pro-panel-heading">
+					<h3 className="panel-title">Create An Article!</h3>
+					<br></br>
+          <form className="form-signin" onSubmit={this.handleSubmit}>
+            <label className="sr-only">Title</label>
+            <input
+							type="text"
+							className="form-control"
+							placeholder="Title"
+							required autofocus
+							valueLink={this.linkState('title')}/>
+						<br></br>
+
+            <label className="sr-only">Body</label>
+						<textarea
+							className="form-control"
+							placeholder="Body"
+							required autofocus
+							valueLink={this.linkState('body')}/>
             <br/>
-            <label>Body</label>
-            <input type="text" valueLink={this.linkState('body')}/>
+						<label className="sr-only">Image Url</label>
+							<input
+								type="text"
+								className="form-control"
+								placeholder="Image URL"
+								valueLink={this.linkState('imageLink')}/>
+						<label className="sr-only">Background Url</label>
+							<input
+								type="text"
+								className="form-control"
+								placeholder="Background URL"
+								valueLink={this.linkState('backgroundLink')}/>
             <br/>
-						<label>Image Url</label>
-            <input type="text" valueLink={this.linkState('imageLink')}/>
-            <br/>
-						<label>Background Url</label>
-            <input type="text" valueLink={this.linkState('backgroundLink')}/>
-            <br/>
-						<input type="submit" value="Create article"/>
+						<input className="btn btn-xs btn-success user-create-art" type="submit" value="Create article"/>
           </form>
-          <button onClick={this.handleCancel}>Cancel</button>
+					<a
+						className="btn btn-xs btn-danger user-cancel"
+						onClick={this.handleCancel}
+						role="button">
+						Cancel
+					</a>
         </div>
+			</div>
     );
   }
 });
