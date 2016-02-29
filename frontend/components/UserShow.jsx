@@ -66,7 +66,7 @@ var User = React.createClass({
 
 
 				<div className="panel-heading user-pro-panel-heading">
-					<h3 className="panel-title">Profile:</h3>
+					<h3 className="panel-title">User Info:</h3>
 						<br></br>
 
 	      <div className="row">
@@ -79,10 +79,6 @@ var User = React.createClass({
 				</div>
 			</div>
 
-				<br></br>
-				<br></br>
-
-				<br></br>
 				<br></br>
 				<div className="ELI-panel">
 					<div className="panel panel-primary user-panel-primary">

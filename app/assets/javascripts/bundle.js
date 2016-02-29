@@ -24877,6 +24877,7 @@
 			this.navigateToArticle();
 		},
 		navigateToArticle: function () {
+			debugger;
 			this.props.history.pushState(null, "articles/" + this.state.article.id);
 		},
 		navigateToHome: function () {
@@ -31678,52 +31679,62 @@
 			var handleClick = this.handleClick;
 			return React.createElement(
 				'div',
-				{ style: { backgroundColor: '#FFFFFF' } },
+				null,
 				React.createElement('br', null),
 				React.createElement('br', null),
 				React.createElement(
-					'h1',
-					null,
-					this.state.article.title
+					'div',
+					{ style: { backgroundColor: '#FFFFFF' } },
+					React.createElement(
+						'h1',
+						null,
+						this.state.article.title
+					),
+					React.createElement('br', null),
+					React.createElement('br', null),
+					this.state.article.image_link,
+					React.createElement('br', null),
+					this.state.article.background_link,
+					React.createElement('br', null),
+					React.createElement(
+						'span',
+						null,
+						this.state.article.locked,
+						React.createElement('br', null),
+						React.createElement('br', null),
+						this.state.article.username,
+						React.createElement('br', null),
+						this.state.article.expertise
+					)
 				),
 				React.createElement('br', null),
 				React.createElement('br', null),
 				React.createElement(
-					'span',
-					null,
-					this.state.article.body
-				),
-				React.createElement('br', null),
-				React.createElement('br', null),
-				this.state.article.image_link,
-				React.createElement('br', null),
-				this.state.article.background_link,
-				React.createElement('br', null),
-				React.createElement(
-					'span',
-					null,
-					this.state.article.author_id,
-					React.createElement('br', null),
-					this.state.article.locked,
-					React.createElement('br', null),
-					React.createElement('br', null),
-					this.state.article.username,
-					React.createElement('br', null),
-					this.state.article.expertise
+					'div',
+					{ style: { backgroundColor: '#FFFFFF' } },
+					React.createElement(
+						'span',
+						{ style: { backgroundColor: '#FFFFFF' } },
+						this.state.article.body
+					)
 				),
 				React.createElement('br', null),
 				React.createElement('br', null),
 				React.createElement(
-					'span',
-					null,
-					React.createElement(CommentForm, { articleId: this.props.params.articleId })
-				),
-				React.createElement('br', null),
-				React.createElement('br', null),
-				React.createElement(
-					'span',
-					null,
-					React.createElement(CommentIndex, { comments: this.state.article.comments })
+					'div',
+					{ style: { backgroundColor: '#FFFFFF' } },
+					React.createElement(
+						'span',
+						null,
+						React.createElement(CommentForm, { articleId: this.props.params.articleId })
+					),
+					React.createElement('br', null),
+					React.createElement('br', null),
+					React.createElement(
+						'span',
+						null,
+						React.createElement(CommentIndex, { comments: this.state.article.comments })
+					)
 				)
 			);
 		}
@@ -31809,7 +31820,7 @@
 					React.createElement(
 						'h3',
 						{ className: 'panel-title' },
-						'Profile:'
+						'User Info:'
 					),
 					React.createElement('br', null),
 					React.createElement(
@@ -31847,9 +31858,6 @@
 						)
 					)
 				),
-				React.createElement('br', null),
-				React.createElement('br', null),
-				React.createElement('br', null),
 				React.createElement('br', null),
 				React.createElement(
 					'div',

@@ -53,43 +53,48 @@ var ArticleShow = React.createClass({
 		// var article = this.props.article;
 		var handleClick = this.handleClick;
 		return (
-			<div style={{backgroundColor: '#FFFFFF'}}>
+			<div>
 				<br></br>
 				<br></br>
-				<h1>
-					{this.state.article.title}
-				</h1>
-				<br></br>
-				<br></br>
-				<span>
-					{this.state.article.body}
-				</span>
-				<br></br>
-				<br></br>
-				{this.state.article.image_link}
-				<br></br>
-				{this.state.article.background_link}
-				<br></br>
-				<span>
-					{this.state.article.author_id}
-					<br></br>
-					{this.state.article.locked}
+				<div style={{backgroundColor: '#FFFFFF'}}>
+					<h1>
+						{this.state.article.title}
+					</h1>
 					<br></br>
 					<br></br>
-					{this.state.article.username}
+					{this.state.article.image_link}
 					<br></br>
-					{this.state.article.expertise}
-				</span>
+					{this.state.article.background_link}
+					<br></br>
+					<span>
+						{this.state.article.locked}
+						<br></br>
+						<br></br>
+						{this.state.article.username}
+						<br></br>
+						{this.state.article.expertise}
+					</span>
+				</div>
 				<br></br>
 				<br></br>
-				<span>
-					<CommentForm articleId={this.props.params.articleId} />
-				</span>
+				<div style={{backgroundColor: '#FFFFFF'}}>
+					<span style={{backgroundColor: '#FFFFFF'}}>
+						{this.state.article.body}
+					</span>
+				</div>
+
 				<br></br>
 				<br></br>
-				<span>
-					<CommentIndex comments={this.state.article.comments}/>
-				</span>
+				<div style={{backgroundColor: '#FFFFFF'}}>
+					<span>
+						<CommentForm articleId={this.props.params.articleId} />
+					</span>
+					<br></br>
+					<br></br>
+					<span>
+						<CommentIndex comments={this.state.article.comments}/>
+					</span>
+				</div>
 			</div>
 		);
 	}
