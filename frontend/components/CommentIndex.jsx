@@ -47,7 +47,7 @@ var CommentIndex = React.createClass({
 		var delButton;
 		return (
 			<div>
-				<ul> Comments
+				<ul className="comment-list">
 					{this.props.comments.map(function(comment){
 						var boundClick = handleClick.bind(null, comment);
 						if (this.state.sessions.length > 0) {
@@ -62,12 +62,18 @@ var CommentIndex = React.createClass({
 							}
 						}
 						return (
-							<li key={comment.id}>
-								{comment.username}<br></br>
-								{comment.expertise}<br></br>
-								{comment.created_at}<br></br>
+							<li className="list-group-item" key={comment.id}>
+								<strong>{comment.username + " - "}</strong>
+								{ comment.expertise + " "} {delButton}
+								<br></br>
 								{comment.body}<br></br>
-							{delButton}
+							<div className="comment-date"> {
+								new Date(comment.created_at).toDateString()
+								+ " " +
+								new Date(comment.created_at).toLocaleTimeString()
+								}
+							</div>
+
 							</li>
 						);
 					}.bind(this))}

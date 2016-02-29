@@ -3,9 +3,15 @@ class User < ActiveRecord::Base
 	validates :password, length: {minimum: 6, allow_nil: true}
 
 	has_many :articles,
-	foreign_key: "author_id"
+	foreign_key: "author_id",
+	dependent: :destroy
 
-	has_many :comments
+	has_many :annotations,
+	foreign_key: "author_id",
+	dependent: :destroy
+
+	has_many :comments,
+	dependent: :destroy
 
 	attr_reader :password
 

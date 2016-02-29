@@ -31684,14 +31684,12 @@
 				React.createElement('br', null),
 				React.createElement(
 					'div',
-					{ style: { backgroundColor: '#FFFFFF' } },
+					{ className: 'well art-details' },
 					React.createElement(
 						'h1',
 						null,
 						this.state.article.title
 					),
-					React.createElement('br', null),
-					React.createElement('br', null),
 					this.state.article.image_link,
 					React.createElement('br', null),
 					this.state.article.background_link,
@@ -31701,34 +31699,40 @@
 						null,
 						this.state.article.locked,
 						React.createElement('br', null),
-						React.createElement('br', null),
+						React.createElement(
+							'strong',
+							null,
+							'Submitted by: '
+						),
 						this.state.article.username,
 						React.createElement('br', null),
+						React.createElement(
+							'strong',
+							null,
+							'Expertise: '
+						),
 						this.state.article.expertise
 					)
 				),
-				React.createElement('br', null),
-				React.createElement('br', null),
 				React.createElement(
 					'div',
-					{ style: { backgroundColor: '#FFFFFF' } },
-					React.createElement(
-						'span',
-						{ style: { backgroundColor: '#FFFFFF' } },
-						this.state.article.body
-					)
+					{ className: 'well art-body' },
+					this.state.article.body
 				),
-				React.createElement('br', null),
-				React.createElement('br', null),
 				React.createElement(
 					'div',
-					{ style: { backgroundColor: '#FFFFFF' } },
+					{ className: 'well comment-sec' },
+					React.createElement(
+						'h5',
+						null,
+						this.state.article.comments.length,
+						' Comments'
+					),
 					React.createElement(
 						'span',
 						null,
 						React.createElement(CommentForm, { articleId: this.props.params.articleId })
 					),
-					React.createElement('br', null),
 					React.createElement('br', null),
 					React.createElement(
 						'span',
@@ -32214,10 +32218,11 @@
 					React.createElement('input', {
 						type: 'text',
 						placeholder: 'Add a comment...',
+						className: 'form-control comment-form',
 						valueLink: this.linkState('body')
 					}),
 					React.createElement('br', null),
-					React.createElement('input', { type: 'submit', value: 'Post' })
+					React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn', type: 'submit', value: 'Post' })
 				)
 			);
 		}
@@ -32284,8 +32289,7 @@
 				null,
 				React.createElement(
 					'ul',
-					null,
-					' Comments',
+					{ className: 'comment-list' },
 					this.props.comments.map(function (comment) {
 						var boundClick = handleClick.bind(null, comment);
 						if (this.state.sessions.length > 0) {
@@ -32303,16 +32307,24 @@
 						}
 						return React.createElement(
 							'li',
-							{ key: comment.id },
-							comment.username,
-							React.createElement('br', null),
-							comment.expertise,
-							React.createElement('br', null),
-							comment.created_at,
+							{ className: 'list-group-item', key: comment.id },
+							React.createElement(
+								'strong',
+								null,
+								comment.username + " - "
+							),
+							comment.expertise + " ",
+							' ',
+							delButton,
 							React.createElement('br', null),
 							comment.body,
 							React.createElement('br', null),
-							delButton
+							React.createElement(
+								'div',
+								{ className: 'comment-date' },
+								' ',
+								new Date(comment.created_at).toDateString() + " " + new Date(comment.created_at).toLocaleTimeString()
+							)
 						);
 					}.bind(this))
 				)

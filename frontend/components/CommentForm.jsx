@@ -41,10 +41,11 @@ var CommentForm = React.createClass({
             <input
 							type="text"
 							placeholder="Add a comment..."
+							className="form-control comment-form"
 							valueLink={this.linkState('body')}
 						/>
             <br/>
-						<input type="submit" value="Post"/>
+						<input className="btn btn-xs btn-success comment-post-btn" type="submit" value="Post"/>
           </form>
         </div>
     );

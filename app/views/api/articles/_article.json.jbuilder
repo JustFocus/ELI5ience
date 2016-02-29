@@ -15,6 +15,16 @@ json.comments article.comments do |comment|
 end
 
 
+json.annotations article.annotations do |annotation|
+	json.id annotation.id
+	json.body annotation.body
+	json.user_id annotation.author_id
+	json.created_at annotation.created_at
+	json.username annotation.user.username
+	json.expertise annotation.user.expertise
+end
+
+
 # TODO: votes/ratings
 # json.average_rating article.average_rating
 

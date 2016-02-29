@@ -1,6 +1,6 @@
 class Api::ArticlesController < ApplicationController
 	def index
-    @articles = Article.includes(:user, :comments)
+    @articles = Article.includes(:user, :comments, :annotations)
 
 			# TODO: search
 	    # if(bounds)

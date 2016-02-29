@@ -56,12 +56,10 @@ var ArticleShow = React.createClass({
 			<div>
 				<br></br>
 				<br></br>
-				<div style={{backgroundColor: '#FFFFFF'}}>
+				<div className="well art-details">
 					<h1>
 						{this.state.article.title}
 					</h1>
-					<br></br>
-					<br></br>
 					{this.state.article.image_link}
 					<br></br>
 					{this.state.article.background_link}
@@ -69,32 +67,26 @@ var ArticleShow = React.createClass({
 					<span>
 						{this.state.article.locked}
 						<br></br>
-						<br></br>
+						<strong>Submitted by: </strong>
 						{this.state.article.username}
 						<br></br>
+						<strong>Expertise: </strong>
 						{this.state.article.expertise}
 					</span>
 				</div>
-				<br></br>
-				<br></br>
-				<div style={{backgroundColor: '#FFFFFF'}}>
-					<span style={{backgroundColor: '#FFFFFF'}}>
-						{this.state.article.body}
-					</span>
+				<div className="well art-body">
+					{this.state.article.body}
 				</div>
-
-				<br></br>
-				<br></br>
-				<div style={{backgroundColor: '#FFFFFF'}}>
-					<span>
-						<CommentForm articleId={this.props.params.articleId} />
-					</span>
-					<br></br>
-					<br></br>
-					<span>
-						<CommentIndex comments={this.state.article.comments}/>
-					</span>
-				</div>
+					<div className="well comment-sec">
+						<h5>{this.state.article.comments.length} Comments</h5>
+						<span>
+							<CommentForm articleId={this.props.params.articleId} />
+						</span>
+						<br></br>
+						<span>
+							<CommentIndex comments={this.state.article.comments}/>
+						</span>
+					</div>
 			</div>
 		);
 	}

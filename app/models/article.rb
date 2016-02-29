@@ -5,6 +5,10 @@ class Article < ActiveRecord::Base
 	foreign_key: :author_id,
 	class_name: "User"
 
-	has_many :comments
+	has_many :comments,
+	dependent: :destroy
+
+	has_many :annotations,
+	dependent: :destroy
 
 end
