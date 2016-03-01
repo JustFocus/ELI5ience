@@ -9,6 +9,8 @@ var ArticleShow = require('./components/ArticleShow');
 var ArticleForm = require('./components/ArticleForm');
 var ArticleIndex = require('./components/ArticleIndex');
 var UserShow = require('./components/UserShow');
+var AnnotationShow = require('./components/AnnotationShow');
+var AnnotationForm = require('./components/AnnotationForm');
 
 //TODO: Search
 // var Search = require('./components/Search');
@@ -25,25 +27,17 @@ var App = React.createClass({
   }
 });
 
-// ReactDOM.render(<App />, root);
-
-// ReactDOM.render(
-//       <div style={{color: "white"}}>
-//         <header><h1>ELI5Science React Main Page</h1></header>
-//       </div>,
-//       document.getElementById('content')
-// );
-
-// TODO: Routing Router
-// {this.props.children}
 
 // TODO: Routing Routes and Router
 var routes = (
   <Route path="/" component={App}>
     <IndexRoute component={ArticleIndex}/>
     <Route path="articles/new" component={ArticleForm}/>
-    <Route path="users/:userId" component={UserShow }/>
+    <Route path="users/:userId" component={UserShow}/>
     <Route path="articles/:articleId" component={ArticleShow}>
+      <Route path="annotations/:annotationId" component={AnnotationShow}>
+      </Route>
+      <Route path="annotations/new" component={AnnotationForm}/>
     </Route>
   </Route>
 );
@@ -59,11 +53,4 @@ window.loadApp = function () {
 //  // <Route path="improvements" component={ImprovementsIndex} />
 //  </Route>
 //  <Route path="annotation/new" component={AnnotationNew}>
-// </Route>
-
-// TODO: Routing Remove old routes
-// <IndexRoute component={Search}/>
-// <Route path="benches/new" component={BenchForm}/>
-// <Route path="benches/:benchId" component={BenchShow}>
-//   <Route path="review" components={ReviewForm}/>
 // </Route>

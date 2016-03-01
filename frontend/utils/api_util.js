@@ -17,6 +17,30 @@ var ApiUtil = {
   //     ApiActions.receiveAll([user]);
   //   });
   // }
+  createAnnotation: function(data) {
+    $.post('api/comments', { annotation: data }, function (annotation) {
+      ApiActions.receiveSingle(annotation);
+    });
+  },
+  removeAnnotation: function(id) {
+    $.ajax({
+      url: 'api/annotations/' + id,
+      type: 'DELETE',
+      success: function(annotation){
+        ApiActions.removeSingle(annotation);
+      }
+    });
+  },
+  updateAnnotation: function(data) {
+    $.ajax({
+      url: 'api/annotations/' + data.id,
+      data: data,
+      type: 'DELETE',
+      success: function(annotation){
+        ApiActions.receiveSingle(annotation);
+      }
+    });
+  },
 
   createComment: function(data) {
     $.post('api/comments', { comment: data }, function (comment) {

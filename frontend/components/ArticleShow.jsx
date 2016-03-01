@@ -1,17 +1,23 @@
 var React = require('react');
+var ReactDOM = require('react-dom');
 var ReactRouter = require('react-router');
 var ApiUtil = require('../utils/api_util');
 var ArticleForm = require('./ArticleForm');
 var ArticleStore = require('../stores/article');
 var CommentForm = require('./CommentForm');
 var CommentIndex = require('./CommentIndex.jsx');
+var AnnotationForm = require('./AnnotationForm');
+var AnnotationShow = require('./AnnotationShow');
 
 var ArticleShow = React.createClass({
 
 	getInitialState: function() {
 		var articleId = this.props.params.articleId;
 		var article = this._findArticleById(articleId) || {comments:  []};
-		return {article: article};
+		return {
+			article: article,
+			annotationDisplay: 0
+			};
 	},
 
 	componentDidMount: function () {
@@ -49,9 +55,137 @@ var ArticleShow = React.createClass({
 
 	},
 
+	// _linkifyBody: function(body) {
+	// 	var linkedBody = body;
+	// 	this.state.article.annotations.forEach(function(annotation){
+	// 		linkedBody = linkedBody.slice(
+	// 			0,
+	// 			annotation.selection_start
+	// 		) + <a href='#'> +
+	// 		linkedBody.slice(annotation.selection_start);
+	// 		linkedBody = linkedBody.slice(
+	// 			0,
+	// 			annotation.selection_start + annotation.selection_length
+	// 		) + </a> +
+	// 		linkedBody.slice(annotation.selection_start + annotation.selection_length);
+	// 	});
+	// 	return linkedBody;
+	// },
+
+	splitBodySections: function() {
+		var sections = [];
+		if (this.hasOwnProperty('state')){
+			if (this.state.article.hasOwnProperty('annotations')) {
+				for (var i = 1; i < this.state.article.annotations.length; i++) {
+					sections.push(this.state.article.body.slice(
+						this.state.article.annotations[i - 1].selection_start +
+						this.state.article.annotations[i - 1].selection_length,
+						this.state.article.annotations[i].selection_start));
+				}
+			}
+		}
+		return sections;
+	},
+
+	splitLinkSecitons: function() {
+		var sections = [];
+		if (this.hasOwnProperty('state')){
+			if (this.state.article.hasOwnProperty('annotations')) {
+				for (var i = 0; i < this.state.article.annotations.length; i++) {
+					sections.push(this.state.article.body.slice(
+						this.state.article.annotations[i].selection_start,
+						this.state.article.annotations[i].selection_start +
+						this.state.article.annotations[i].selection_length));
+				}
+			}
+		}
+		return sections;
+	},
+
+	splitBodyFL: function() {
+		var sections = [];
+		if (this.hasOwnProperty('state')){
+			if (this.state.article.hasOwnProperty('annotations')) {
+				sections.push(
+					this.state.article.body.slice(
+						0,
+						this.state.article.annotations[0].selection_start
+					)
+				);
+				sections.push(
+					this.state.article.body.slice(
+						this.state.article.annotations[this.state.article.annotations.length - 1].selection_start + this.state.article.annotations[this.state.article.annotations.length - 1].selection_length,
+						this.state.article.body.length
+					)
+				);
+			}
+		}
+		return sections;
+	},
+
+	bodyContains: function(text) {
+		if (this.state.article.body.indexOf(text) >= 0) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	uniqueText: function(text) {
+		if (this.state.article.body.indexOf(text) ===
+			this.state.article.body.lastIndexOf(text)){
+				return true;
+			} else {
+				return false;
+			}
+	},
+
+	uniqueSelection: function(text) {
+		var endIdx = this.state.article.body.indexOf(text) + text.length;
+		var startIdx = this.state.article.body.indexOf(text);
+		var annStartIdx;
+		var annEndIdx;
+		for (var i = 0; i < this.state.article.annotations.length; i++) {
+			annStartIdx = this.state.article.annotations[i].selection_start;
+			annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
+			if ( (startIdx >= annStartIdx && startIdx <= annEndIdx) ||
+					(endIdx >= annStartIdx && endIdx <= annEndIdx) ){
+						return false;
+				}
+		}
+		return true;
+	},
+
+	handleMouseUp: function(e) {
+		// console.log(window.getSelection().toString());
+		// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
+		// this.props.children = null;
+		// this.setState({mounted: false});
+		var textSelection = window.getSelection().toString();
+		if ( this.bodyContains(textSelection) &&
+		this.uniqueText(textSelection) &&
+		this.uniqueSelection(textSelection) ) {
+			this.setState({annotationDisplay: 2});
+			return true;
+		} else {
+			this.setState({annotationDisplay: 0});
+			return false;
+		}
+	},
+
+	linkClickHandler: function(){
+		this.setState({annotationDisplay: 1});
+	},
+
 	render: function() {
 		// var article = this.props.article;
 		var handleClick = this.handleClick;
+		var bodyFristLast = this.splitBodyFL();
+		var bodySections = this.splitBodySections();
+		var linkSections = this.splitLinkSecitons();
+		var Link = ReactRouter.Link;
+		var validText = false;
+
 		return (
 			<div>
 				<br></br>
@@ -74,13 +208,57 @@ var ArticleShow = React.createClass({
 						{this.state.article.expertise}
 					</span>
 				</div>
-				<div className="well art-body">
-					{this.state.article.body}
-				</div>
+				<div className="body-ann-cont">
+					<div className="well art-body">
+						{
+							function(){
+								if (this.hasOwnProperty('state')){
+									if (this.state.article.hasOwnProperty('annotations')) {
+										return( <div onMouseUp={this.handleMouseUp}>
+											{bodyFristLast.shift()}
+											{this.state.article.annotations.map(function(annotation){
+												return(
+														<div key={annotation.id} className="art-sec">
+															<a
+																href={"/#/articles/" + this.state.article.id +"/annotations/" + annotation.id}
+																onClick={this.linkClickHandler}
+																className={"ann-link" + annotation.id}>
+																{linkSections.shift()}
+															</a>
+															{bodySections.shift()}
+														</div>
+												);
+											}.bind(this))}
+											{bodyFristLast.shift()}
+
+										</div>);
+									}
+								}
+							}.bind(this)()
+						}
+					</div>
+					<div className="well art-annotation" articles={this.props.articles}>
+						{ function () {
+							if (this.state.annotationDisplay === 1){
+								return <AnnotationShow article={this.state.article} annotationId={this.props.params.annotationId} />;
+							} else if (this.state.annotationDisplay === 2){
+								return <AnnotationForm article={this.state.article} params={this.props.params} />;
+							} else {
+								console.log(this.state.annotationDisplay);
+								return (<div>
+									{"<-----"} <br></br>
+									Select Text to create an annotation, or click a link to display an annotation
+									<br></br>
+									{"<-----"}
+								</div>);
+							}
+						}.bind(this)() }
+					</div>
+				</div >
 					<div className="well comment-sec">
 						<h5>{this.state.article.comments.length} Comments</h5>
-						<span>
-							<CommentForm articleId={this.props.params.articleId} />
+						<span >
+							<CommentForm  articleId={this.props.params.articleId} />
 						</span>
 						<br></br>
 						<span>

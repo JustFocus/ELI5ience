@@ -34,7 +34,7 @@ var insertComment = function(comment) {
     if (article.id === comment.article_id) {
       article.comments.push(comment);
     }
-  })
+  });
   return _articles;
 };
 

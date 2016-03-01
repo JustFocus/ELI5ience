@@ -52,31 +52,34 @@ var CommentIndex = React.createClass({
 						var boundClick = handleClick.bind(null, comment);
 						if (this.state.sessions.length > 0) {
 							if ( this.state.sessions[0].id === comment.user_id ) {
-								delButton = <a
-															className="btn btn-xs btn-danger"
-															onClick={boundClick}
-															comment={comment}
-															role="button">
-															Delete
-														</a>;
+								delButton =
+									<a
+										className="btn btn-xs btn-danger"
+										onClick={boundClick}
+										comment={comment}
+										role="button">
+										Delete
+									</a>;
 							}
 						}
 						return (
 							<li className="list-group-item" key={comment.id}>
 								<strong>{comment.username + " - "}</strong>
-								{ comment.expertise + " "} {delButton}
+								{comment.expertise + " "}
+								{delButton}
 								<br></br>
-								{comment.body}<br></br>
-							<div className="comment-date"> {
-								new Date(comment.created_at).toDateString()
-								+ " " +
-								new Date(comment.created_at).toLocaleTimeString()
-								}
-							</div>
-
+								{comment.body}
+								<br></br>
+								<div className="comment-date"> {
+									new Date(comment.created_at).toDateString()
+									+ " " +
+									new Date(comment.created_at).toLocaleTimeString()
+									}
+								</div>
 							</li>
 						);
-					}.bind(this))}
+						}.bind(this))
+					}
 				</ul>
 			</div>
 		);

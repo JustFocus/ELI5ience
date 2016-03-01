@@ -35,7 +35,7 @@ var CommentForm = React.createClass({
 
 	render: function(){
     return (
-        <div>
+        <div id='annotation'>
           <form onSubmit={this.handleSubmit}>
             <br/>
             <input

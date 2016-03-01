@@ -18,6 +18,8 @@ end
 json.annotations article.annotations do |annotation|
 	json.id annotation.id
 	json.body annotation.body
+	json.selection_start annotation.selection_start
+	json.selection_length annotation.selection_length
 	json.user_id annotation.author_id
 	json.created_at annotation.created_at
 	json.username annotation.user.username

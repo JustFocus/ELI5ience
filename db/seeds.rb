@@ -151,14 +151,14 @@ Annotation.create!(
   body: "This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. This is going to be a really long annotation. ",
 	author_id: "1",
 	article_id: "1",
-  selection_start: 0,
-  selection_length: 100
+  selection_start: 2,
+  selection_length: 2
 )
 
 Annotation.create!(
   body: "Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.",
 	author_id: "2",
 	article_id: "1",
-  selection_start: 150,
-  selection_length: 300
+  selection_start: 6,
+  selection_length: 4
 )
