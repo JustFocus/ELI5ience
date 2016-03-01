@@ -10,94 +10,41 @@ var AnnotationForm = React.createClass({
   },
 	getInitialState: function(){
     return {
-      title: "",
       body: "",
-			imageLink: "",
-			backgroundLink: "",
-			article: null
+			annotation: null
     };
   },
 
 	handleSubmit: function(event){
 		event.preventDefault();
-		var article = {
-			title: this.state.title,
+		var annotation = {
 			body: this.state.body,
-			image_link: this.state.imageLink,
-			background_link: this.state.backgroundLink,
+			article_id: this.props.articleId,
+			selection_start: this.props.selectionStart,
+			selection_length: this.props.selectionLength,
 		};
-		ApiUtil.createArticle(article);
+		ApiUtil.createAnnotation(annotation);
+		ApiUtil.fetchArticles();
+		this.props.submitCallback();
 	},
-	componentDidMount: function () {
-		this.articleStoreListener = ArticleStore.addListener(this._onChange);
-	},
-	componentWillUnmount: function() {
-		this.articleStoreListener.remove();
-	},
-	_onChange: function () {
-    this.setState({ article: ArticleStore.mostRecent() });
-		this.navigateToArticle();
-  },
-	navigateToArticle: function(){
-		debugger;
-		this.props.history.pushState(
-			null,
-			"articles/" + this.state.article.id
-		);
-	},
-	navigateToHome: function(){
-		this.props.history.pushState(null, "/");
-	},
-	handleCancel: function(event){
-		event.preventDefault();
-		this.navigateToHome();
-	},
+	
 	render: function(){
     return (
 			<div>
-				<br></br>
-				<div className="panel-heading user-pro-panel-heading">
-					<h3 className="panel-title">Create An Article!</h3>
-					<br></br>
-          <form className="form-signin" onSubmit={this.handleSubmit}>
-            <label className="sr-only">Title</label>
-            <input
-							type="text"
-							className="form-control"
-							placeholder="Title"
-							required autofocus
-							valueLink={this.linkState('title')}/>
-						<br></br>
-
-            <label className="sr-only">Body</label>
-						<textarea
-							className="form-control"
-							placeholder="Body"
-							required autofocus
-							valueLink={this.linkState('body')}/>
-            <br/>
-						<label className="sr-only">Image Url</label>
-							<input
-								type="text"
-								className="form-control"
-								placeholder="Image URL"
-								valueLink={this.linkState('imageLink')}/>
-						<label className="sr-only">Background Url</label>
-							<input
-								type="text"
-								className="form-control"
-								placeholder="Background URL"
-								valueLink={this.linkState('backgroundLink')}/>
-            <br/>
-						<input className="btn btn-xs btn-success user-create-art" type="submit" value="Create article"/>
-          </form>
-					<a
-						className="btn btn-xs btn-danger user-cancel"
-						onClick={this.handleCancel}
-						role="button">
-						Cancel
-					</a>
-        </div>
+        <form onSubmit={this.handleSubmit}>
+          <label className="sr-only">Body</label>
+					<textarea
+						className="form-control comment-form"
+						placeholder="Add annotation..."
+						required autofocus
+						valueLink={this.linkState('body')}/>
+          <br/>
+					<input
+						className="btn btn-xs btn-success user-create-art"
+						type="submit"
+						value="Create annotation"
+					/>
+        </form>
 			</div>
     );
   }

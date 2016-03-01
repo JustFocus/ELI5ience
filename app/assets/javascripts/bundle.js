@@ -24373,7 +24373,7 @@
 	  //   });
 	  // }
 	  createAnnotation: function (data) {
-	    $.post('api/comments', { annotation: data }, function (annotation) {
+	    $.post('api/annotations', { annotation: data }, function (annotation) {
 	      ApiActions.receiveSingle(annotation);
 	    });
 	  },
@@ -24504,6 +24504,12 @@
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.SESSIONS_RECEIVED,
 	      sessions: [sessions]
+	    });
+	  },
+	  receiveSingleAnnotation: function (annotation) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.ANNOTATION_RECEIVED,
+	      annotation: annotation
 	    });
 	  }
 	};
@@ -24835,7 +24841,8 @@
 	  ARTICLES_RECEIVED: "ARTICLES_RECEIVED",
 	  ARTICLE_REMOVED: "ARTICLE_REMOVED",
 	  USER_RECEIVED: "USER_RECEIVED",
-	  COMMENT_RECEIVED: "USER_RECEIVED"
+	  COMMENT_RECEIVED: "COMMENT_RECEIVED",
+	  ANNOTATION_RECEIVED: "ANNOTATION_RECEIVED"
 	};
 	
 	module.exports = ArticleConstants;
@@ -24889,7 +24896,6 @@
 			this.navigateToArticle();
 		},
 		navigateToArticle: function () {
-			debugger;
 			this.props.history.pushState(null, "articles/" + this.state.article.id);
 		},
 		navigateToHome: function () {
@@ -25145,6 +25151,15 @@
 	  return _articles;
 	};
 	
+	var insertAnnotation = function (annotation) {
+	  _articles.forEach(function (article) {
+	    if (article.id === annotation.article_id) {
+	      article.annotations.push(annotation);
+	    }
+	  });
+	  return _articles;
+	};
+	
 	ArticleStore.mostRecent = function () {
 	  return _recentArticle;
 	};
@@ -25177,6 +25192,10 @@
 	      break;
 	    case ArticleConstants.COMMENT_RECEIVED:
 	      insertComment(payload.comment);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.ANNOTATION_RECEIVED:
+	      insertAnnotation(payload.annotation);
 	      ArticleStore.__emitChange();
 	      break;
 	  }
@@ -31654,7 +31673,9 @@
 			var article = this._findArticleById(articleId) || { comments: [] };
 			return {
 				article: article,
-				annotationDisplay: 0
+				annotationDisplay: 0,
+				selection_start: 0,
+				selection_length: 0
 			};
 		},
 	
@@ -31709,60 +31730,62 @@
 		// 	return linkedBody;
 		// },
 	
-		splitBodySections: function () {
+		splitBodySections: function (sortedAnnotations) {
 			var sections = [];
 			if (this.hasOwnProperty('state')) {
 				if (this.state.article.hasOwnProperty('annotations')) {
-					for (var i = 1; i < this.state.article.annotations.length; i++) {
-						sections.push(this.state.article.body.slice(this.state.article.annotations[i - 1].selection_start + this.state.article.annotations[i - 1].selection_length, this.state.article.annotations[i].selection_start));
+					for (var i = 1; i < sortedAnnotations.length; i++) {
+						sections.push(this.state.article.body.slice(sortedAnnotations[i - 1].selection_start + sortedAnnotations[i - 1].selection_length, sortedAnnotations[i].selection_start));
 					}
 				}
 			}
 			return sections;
 		},
 	
-		splitLinkSecitons: function () {
+		splitLinkSecitons: function (sortedAnnotations) {
 			var sections = [];
 			if (this.hasOwnProperty('state')) {
 				if (this.state.article.hasOwnProperty('annotations')) {
-					for (var i = 0; i < this.state.article.annotations.length; i++) {
-						sections.push(this.state.article.body.slice(this.state.article.annotations[i].selection_start, this.state.article.annotations[i].selection_start + this.state.article.annotations[i].selection_length));
+					for (var i = 0; i < sortedAnnotations.length; i++) {
+						sections.push(this.state.article.body.slice(sortedAnnotations[i].selection_start, sortedAnnotations[i].selection_start + sortedAnnotations[i].selection_length));
 					}
 				}
 			}
 			return sections;
 		},
 	
-		splitBodyFL: function () {
+		splitBodyFL: function (sortedAnnotations) {
 			var sections = [];
 			if (this.hasOwnProperty('state')) {
 				if (this.state.article.hasOwnProperty('annotations')) {
-					sections.push(this.state.article.body.slice(0, this.state.article.annotations[0].selection_start));
-					sections.push(this.state.article.body.slice(this.state.article.annotations[this.state.article.annotations.length - 1].selection_start + this.state.article.annotations[this.state.article.annotations.length - 1].selection_length, this.state.article.body.length));
+					if (sortedAnnotations.length === 0) {
+						return [this.state.article.body, ''];
+					}
+					sections.push(this.state.article.body.slice(0, sortedAnnotations[0].selection_start));
+					sections.push(this.state.article.body.slice(sortedAnnotations[sortedAnnotations.length - 1].selection_start + sortedAnnotations[sortedAnnotations.length - 1].selection_length, this.state.article.body.length));
 				}
 			}
 			return sections;
 		},
 	
-		bodyContains: function (text) {
-			if (this.state.article.body.indexOf(text) >= 0) {
+		bodyContains: function (text, startIdx) {
+			if (startIdx >= 0) {
 				return true;
 			} else {
 				return false;
 			}
 		},
 	
-		uniqueText: function (text) {
-			if (this.state.article.body.indexOf(text) === this.state.article.body.lastIndexOf(text)) {
+		uniqueText: function (text, startIdx) {
+			if (startIdx === this.state.article.body.lastIndexOf(text)) {
 				return true;
 			} else {
 				return false;
 			}
 		},
 	
-		uniqueSelection: function (text) {
-			var endIdx = this.state.article.body.indexOf(text) + text.length;
-			var startIdx = this.state.article.body.indexOf(text);
+		uniqueSelection: function (text, startIdx) {
+			var endIdx = startIdx + text.length;
 			var annStartIdx;
 			var annEndIdx;
 			for (var i = 0; i < this.state.article.annotations.length; i++) {
@@ -31775,17 +31798,34 @@
 			return true;
 		},
 	
+		sortAnnotations: function (array) {
+			var key = 'selection_start';
+			return array.sort(function (a, b) {
+				var x = a[key];var y = b[key];
+				return x < y ? -1 : x > y ? 1 : 0;
+			});
+		},
+	
 		handleMouseUp: function (e) {
 			// console.log(window.getSelection().toString());
 			// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
 			// this.props.children = null;
 			// this.setState({mounted: false});
 			var textSelection = window.getSelection().toString();
-			if (this.bodyContains(textSelection) && this.uniqueText(textSelection) && this.uniqueSelection(textSelection)) {
-				this.setState({ annotationDisplay: 2 });
+			var textIdx = this.state.article.body.indexOf(textSelection);
+			if (this.bodyContains(textSelection, textIdx) && this.uniqueText(textSelection, textIdx) && this.uniqueSelection(textSelection, textIdx)) {
+				this.setState({
+					annotationDisplay: 2,
+					selection_start: textIdx,
+					selection_length: textSelection.length
+				});
 				return true;
 			} else {
-				this.setState({ annotationDisplay: 0 });
+				this.setState({
+					annotationDisplay: 0,
+					selection_start: 0,
+					selection_length: 0
+				});
 				return false;
 			}
 		},
@@ -31794,15 +31834,23 @@
 			this.setState({ annotationDisplay: 1 });
 		},
 	
+		resetFormView: function () {
+			this.setState({
+				annotationDisplay: 0,
+				selection_start: 0,
+				selection_length: 0
+			});
+		},
+	
 		render: function () {
 			// var article = this.props.article;
+			var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
 			var handleClick = this.handleClick;
-			var bodyFristLast = this.splitBodyFL();
-			var bodySections = this.splitBodySections();
-			var linkSections = this.splitLinkSecitons();
+			var bodyFristLast = this.splitBodyFL(sortedAnnotations);
+			var bodySections = this.splitBodySections(sortedAnnotations);
+			var linkSections = this.splitLinkSecitons(sortedAnnotations);
 			var Link = ReactRouter.Link;
 			var validText = false;
-	
 			return React.createElement(
 				'div',
 				null,
@@ -31881,9 +31929,13 @@
 							if (this.state.annotationDisplay === 1) {
 								return React.createElement(AnnotationShow, { article: this.state.article, annotationId: this.props.params.annotationId });
 							} else if (this.state.annotationDisplay === 2) {
-								return React.createElement(AnnotationForm, { article: this.state.article, params: this.props.params });
+								return React.createElement(AnnotationForm, {
+									articleId: this.props.params.articleId,
+									selectionStart: this.state.selection_start,
+									selectionLength: this.state.selection_length,
+									submitCallback: this.resetFormView
+								});
 							} else {
-								console.log(this.state.annotationDisplay);
 								return React.createElement(
 									'div',
 									null,
@@ -32389,7 +32441,7 @@
 		render: function () {
 			return React.createElement(
 				'div',
-				{ id: 'annotation' },
+				null,
 				React.createElement(
 					'form',
 					{ onSubmit: this.handleSubmit },
@@ -32625,116 +32677,47 @@
 		},
 		getInitialState: function () {
 			return {
-				title: "",
 				body: "",
-				imageLink: "",
-				backgroundLink: "",
-				article: null
+				annotation: null
 			};
 		},
 	
 		handleSubmit: function (event) {
 			event.preventDefault();
-			var article = {
-				title: this.state.title,
+			var annotation = {
 				body: this.state.body,
-				image_link: this.state.imageLink,
-				background_link: this.state.backgroundLink
+				article_id: this.props.articleId,
+				selection_start: this.props.selectionStart,
+				selection_length: this.props.selectionLength
 			};
-			ApiUtil.createArticle(article);
+			ApiUtil.createAnnotation(annotation);
+			ApiUtil.fetchArticles();
+			this.props.submitCallback();
 		},
-		componentDidMount: function () {
-			this.articleStoreListener = ArticleStore.addListener(this._onChange);
-		},
-		componentWillUnmount: function () {
-			this.articleStoreListener.remove();
-		},
-		_onChange: function () {
-			this.setState({ article: ArticleStore.mostRecent() });
-			this.navigateToArticle();
-		},
-		navigateToArticle: function () {
-			debugger;
-			this.props.history.pushState(null, "articles/" + this.state.article.id);
-		},
-		navigateToHome: function () {
-			this.props.history.pushState(null, "/");
-		},
-		handleCancel: function (event) {
-			event.preventDefault();
-			this.navigateToHome();
-		},
+	
 		render: function () {
 			return React.createElement(
 				'div',
 				null,
-				React.createElement('br', null),
 				React.createElement(
-					'div',
-					{ className: 'panel-heading user-pro-panel-heading' },
+					'form',
+					{ onSubmit: this.handleSubmit },
 					React.createElement(
-						'h3',
-						{ className: 'panel-title' },
-						'Create An Article!'
+						'label',
+						{ className: 'sr-only' },
+						'Body'
 					),
+					React.createElement('textarea', {
+						className: 'form-control comment-form',
+						placeholder: 'Add annotation...',
+						required: true, autofocus: true,
+						valueLink: this.linkState('body') }),
 					React.createElement('br', null),
-					React.createElement(
-						'form',
-						{ className: 'form-signin', onSubmit: this.handleSubmit },
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Title'
-						),
-						React.createElement('input', {
-							type: 'text',
-							className: 'form-control',
-							placeholder: 'Title',
-							required: true, autofocus: true,
-							valueLink: this.linkState('title') }),
-						React.createElement('br', null),
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Body'
-						),
-						React.createElement('textarea', {
-							className: 'form-control',
-							placeholder: 'Body',
-							required: true, autofocus: true,
-							valueLink: this.linkState('body') }),
-						React.createElement('br', null),
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Image Url'
-						),
-						React.createElement('input', {
-							type: 'text',
-							className: 'form-control',
-							placeholder: 'Image URL',
-							valueLink: this.linkState('imageLink') }),
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Background Url'
-						),
-						React.createElement('input', {
-							type: 'text',
-							className: 'form-control',
-							placeholder: 'Background URL',
-							valueLink: this.linkState('backgroundLink') }),
-						React.createElement('br', null),
-						React.createElement('input', { className: 'btn btn-xs btn-success user-create-art', type: 'submit', value: 'Create article' })
-					),
-					React.createElement(
-						'a',
-						{
-							className: 'btn btn-xs btn-danger user-cancel',
-							onClick: this.handleCancel,
-							role: 'button' },
-						'Cancel'
-					)
+					React.createElement('input', {
+						className: 'btn btn-xs btn-success user-create-art',
+						type: 'submit',
+						value: 'Create annotation'
+					})
 				)
 			);
 		}

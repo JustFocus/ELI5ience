@@ -38,6 +38,15 @@ var insertComment = function(comment) {
   return _articles;
 };
 
+var insertAnnotation = function(annotation) {
+  _articles.forEach(function(article){
+    if (article.id === annotation.article_id) {
+      article.annotations.push(annotation);
+    }
+  });
+  return _articles;
+};
+
 ArticleStore.mostRecent = function() {
   return _recentArticle;
 };
@@ -70,6 +79,10 @@ ArticleStore.__onDispatch = function (payload) {
       break;
     case ArticleConstants.COMMENT_RECEIVED:
       insertComment(payload.comment);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.ANNOTATION_RECEIVED:
+      insertAnnotation(payload.annotation);
       ArticleStore.__emitChange();
       break;
   }

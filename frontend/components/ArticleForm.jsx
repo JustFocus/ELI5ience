@@ -39,7 +39,6 @@ var ArticleForm = React.createClass({
 		this.navigateToArticle();
   },
 	navigateToArticle: function(){
-		debugger;
 		this.props.history.pushState(
 			null,
 			"articles/" + this.state.article.id

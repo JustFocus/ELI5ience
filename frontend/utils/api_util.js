@@ -18,7 +18,7 @@ var ApiUtil = {
   //   });
   // }
   createAnnotation: function(data) {
-    $.post('api/comments', { annotation: data }, function (annotation) {
+    $.post('api/annotations', { annotation: data }, function (annotation) {
       ApiActions.receiveSingle(annotation);
     });
   },

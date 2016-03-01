@@ -16,7 +16,9 @@ var ArticleShow = React.createClass({
 		var article = this._findArticleById(articleId) || {comments:  []};
 		return {
 			article: article,
-			annotationDisplay: 0
+			annotationDisplay: 0,
+			selection_start: 0,
+			selection_length: 0
 			};
 	},
 
@@ -72,49 +74,51 @@ var ArticleShow = React.createClass({
 	// 	return linkedBody;
 	// },
 
-	splitBodySections: function() {
+	splitBodySections: function(sortedAnnotations) {
 		var sections = [];
 		if (this.hasOwnProperty('state')){
 			if (this.state.article.hasOwnProperty('annotations')) {
-				for (var i = 1; i < this.state.article.annotations.length; i++) {
+				for (var i = 1; i < sortedAnnotations.length; i++) {
 					sections.push(this.state.article.body.slice(
-						this.state.article.annotations[i - 1].selection_start +
-						this.state.article.annotations[i - 1].selection_length,
-						this.state.article.annotations[i].selection_start));
+						sortedAnnotations[i - 1].selection_start +
+						sortedAnnotations[i - 1].selection_length,
+						sortedAnnotations[i].selection_start));
 				}
 			}
 		}
 		return sections;
 	},
 
-	splitLinkSecitons: function() {
+	splitLinkSecitons: function(sortedAnnotations) {
 		var sections = [];
 		if (this.hasOwnProperty('state')){
 			if (this.state.article.hasOwnProperty('annotations')) {
-				for (var i = 0; i < this.state.article.annotations.length; i++) {
+				for (var i = 0; i < sortedAnnotations.length; i++) {
 					sections.push(this.state.article.body.slice(
-						this.state.article.annotations[i].selection_start,
-						this.state.article.annotations[i].selection_start +
-						this.state.article.annotations[i].selection_length));
+						sortedAnnotations[i].selection_start,
+						sortedAnnotations[i].selection_start +
+						sortedAnnotations[i].selection_length));
 				}
 			}
 		}
 		return sections;
 	},
 
-	splitBodyFL: function() {
+	splitBodyFL: function(sortedAnnotations) {
 		var sections = [];
 		if (this.hasOwnProperty('state')){
 			if (this.state.article.hasOwnProperty('annotations')) {
+				if (sortedAnnotations.length === 0)
+				{return [this.state.article.body, ''];}
 				sections.push(
 					this.state.article.body.slice(
 						0,
-						this.state.article.annotations[0].selection_start
+						sortedAnnotations[0].selection_start
 					)
 				);
 				sections.push(
 					this.state.article.body.slice(
-						this.state.article.annotations[this.state.article.annotations.length - 1].selection_start + this.state.article.annotations[this.state.article.annotations.length - 1].selection_length,
+						sortedAnnotations[sortedAnnotations.length - 1].selection_start + sortedAnnotations[sortedAnnotations.length - 1].selection_length,
 						this.state.article.body.length
 					)
 				);
@@ -123,16 +127,16 @@ var ArticleShow = React.createClass({
 		return sections;
 	},
 
-	bodyContains: function(text) {
-		if (this.state.article.body.indexOf(text) >= 0) {
+	bodyContains: function(text, startIdx) {
+		if (startIdx >= 0) {
 			return true;
 		} else {
 			return false;
 		}
 	},
 
-	uniqueText: function(text) {
-		if (this.state.article.body.indexOf(text) ===
+	uniqueText: function(text, startIdx) {
+		if (startIdx ===
 			this.state.article.body.lastIndexOf(text)){
 				return true;
 			} else {
@@ -140,9 +144,8 @@ var ArticleShow = React.createClass({
 			}
 	},
 
-	uniqueSelection: function(text) {
-		var endIdx = this.state.article.body.indexOf(text) + text.length;
-		var startIdx = this.state.article.body.indexOf(text);
+	uniqueSelection: function(text, startIdx) {
+		var endIdx = startIdx + text.length;
 		var annStartIdx;
 		var annEndIdx;
 		for (var i = 0; i < this.state.article.annotations.length; i++) {
@@ -156,19 +159,36 @@ var ArticleShow = React.createClass({
 		return true;
 	},
 
+	sortAnnotations: function(array) {
+		var key = 'selection_start';
+    return array.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+	},
+
 	handleMouseUp: function(e) {
 		// console.log(window.getSelection().toString());
 		// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
 		// this.props.children = null;
 		// this.setState({mounted: false});
 		var textSelection = window.getSelection().toString();
-		if ( this.bodyContains(textSelection) &&
-		this.uniqueText(textSelection) &&
-		this.uniqueSelection(textSelection) ) {
-			this.setState({annotationDisplay: 2});
+		var textIdx = this.state.article.body.indexOf(textSelection);
+		if ( this.bodyContains(textSelection, textIdx) &&
+		this.uniqueText(textSelection, textIdx) &&
+		this.uniqueSelection(textSelection, textIdx) ) {
+			this.setState({
+				annotationDisplay: 2,
+				selection_start: textIdx,
+				selection_length: textSelection.length
+			});
 			return true;
 		} else {
-			this.setState({annotationDisplay: 0});
+			this.setState({
+				annotationDisplay: 0,
+				selection_start: 0,
+				selection_length: 0
+			});
 			return false;
 		}
 	},
@@ -177,15 +197,23 @@ var ArticleShow = React.createClass({
 		this.setState({annotationDisplay: 1});
 	},
 
+	resetFormView: function() {
+		this.setState({
+			annotationDisplay: 0,
+			selection_start: 0,
+			selection_length: 0
+		});
+	},
+
 	render: function() {
 		// var article = this.props.article;
+		var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
 		var handleClick = this.handleClick;
-		var bodyFristLast = this.splitBodyFL();
-		var bodySections = this.splitBodySections();
-		var linkSections = this.splitLinkSecitons();
+		var bodyFristLast = this.splitBodyFL(sortedAnnotations);
+		var bodySections = this.splitBodySections(sortedAnnotations);
+		var linkSections = this.splitLinkSecitons(sortedAnnotations);
 		var Link = ReactRouter.Link;
 		var validText = false;
-
 		return (
 			<div>
 				<br></br>
@@ -242,9 +270,15 @@ var ArticleShow = React.createClass({
 							if (this.state.annotationDisplay === 1){
 								return <AnnotationShow article={this.state.article} annotationId={this.props.params.annotationId} />;
 							} else if (this.state.annotationDisplay === 2){
-								return <AnnotationForm article={this.state.article} params={this.props.params} />;
+								return (
+									<AnnotationForm
+									articleId={this.props.params.articleId}
+									selectionStart={this.state.selection_start}
+									selectionLength={this.state.selection_length}
+									submitCallback={this.resetFormView}
+									/>
+								);
 							} else {
-								console.log(this.state.annotationDisplay);
 								return (<div>
 									{"<-----"} <br></br>
 									Select Text to create an annotation, or click a link to display an annotation

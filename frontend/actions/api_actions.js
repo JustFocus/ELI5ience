@@ -38,6 +38,12 @@ var ApiActions = {
       sessions: [sessions]
     });
   },
+  receiveSingleAnnotation: function(annotation){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.ANNOTATION_RECEIVED,
+      annotation: annotation
+    });
+  },
 };
 
 module.exports = ApiActions;

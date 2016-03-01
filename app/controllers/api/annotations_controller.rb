@@ -11,7 +11,7 @@ class Api::AnnotationsController < ApplicationController
 
   def create
 		annotation = params[:annotation]
-		annotation[:user_id] = current_user.id
+		annotation[:author_id] = current_user.id
 		#TODO: Add error if user is not logged in
     annotation = Annotation.create!(annotation_params)
     render json: annotation
