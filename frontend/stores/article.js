@@ -28,6 +28,16 @@ var removeArticle = function(article){
 	// _articles.
   // _articles = articles.slice(0);
 };
+var removeComment = function(comment){
+	//TODO: this - necessary? should _articles be [] or {}
+	// _articles.
+  // _articles = articles.slice(0);
+};
+var removeAnnotation = function(annotation){
+	//TODO: this - necessary? should _articles be [] or {}
+	// _articles.
+  // _articles = articles.slice(0);
+};
 
 var insertComment = function(comment) {
   _articles.forEach(function(article){
@@ -81,8 +91,16 @@ ArticleStore.__onDispatch = function (payload) {
       insertComment(payload.comment);
       ArticleStore.__emitChange();
       break;
+    case ArticleConstants.COMMENT_REMOVED:
+      removeComment(payload.comment);
+      ArticleStore.__emitChange();
+      break;
     case ArticleConstants.ANNOTATION_RECEIVED:
       insertAnnotation(payload.annotation);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.ANNOTATION_REMOVED:
+      removeAnnotation(payload.annotation);
       ArticleStore.__emitChange();
       break;
   }

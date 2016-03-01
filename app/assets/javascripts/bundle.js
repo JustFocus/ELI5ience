@@ -24374,7 +24374,7 @@
 	  // }
 	  createAnnotation: function (data) {
 	    $.post('api/annotations', { annotation: data }, function (annotation) {
-	      ApiActions.receiveSingle(annotation);
+	      ApiActions.receiveSingleAnnotation(annotation);
 	    });
 	  },
 	  removeAnnotation: function (id) {
@@ -24382,7 +24382,7 @@
 	      url: 'api/annotations/' + id,
 	      type: 'DELETE',
 	      success: function (annotation) {
-	        ApiActions.removeSingle(annotation);
+	        ApiActions.removeSingleAnnotation(annotation);
 	      }
 	    });
 	  },
@@ -24399,7 +24399,7 @@
 	
 	  createComment: function (data) {
 	    $.post('api/comments', { comment: data }, function (comment) {
-	      ApiActions.receiveSingle(comment);
+	      ApiActions.receiveSingleComment(comment);
 	    });
 	  },
 	  removeComment: function (id) {
@@ -24407,7 +24407,7 @@
 	      url: 'api/comments/' + id,
 	      type: 'DELETE',
 	      success: function (comment) {
-	        ApiActions.removeSingle(comment);
+	        ApiActions.removeSingleComment(comment);
 	      }
 	    });
 	  },
@@ -24500,6 +24500,12 @@
 	      comment: comment
 	    });
 	  },
+	  removeSingleComment: function (comment) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.COMMENT_REMOVED,
+	      comment: comment
+	    });
+	  },
 	  receiveSessions: function (sessions) {
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.SESSIONS_RECEIVED,
@@ -24509,6 +24515,12 @@
 	  receiveSingleAnnotation: function (annotation) {
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.ANNOTATION_RECEIVED,
+	      annotation: annotation
+	    });
+	  },
+	  removeSingleAnnotation: function (annotation) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.ANNOTATION_REMOVED,
 	      annotation: annotation
 	    });
 	  }
@@ -24842,7 +24854,9 @@
 	  ARTICLE_REMOVED: "ARTICLE_REMOVED",
 	  USER_RECEIVED: "USER_RECEIVED",
 	  COMMENT_RECEIVED: "COMMENT_RECEIVED",
-	  ANNOTATION_RECEIVED: "ANNOTATION_RECEIVED"
+	  COMMENT_REMOVED: "COMMENT_REMOVED",
+	  ANNOTATION_RECEIVED: "ANNOTATION_RECEIVED",
+	  ANNOTATION_REMOVED: "ANNOTATION_REMOVED"
 	};
 	
 	module.exports = ArticleConstants;
@@ -25141,6 +25155,16 @@
 	  // _articles.
 	  // _articles = articles.slice(0);
 	};
+	var removeComment = function (comment) {
+	  //TODO: this - necessary? should _articles be [] or {}
+	  // _articles.
+	  // _articles = articles.slice(0);
+	};
+	var removeAnnotation = function (annotation) {
+	  //TODO: this - necessary? should _articles be [] or {}
+	  // _articles.
+	  // _articles = articles.slice(0);
+	};
 	
 	var insertComment = function (comment) {
 	  _articles.forEach(function (article) {
@@ -25194,8 +25218,16 @@
 	      insertComment(payload.comment);
 	      ArticleStore.__emitChange();
 	      break;
+	    case ArticleConstants.COMMENT_REMOVED:
+	      removeComment(payload.comment);
+	      ArticleStore.__emitChange();
+	      break;
 	    case ArticleConstants.ANNOTATION_RECEIVED:
 	      insertAnnotation(payload.annotation);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.ANNOTATION_REMOVED:
+	      removeAnnotation(payload.annotation);
 	      ArticleStore.__emitChange();
 	      break;
 	  }

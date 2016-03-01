@@ -19,7 +19,7 @@ var ApiUtil = {
   // }
   createAnnotation: function(data) {
     $.post('api/annotations', { annotation: data }, function (annotation) {
-      ApiActions.receiveSingle(annotation);
+      ApiActions.receiveSingleAnnotation(annotation);
     });
   },
   removeAnnotation: function(id) {
@@ -27,7 +27,7 @@ var ApiUtil = {
       url: 'api/annotations/' + id,
       type: 'DELETE',
       success: function(annotation){
-        ApiActions.removeSingle(annotation);
+        ApiActions.removeSingleAnnotation(annotation);
       }
     });
   },
@@ -44,7 +44,7 @@ var ApiUtil = {
 
   createComment: function(data) {
     $.post('api/comments', { comment: data }, function (comment) {
-      ApiActions.receiveSingle(comment);
+      ApiActions.receiveSingleComment(comment);
     });
   },
   removeComment: function(id) {
@@ -52,7 +52,7 @@ var ApiUtil = {
       url: 'api/comments/' + id,
       type: 'DELETE',
       success: function(comment){
-        ApiActions.removeSingle(comment);
+        ApiActions.removeSingleComment(comment);
       }
     });
   },

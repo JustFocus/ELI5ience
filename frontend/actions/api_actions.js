@@ -32,6 +32,12 @@ var ApiActions = {
       comment: comment
     });
   },
+  removeSingleComment: function(comment){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.COMMENT_REMOVED,
+      comment: comment
+    });
+  },
   receiveSessions: function(sessions){
     AppDispatcher.dispatch({
       actionType: ArticleConstants.SESSIONS_RECEIVED,
@@ -41,6 +47,12 @@ var ApiActions = {
   receiveSingleAnnotation: function(annotation){
     AppDispatcher.dispatch({
       actionType: ArticleConstants.ANNOTATION_RECEIVED,
+      annotation: annotation
+    });
+  },
+  removeSingleAnnotation: function(annotation){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.ANNOTATION_REMOVED,
       annotation: annotation
     });
   },
