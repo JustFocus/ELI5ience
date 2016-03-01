@@ -15,45 +15,70 @@ var AnnotationShow = React.createClass({
   },
 
 	componentWillUnmount: function() {
-
+		this.sessionStoreListener.remove();
 	},
 
 	componentDidMount: function () {
-
+		this.sessionStoreListener = SessionStore.addListener(this._onChange);
+		ApiUtil.fetchSessions();
 	},
 
 	_onChange: function () {
-
+		this.setState({
+			sessions: SessionStore.all()
+		 });
 	},
 
-	handleDelClick: function (article) {
-
+	handleDelClick: function (annotationId) {
+		if (confirm("Are you sure you want to delete your annotation?")) {
+			ApiUtil.removeAnnotation(annotationId);
+			ApiUtil.fetchArticles();
+			ApiUtil.fetchSessions();
+		}
   },
-
-	handleArticleClick: function(article) {
-	},
-
-	newArticleClick: function() {
-	},
 
 	annotationBody: function(annotationId, annotations) {
 		for (var i = 0; i < annotations.length; i++) {
-			if (annotationId === annotations[i].id.toString()) return annotations[i].body;
+			if (annotationId === annotations[i].id.toString())
+				return {
+					body: annotations[i].body,
+					user_id: annotations[i].user_id
+				};
+		}
+		return ['', 0];
+	},
+
+	delButton: function(userId, annotationId){
+		if (this.state.sessions.length > 0) {
+			if ( this.state.sessions[0].id === userId ) {
+				return (
+					<a
+						className="btn btn-xs btn-danger"
+						onClick={this.handleDelClick.bind(null, annotationId)}
+						role="button">
+						Delete
+					</a>);
+			} else
+			return '';
 		}
 	},
 
+
 	render: function() {
 		var handleDelClick = this.handleDelClick;
-		var handleArticleClick = this.handleArticleClick;
 		var user = this.state.user;
-		var annotations = this.props.article.annotations
+		var annotations = this.props.article.annotations;
 
-		var annotationId = this.props.annotationId
-		var delButton;
+		var annotationId = this.props.annotationId;
 
+		var annotationDetails = this.annotationBody(annotationId, annotations);
+
+		var delButton = this.delButton(annotationDetails.user_id, annotationId);
 		return (
 			<div id="annotation">
-				{this.annotationBody(annotationId, annotations)}
+				{annotationDetails.body}
+				<br></br>
+				{delButton}
 			</div>
 		);
 	}

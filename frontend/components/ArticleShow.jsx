@@ -268,7 +268,10 @@ var ArticleShow = React.createClass({
 					<div className="well art-annotation" articles={this.props.articles}>
 						{ function () {
 							if (this.state.annotationDisplay === 1){
-								return <AnnotationShow article={this.state.article} annotationId={this.props.params.annotationId} />;
+								return <AnnotationShow
+									article={this.state.article}
+									annotationId={this.props.params.annotationId}
+									/>;
 							} else if (this.state.annotationDisplay === 2){
 								return (
 									<AnnotationForm
