@@ -113,7 +113,10 @@ var User = React.createClass({
 													<a
 														href={"#/articles/" + article.id}
 														onClick={this.boundArticleClick}
-														className="list-group-item"
+														className="list-group-item user-article"
+														style={{
+															  color: '#CCC'
+														}}
 													>
 														{article.title}
 													</a>

@@ -48,7 +48,13 @@ var AnnotationShow = React.createClass({
 		return ['', 0];
 	},
 
-	delButton: function(userId, annotationId){
+	delButton: function(annotationId){
+		var userId;
+		for (var i = 0; i < this.props.article.annotations.length; i++) {
+			if (this.props.article.annotations[i].id == annotationId) {
+				userId = this.props.article.annotations[i].user_id;
+			}
+		}
 		if (this.state.sessions.length > 0) {
 			if ( this.state.sessions[0].id === userId ) {
 				return (
@@ -68,12 +74,10 @@ var AnnotationShow = React.createClass({
 		var handleDelClick = this.handleDelClick;
 		var user = this.state.user;
 		var annotations = this.props.article.annotations;
-
 		var annotationId = this.props.annotationId;
-
 		var annotationDetails = this.annotationBody(annotationId, annotations);
+		var delButton = this.delButton(annotationId);
 
-		var delButton = this.delButton(annotationDetails.user_id, annotationId);
 		return (
 			<div id="annotation">
 				{annotationDetails.body}

@@ -18,15 +18,23 @@
 @import "bootstrap-sprockets"
 @import "bootstrap"
 
+// html, body
+//   height: 100%
+
+html
+
 
 body
   margin: 0
-  background: image-url('saturnmosaic_cassini_4000.jpg')
+
+  background: url('crescentsaturn_cassini_big.jpg') no-repeat center center fixed
+  // webkit-background-size: cover
+  // moz-background-size: cover
+  // o-background-size: cover
   background-size: cover
-  background-repeat:no-repeat
-  display: compact
+
   font: 13px/18px "Helvetica Neue", Helvetica, Arial, sans-serif
-  opacity: 0.95
+  opacity: 1
   padding-bottom: 70px
 
 footer
@@ -39,27 +47,56 @@ footer
 //   background-color: white !important
 //   opacity: 0.5 !important
 
+.jumbotron
+  background-color: #111
+  color:  #CCC
+
+.jumbo
+  background-color: #111
+  color: #CCC
+
+.jumbo-header
+  color: #111
+
+.subheader
+  color: #888
+
 .col-md-4
   margin: 1px
   width: 32.333333%
+  background-color: #111
+  color: #CCC
 
 .navbar
   min-height: 0px
 
 .panel-primary.user-panel-primary
-  border-color: #090909
-  background-color: #eee
+  background-color: #111
+  color: #CCC
+  border-color: #000
 
 .panel-heading.user-panel-heading
-  background-color: #222
+  background-color: #111
+  color: #CCC
+  border-color: #000
 
 .panel-heading.user-pro-panel-heading
-  background-color: #222
-  color: #fff
+  background-color: #111
+  color: #CCC
   width: 440px
 
 .list-group-item
-  color: #555
+  background-color: #111
+  color: #CCC
+
+.user-article
+  background-color: #111
+  color: #CCC
+
+.comment-list-art
+  background-color: #111
+  color: #CCC
+  padding: 10px
 
 .ELI-panel
   width: 400px
@@ -82,30 +119,46 @@ footer
 .art-body
   width: 49%
   float: left
+  background-color: #111
+  color: #CCC
 
 .art-annotation
   width: 49%
   float: right
+  background-color: #111
+  color: #CCC
 
 .art-details
   margin-left: 50px
   margin-right: 50px
+  background-color: #111
+  color: #CCC
 
 .body-ann-cont
   overflow: auto
+  background-color: #111
+  color: #CCC
 
 .comment-sec
   width: 49%
   margin-top: 5px
+  background-color: #111
+  color: #CCC
 
 .comment-form
   margin: -10px
+  background-color: #111
+  color: #CCC
 
 .comment-date
   font-size: 10px
 
 .comment-list
-  padding: 0px
+  padding: 10px
+  background-color: #111
+  color: #CCC
 
 .art-sec
   display: inline
+  background-color: #111
+  color: #CCC

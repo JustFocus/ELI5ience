@@ -294,10 +294,10 @@ var ArticleShow = React.createClass({
 								);
 							} else {
 								return (<div>
-									{"<-----"} <br></br>
+									<strong>{"<-----"} <br></br>
 									Select Text to create an annotation, or click a link to display an annotation
 									<br></br>
-									{"<-----"}
+									{"<-----"}</strong>
 								</div>);
 							}
 						}.bind(this)() }

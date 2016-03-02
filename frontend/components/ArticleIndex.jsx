@@ -48,9 +48,9 @@ var ArticleIndex = React.createClass({
 		return(
 			<span>
         <div className="jumbotron">
-          <div className="container">
-            <h1>Welcome to ELI5ience!</h1>
-            <p>ELI5ience is a web application where users can post and annotate articles. </p>
+          <div className="container jumbo">
+            <h1 className="jumbo-header" style={{color: '#CCC'}}>Welcome to ELI5ience!</h1>
+            <p className="subheader">A place where users can post and annotate articles. </p>
             <a
               className="btn btn-xs btn-success"
               onClick={this.newArticleClick}
@@ -66,7 +66,7 @@ var ArticleIndex = React.createClass({
           {this.state.articles.map(function(article) {
             var boundClick = handleClick.bind(null, article);
             return (
-              <div key={article.id} style={{backgroundColor: '#FFFFFF'}}
+              <div key={article.id}
                 className="col-md-4">
                 <h2>{article.title}</h2>
                 <p>{article.body.slice(0, 300) + "..."}</p>

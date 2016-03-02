@@ -68,8 +68,12 @@ var CommentIndex = React.createClass({
 								{comment.expertise + " "}
 								{delButton}
 								<br></br>
+								<br></br>
+
 								{comment.body}
 								<br></br>
+								<br></br>
+
 								<div className="comment-date"> {
 									new Date(comment.created_at).toDateString()
 									+ " " +

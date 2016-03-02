@@ -25071,16 +25071,16 @@
 	        { className: 'jumbotron' },
 	        React.createElement(
 	          'div',
-	          { className: 'container' },
+	          { className: 'container jumbo' },
 	          React.createElement(
 	            'h1',
-	            null,
+	            { className: 'jumbo-header', style: { color: '#CCC' } },
 	            'Welcome to ELI5ience!'
 	          ),
 	          React.createElement(
 	            'p',
-	            null,
-	            'ELI5ience is a web application where users can post and annotate articles. '
+	            { className: 'subheader' },
+	            'A place where users can post and annotate articles. '
 	          ),
 	          React.createElement(
 	            'a',
@@ -25100,7 +25100,7 @@
 	          var boundClick = handleClick.bind(null, article);
 	          return React.createElement(
 	            'div',
-	            { key: article.id, style: { backgroundColor: '#FFFFFF' },
+	            { key: article.id,
 	              className: 'col-md-4' },
 	            React.createElement(
 	              'h2',
@@ -32026,12 +32026,16 @@
 								return React.createElement(
 									'div',
 									null,
-									"<-----",
-									' ',
-									React.createElement('br', null),
-									'Select Text to create an annotation, or click a link to display an annotation',
-									React.createElement('br', null),
-									"<-----"
+									React.createElement(
+										'strong',
+										null,
+										"<-----",
+										' ',
+										React.createElement('br', null),
+										'Select Text to create an annotation, or click a link to display an annotation',
+										React.createElement('br', null),
+										"<-----"
+									)
 								);
 							}
 						}.bind(this)()
@@ -32236,7 +32240,10 @@
 												{
 													href: "#/articles/" + article.id,
 													onClick: this.boundArticleClick,
-													className: 'list-group-item'
+													className: 'list-group-item user-article',
+													style: {
+														color: '#CCC'
+													}
 												},
 												article.title
 											),
@@ -32635,7 +32642,9 @@
 							comment.expertise + " ",
 							delButton,
 							React.createElement('br', null),
+							React.createElement('br', null),
 							comment.body,
+							React.createElement('br', null),
 							React.createElement('br', null),
 							React.createElement(
 								'div',
@@ -32742,7 +32751,13 @@
 			return ['', 0];
 		},
 	
-		delButton: function (userId, annotationId) {
+		delButton: function (annotationId) {
+			var userId;
+			for (var i = 0; i < this.props.article.annotations.length; i++) {
+				if (this.props.article.annotations[i].id == annotationId) {
+					userId = this.props.article.annotations[i].user_id;
+				}
+			}
 			if (this.state.sessions.length > 0) {
 				if (this.state.sessions[0].id === userId) {
 					return React.createElement(
@@ -32761,12 +32776,10 @@
 			var handleDelClick = this.handleDelClick;
 			var user = this.state.user;
 			var annotations = this.props.article.annotations;
-	
 			var annotationId = this.props.annotationId;
-	
 			var annotationDetails = this.annotationBody(annotationId, annotations);
+			var delButton = this.delButton(annotationId);
 	
-			var delButton = this.delButton(annotationDetails.user_id, annotationId);
 			return React.createElement(
 				'div',
 				{ id: 'annotation' },
