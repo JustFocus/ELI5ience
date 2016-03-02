@@ -40,6 +40,7 @@ var CommentForm = React.createClass({
             <br/>
             <input
 							type="text"
+							required autofocus
 							placeholder="Add a comment..."
 							className="form-control comment-form"
 							valueLink={this.linkState('body')}

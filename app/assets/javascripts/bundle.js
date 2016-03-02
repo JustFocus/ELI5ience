@@ -24373,16 +24373,16 @@
 	  //   });
 	  // }
 	  createAnnotation: function (data) {
-	    $.post('api/annotations', { annotation: data }, function (annotation) {
-	      ApiActions.receiveSingleAnnotation(annotation);
+	    $.post('api/annotations', { annotation: data }, function (annotations) {
+	      ApiActions.receiveAnnotations(annotations);
 	    });
 	  },
 	  removeAnnotation: function (id) {
 	    $.ajax({
 	      url: 'api/annotations/' + id,
 	      type: 'DELETE',
-	      success: function (annotation) {
-	        ApiActions.removeSingleAnnotation(annotation);
+	      success: function (annotations) {
+	        ApiActions.receiveAnnotations(annotations);
 	      }
 	    });
 	  },
@@ -24391,23 +24391,23 @@
 	      url: 'api/annotations/' + data.id,
 	      data: data,
 	      type: 'DELETE',
-	      success: function (annotation) {
-	        ApiActions.receiveSingle(annotation);
+	      success: function (annotations) {
+	        ApiActions.receiveAnnotations(annotations);
 	      }
 	    });
 	  },
 	
 	  createComment: function (data) {
-	    $.post('api/comments', { comment: data }, function (comment) {
-	      ApiActions.receiveSingleComment(comment);
+	    $.post('api/comments', { comment: data }, function (comments) {
+	      ApiActions.receiveComments(comments);
 	    });
 	  },
 	  removeComment: function (id) {
 	    $.ajax({
 	      url: 'api/comments/' + id,
 	      type: 'DELETE',
-	      success: function (comment) {
-	        ApiActions.removeSingleComment(comment);
+	      success: function (comments) {
+	        ApiActions.receiveComments(comments);
 	      }
 	    });
 	  },
@@ -24500,6 +24500,12 @@
 	      comment: comment
 	    });
 	  },
+	  receiveComments: function (comments) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.COMMENTS_RECEIVED,
+	      comments: comments
+	    });
+	  },
 	  removeSingleComment: function (comment) {
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.COMMENT_REMOVED,
@@ -24516,6 +24522,12 @@
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.ANNOTATION_RECEIVED,
 	      annotation: annotation
+	    });
+	  },
+	  receiveAnnotations: function (annotations) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.ANNOTATIONS_RECEIVED,
+	      annotations: annotations
 	    });
 	  },
 	  removeSingleAnnotation: function (annotation) {
@@ -24854,8 +24866,10 @@
 	  ARTICLE_REMOVED: "ARTICLE_REMOVED",
 	  USER_RECEIVED: "USER_RECEIVED",
 	  COMMENT_RECEIVED: "COMMENT_RECEIVED",
+	  COMMENTS_RECEIVED: "COMMENTS_RECEIVED",
 	  COMMENT_REMOVED: "COMMENT_REMOVED",
 	  ANNOTATION_RECEIVED: "ANNOTATION_RECEIVED",
+	  ANNOTATIONS_RECEIVED: "ANNOTATIONS_RECEIVED",
 	  ANNOTATION_REMOVED: "ANNOTATION_REMOVED"
 	};
 	
@@ -25166,6 +25180,25 @@
 	  // _articles = articles.slice(0);
 	};
 	
+	var insertComments = function (comments) {
+	  if (comments.length === 0) return _articles;
+	  _articles.forEach(function (article) {
+	    if (article.id === comments[0].article_id) {
+	      article.comments = comments;
+	    }
+	  });
+	  return _articles;
+	};
+	
+	var insertAnnotations = function (annotations) {
+	  _articles.forEach(function (article) {
+	    if (article.id === annotations[0].article_id) {
+	      article.annotations = annotations;
+	    }
+	  });
+	  return _articles;
+	};
+	
 	var insertComment = function (comment) {
 	  _articles.forEach(function (article) {
 	    if (article.id === comment.article_id) {
@@ -25218,12 +25251,20 @@
 	      insertComment(payload.comment);
 	      ArticleStore.__emitChange();
 	      break;
+	    case ArticleConstants.COMMENTS_RECEIVED:
+	      insertComments(payload.comments);
+	      ArticleStore.__emitChange();
+	      break;
 	    case ArticleConstants.COMMENT_REMOVED:
 	      removeComment(payload.comment);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.ANNOTATION_RECEIVED:
 	      insertAnnotation(payload.annotation);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.ANNOTATIONS_RECEIVED:
+	      insertAnnotations(payload.annotations);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.ANNOTATION_REMOVED:
@@ -31832,10 +31873,12 @@
 	
 		sortAnnotations: function (array) {
 			var key = 'selection_start';
-			return array.sort(function (a, b) {
-				var x = a[key];var y = b[key];
-				return x < y ? -1 : x > y ? 1 : 0;
-			});
+			if (this.state.article.hasOwnProperty('annotations')) {
+				return array.sort(function (a, b) {
+					var x = a[key];var y = b[key];
+					return x < y ? -1 : x > y ? 1 : 0;
+				});
+			}
 		},
 	
 		handleMouseUp: function (e) {
@@ -31872,6 +31915,15 @@
 				selection_start: 0,
 				selection_length: 0
 			});
+		},
+	
+		commentLength: function () {
+	
+			if (this.state.article.hasOwnProperty('comments')) {
+				return this.state.article.comments.length;
+			} else {
+				return 0;
+			}
 		},
 	
 		render: function () {
@@ -31991,7 +32043,7 @@
 					React.createElement(
 						'h5',
 						null,
-						this.state.article.comments.length,
+						this.commentLength,
 						' Comments'
 					),
 					React.createElement(
@@ -32483,6 +32535,7 @@
 					React.createElement('br', null),
 					React.createElement('input', {
 						type: 'text',
+						required: true, autofocus: true,
 						placeholder: 'Add a comment...',
 						className: 'form-control comment-form',
 						valueLink: this.linkState('body')
@@ -32512,7 +32565,7 @@
 	
 		getInitialState: function () {
 			return {
-				comments: this.props.comments,
+				comments: this.props.comments || [],
 				sessions: SessionStore.all()
 			};
 		},
@@ -32542,7 +32595,7 @@
 	
 		componentWillReceiveProps: function () {
 			this.setState({
-				comments: this.props.comments,
+				comments: this.props.comments || [],
 				sessions: SessionStore.all()
 			});
 		},
@@ -32556,7 +32609,7 @@
 				React.createElement(
 					'ul',
 					{ className: 'comment-list' },
-					this.props.comments.map(function (comment) {
+					this.state.comments.map(function (comment) {
 						var boundClick = handleClick.bind(null, comment);
 						if (this.state.sessions.length > 0) {
 							if (this.state.sessions[0].id === comment.user_id) {

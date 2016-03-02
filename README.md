@@ -16,9 +16,9 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 
 - [x] Create an account
 - [x] Log in / Log out
-- [ ] Create, read, edit, and delete articles
-- [ ] Create, read, edit, and delete comments on articles
-- [ ] Create, read, edit, and delete annotations on articles
+- [x] Create, read, and delete articles
+- [x] Create, read, and delete comments on articles
+- [x] Create, read, and delete annotations on articles
 - [ ] Create, read, edit, and delete improvements on annotations
 - [ ] Vote on annotations
 
@@ -66,40 +66,40 @@ the API.
 
 **Objective:** Articles can be created, read, edited and destroyed with the user interface.
 
-- [ ] article creation page
-- [ ] main page w/ list of articles
-- [ ] article page
+- [x] article creation page
+- [x] main page w/ list of articles
+- [x] article page
 
 ### Phase 4: [Comments (0.5 day)][phase-four]
 
 **Objective:** Comments belong to articles and can be viewed on articles.
 
-- [ ] create `Comment` model
+- [x] create `Comment` model
 - build out API, Flux loop, and components for:
-  - [ ] Comment CRUD
-  - [ ] viewing comments on articles
+  - [x] Comment CRUD
+  - [x] viewing comments on articles
 
 ### Phase 5: [Start Styling (1 day)][phase-five]
 
 **Objective:** Existing pages (sign up, sign in, profile, articles, and main page) will look good.
 
-- [ ] create a basic style guide
-- [ ] position elements on the page
-- [ ] add basic colors & styles
+- [x] create a basic style guide
+- [x] position elements on the page
+- [x] add basic colors & styles
 
 ### Phase 6: [Annotations Flux Architecture and Router (2 days)][phase-six]
 
 **Objective:** Annotations belong to Articles, and can be viewed on articles.
 
-- [ ] setup the flux loop with skeleton files
-- [ ] setup React Router
-- [ ] create `Annotation` model
+- [x] setup the flux loop with skeleton files
+- [x] setup React Router
+- [x] create `Annotation` model
 - build out API, Flux loop, and components for:
-  - [ ] Annotation CRUD
-      - [ ] selecting text opens annotation form
-  - [ ] viewing annotation on articles
-  - [ ] modify article body to include links to Annotations
-- [ ] Use CSS to style new views
+  - [x] Annotation CRUD
+      - [x] selecting text opens annotation form
+  - [x] viewing annotation on articles
+  - [x] modify article body to include links to Annotations
+- [x] Use CSS to style new views
 
 ### Phase 7: [Improvements (1 day)][phase-seven]
 

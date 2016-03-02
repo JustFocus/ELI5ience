@@ -7,7 +7,7 @@ var CommentIndex = React.createClass({
 
 	getInitialState: function() {
 		return{
-			comments: this.props.comments,
+			comments: this.props.comments || [],
 			sessions: SessionStore.all()
 		};
 	},
@@ -37,7 +37,7 @@ var CommentIndex = React.createClass({
 
 	componentWillReceiveProps: function() {
 		this.setState({
-			comments: this.props.comments,
+			comments: this.props.comments || [],
 			sessions: SessionStore.all()
 		});
 	},
@@ -48,7 +48,7 @@ var CommentIndex = React.createClass({
 		return (
 			<div>
 				<ul className="comment-list">
-					{this.props.comments.map(function(comment){
+					{this.state.comments.map(function(comment){
 						var boundClick = handleClick.bind(null, comment);
 						if (this.state.sessions.length > 0) {
 							if ( this.state.sessions[0].id === comment.user_id ) {

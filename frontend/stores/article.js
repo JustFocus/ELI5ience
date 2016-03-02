@@ -39,6 +39,25 @@ var removeAnnotation = function(annotation){
   // _articles = articles.slice(0);
 };
 
+var insertComments = function(comments) {
+  if (comments.length === 0) return _articles;
+  _articles.forEach(function(article){
+    if (article.id === comments[0].article_id) {
+      article.comments = comments;
+    }
+  });
+  return _articles;
+};
+
+var insertAnnotations = function(annotations) {
+  _articles.forEach(function(article){
+    if (article.id === annotations[0].article_id) {
+      article.annotations = annotations;
+    }
+  });
+  return _articles;
+};
+
 var insertComment = function(comment) {
   _articles.forEach(function(article){
     if (article.id === comment.article_id) {
@@ -91,12 +110,20 @@ ArticleStore.__onDispatch = function (payload) {
       insertComment(payload.comment);
       ArticleStore.__emitChange();
       break;
+    case ArticleConstants.COMMENTS_RECEIVED:
+      insertComments(payload.comments);
+      ArticleStore.__emitChange();
+      break;
     case ArticleConstants.COMMENT_REMOVED:
       removeComment(payload.comment);
       ArticleStore.__emitChange();
       break;
     case ArticleConstants.ANNOTATION_RECEIVED:
       insertAnnotation(payload.annotation);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.ANNOTATIONS_RECEIVED:
+      insertAnnotations(payload.annotations);
       ArticleStore.__emitChange();
       break;
     case ArticleConstants.ANNOTATION_REMOVED:

@@ -161,10 +161,12 @@ var ArticleShow = React.createClass({
 
 	sortAnnotations: function(array) {
 		var key = 'selection_start';
-    return array.sort(function(a, b) {
-        var x = a[key]; var y = b[key];
-        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    });
+		if (this.state.article.hasOwnProperty('annotations')) {
+	    return array.sort(function(a, b) {
+	        var x = a[key]; var y = b[key];
+	        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	    });
+		}
 	},
 
 	handleMouseUp: function(e) {
@@ -203,6 +205,15 @@ var ArticleShow = React.createClass({
 			selection_start: 0,
 			selection_length: 0
 		});
+	},
+
+	commentLength: function () {
+
+		if (this.state.article.hasOwnProperty('comments')) {
+			return this.state.article.comments.length;
+		} else {
+			return 0;
+		}
 	},
 
 	render: function() {
@@ -293,7 +304,7 @@ var ArticleShow = React.createClass({
 					</div>
 				</div >
 					<div className="well comment-sec">
-						<h5>{this.state.article.comments.length} Comments</h5>
+						<h5>{this.commentLength} Comments</h5>
 						<span >
 							<CommentForm  articleId={this.props.params.articleId} />
 						</span>

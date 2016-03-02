@@ -18,16 +18,16 @@ var ApiUtil = {
   //   });
   // }
   createAnnotation: function(data) {
-    $.post('api/annotations', { annotation: data }, function (annotation) {
-      ApiActions.receiveSingleAnnotation(annotation);
+    $.post('api/annotations', { annotation: data }, function (annotations) {
+      ApiActions.receiveAnnotations(annotations);
     });
   },
   removeAnnotation: function(id) {
     $.ajax({
       url: 'api/annotations/' + id,
       type: 'DELETE',
-      success: function(annotation){
-        ApiActions.removeSingleAnnotation(annotation);
+      success: function(annotations){
+        ApiActions.receiveAnnotations(annotations);
       }
     });
   },
@@ -36,23 +36,23 @@ var ApiUtil = {
       url: 'api/annotations/' + data.id,
       data: data,
       type: 'DELETE',
-      success: function(annotation){
-        ApiActions.receiveSingle(annotation);
+      success: function(annotations){
+        ApiActions.receiveAnnotations(annotations);
       }
     });
   },
 
   createComment: function(data) {
-    $.post('api/comments', { comment: data }, function (comment) {
-      ApiActions.receiveSingleComment(comment);
+    $.post('api/comments', { comment: data }, function (comments) {
+      ApiActions.receiveComments(comments);
     });
   },
   removeComment: function(id) {
     $.ajax({
       url: 'api/comments/' + id,
       type: 'DELETE',
-      success: function(comment){
-        ApiActions.removeSingleComment(comment);
+      success: function(comments){
+        ApiActions.receiveComments(comments);
       }
     });
   },
