@@ -2,6 +2,7 @@ var React = require('react');
 var ApiUtil = require('../utils/api_util');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
 var ArticleStore = require('../stores/article');
+var SessionStore = require('../stores/session');
 
 var ArticleForm = React.createClass({
 	mixins: [LinkedStateMixin],
@@ -14,7 +15,8 @@ var ArticleForm = React.createClass({
       body: "",
 			imageLink: "",
 			backgroundLink: "",
-			article: null
+			article: null,
+			session: SessionStore.all()
     };
   },
 
@@ -27,18 +29,22 @@ var ArticleForm = React.createClass({
 			background_link: this.state.backgroundLink,
 		};
 		ApiUtil.createArticle(article);
+		this.createListener = ArticleStore.addListener(this.navigateToArticle);
 	},
 	componentDidMount: function () {
-		this.articleStoreListener = ArticleStore.addListener(this._onChange);
+		this.sessionStoreListener = SessionStore.addListener(this._onChange);
+		ApiUtil.fetchSessions();
 	},
 	componentWillUnmount: function() {
-		this.articleStoreListener.remove();
+		this.sessionStoreListener.remove();
+		this.createListener.remove();
 	},
 	_onChange: function () {
-    this.setState({ article: ArticleStore.mostRecent() });
-		this.navigateToArticle();
+		this.setState({ session: SessionStore.all()});
+		// this.navigateToArticle();
   },
 	navigateToArticle: function(){
+		this.setState({ article: ArticleStore.mostRecent() });
 		this.props.history.pushState(
 			null,
 			"articles/" + this.state.article.id
@@ -50,6 +56,19 @@ var ArticleForm = React.createClass({
 	handleCancel: function(event){
 		event.preventDefault();
 		this.navigateToHome();
+	},
+	createBtn: function(session){
+		if (session.length === 0) {
+			return <div className='errlogin'>Please login to create an article!</div>;
+		} else {
+			return (
+				<input
+					className="btn btn-xs btn-success user-create-art"
+					type="submit"
+					value="Create article"
+				/>
+			);
+		}
 	},
 	render: function(){
     return (
@@ -90,7 +109,7 @@ var ArticleForm = React.createClass({
 								placeholder="Background URL"
 								valueLink={this.linkState('backgroundLink')}/>
             <br/>
-						<input className="btn btn-xs btn-success user-create-art" type="submit" value="Create article"/>
+						{this.createBtn(this.state.session)}
           </form>
 					<a
 						className="btn btn-xs btn-danger user-cancel"

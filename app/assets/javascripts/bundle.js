@@ -24914,6 +24914,7 @@
 	var ApiUtil = __webpack_require__(208);
 	var LinkedStateMixin = __webpack_require__(239);
 	var ArticleStore = __webpack_require__(219);
+	var SessionStore = __webpack_require__(246);
 	
 	var ArticleForm = React.createClass({
 		displayName: 'ArticleForm',
@@ -24928,7 +24929,8 @@
 				body: "",
 				imageLink: "",
 				backgroundLink: "",
-				article: null
+				article: null,
+				session: SessionStore.all()
 			};
 		},
 	
@@ -24941,18 +24943,22 @@
 				background_link: this.state.backgroundLink
 			};
 			ApiUtil.createArticle(article);
+			this.createListener = ArticleStore.addListener(this.navigateToArticle);
 		},
 		componentDidMount: function () {
-			this.articleStoreListener = ArticleStore.addListener(this._onChange);
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
 		},
 		componentWillUnmount: function () {
-			this.articleStoreListener.remove();
+			this.sessionStoreListener.remove();
+			this.createListener.remove();
 		},
 		_onChange: function () {
-			this.setState({ article: ArticleStore.mostRecent() });
-			this.navigateToArticle();
+			this.setState({ session: SessionStore.all() });
+			// this.navigateToArticle();
 		},
 		navigateToArticle: function () {
+			this.setState({ article: ArticleStore.mostRecent() });
 			this.props.history.pushState(null, "articles/" + this.state.article.id);
 		},
 		navigateToHome: function () {
@@ -24961,6 +24967,21 @@
 		handleCancel: function (event) {
 			event.preventDefault();
 			this.navigateToHome();
+		},
+		createBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errlogin' },
+					'Please login to create an article!'
+				);
+			} else {
+				return React.createElement('input', {
+					className: 'btn btn-xs btn-success user-create-art',
+					type: 'submit',
+					value: 'Create article'
+				});
+			}
 		},
 		render: function () {
 			return React.createElement(
@@ -25024,7 +25045,7 @@
 							placeholder: 'Background URL',
 							valueLink: this.linkState('backgroundLink') }),
 						React.createElement('br', null),
-						React.createElement('input', { className: 'btn btn-xs btn-success user-create-art', type: 'submit', value: 'Create article' })
+						this.createBtn(this.state.session)
 					),
 					React.createElement(
 						'a',
@@ -25091,6 +25112,14 @@
 	    this.props.history.pushState(null, "articles/new");
 	  },
 	
+	  commentCount: function (commentsLength) {
+	    if (commentsLength === 1) {
+	      return "1 Comment";
+	    } else {
+	      return commentsLength.toString() + " Comments";
+	    }
+	  },
+	
 	  render: function () {
 	    var handleClick = this.handleClick;
 	    return React.createElement(
@@ -25153,10 +25182,15 @@
 	                  article: article,
 	                  role: 'button' },
 	                'View article »'
+	              ),
+	              React.createElement(
+	                'span',
+	                { className: 'comment-count' },
+	                this.commentCount(article.comments.length)
 	              )
 	            )
 	          );
-	        })
+	        }.bind(this))
 	      )
 	    );
 	  }
@@ -32573,6 +32607,7 @@
 	var React = __webpack_require__(1);
 	var ApiUtil = __webpack_require__(208);
 	var LinkedStateMixin = __webpack_require__(239);
+	var SessionStore = __webpack_require__(246);
 	
 	var CommentForm = React.createClass({
 		displayName: 'CommentForm',
@@ -32585,7 +32620,8 @@
 			return {
 				body: "",
 				articleId: this.props.articleId,
-				user_id: ""
+				user_id: "",
+				session: SessionStore.all()
 			};
 		},
 	
@@ -32599,12 +32635,40 @@
 			ApiUtil.fetchArticles();
 		},
 	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+			// this.navigateToArticle();
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
 		componentWillReceiveProps: function (propUpdate) {
 			this.setState({
 				body: "",
 				articleId: this.props.articleId,
 				user_id: ""
 			});
+		},
+	
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Please login to post a comment!'
+				);
+			} else {
+				return React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn',
+					type: 'submit',
+					value: 'Post' });
+			}
 		},
 	
 		render: function () {
@@ -32623,7 +32687,7 @@
 						valueLink: this.linkState('body')
 					}),
 					React.createElement('br', null),
-					React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn', type: 'submit', value: 'Post' })
+					this.postBtn(this.state.session)
 				)
 			);
 		}
@@ -32975,6 +33039,7 @@
 	var React = __webpack_require__(1);
 	var ApiUtil = __webpack_require__(208);
 	var LinkedStateMixin = __webpack_require__(239);
+	var SessionStore = __webpack_require__(246);
 	
 	var ImprovementForm = React.createClass({
 		displayName: 'ImprovementForm',
@@ -32987,7 +33052,8 @@
 			return {
 				body: "",
 				annotationId: this.props.annotationId,
-				user_id: ""
+				user_id: "",
+				session: SessionStore.all()
 			};
 		},
 	
@@ -33000,6 +33066,16 @@
 			ApiUtil.createImprovement(improvement);
 			ApiUtil.fetchArticles();
 		},
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+		},
 	
 		componentWillReceiveProps: function (propUpdate) {
 			this.setState({
@@ -33008,7 +33084,20 @@
 				user_id: ""
 			});
 		},
-	
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Please login to suggest an improvement!'
+				);
+			} else {
+				return React.createElement('input', {
+					className: 'btn btn-xs btn-success comment-post-btn',
+					type: 'submit',
+					value: 'Post' });
+			}
+		},
 		render: function () {
 			return React.createElement(
 				'div',
@@ -33025,7 +33114,7 @@
 						valueLink: this.linkState('body')
 					}),
 					React.createElement('br', null),
-					React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn', type: 'submit', value: 'Post' })
+					this.postBtn(this.state.session)
 				)
 			);
 		}

@@ -1,6 +1,7 @@
 var React = require('react');
 var ApiUtil = require('../utils/api_util');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
+var SessionStore = require('../stores/session');
 
 var ImprovementForm = React.createClass({
 	mixins: [LinkedStateMixin],
@@ -11,7 +12,8 @@ var ImprovementForm = React.createClass({
     return {
       body: "",
 			annotationId: this.props.annotationId,
-			user_id: ""
+			user_id: "",
+			session: SessionStore.all()
     };
   },
 
@@ -24,6 +26,16 @@ var ImprovementForm = React.createClass({
 		ApiUtil.createImprovement(improvement);
 		ApiUtil.fetchArticles();
 	},
+	componentDidMount: function () {
+		this.sessionStoreListener = SessionStore.addListener(this._onChange);
+		ApiUtil.fetchSessions();
+	},
+	componentWillUnmount: function() {
+		this.sessionStoreListener.remove();
+	},
+	_onChange: function () {
+		this.setState({ session: SessionStore.all()});
+  },
 
 	componentWillReceiveProps: function (propUpdate) {
 		this.setState({
@@ -32,7 +44,19 @@ var ImprovementForm = React.createClass({
 			user_id: ""
 		});
 	},
+	postBtn: function(session) {
+		if (session.length === 0) {
+			return <div className='errPost'>Please login to suggest an improvement!</div>;
+		} else {
+			return (
+				<input
+					className="btn btn-xs btn-success comment-post-btn"
+					type="submit"
+					value="Post"/>
 
+			);
+		}
+	},
 	render: function(){
     return (
         <div>
@@ -46,7 +70,7 @@ var ImprovementForm = React.createClass({
 							valueLink={this.linkState('body')}
 						/>
             <br/>
-						<input className="btn btn-xs btn-success comment-post-btn" type="submit" value="Post"/>
+						{this.postBtn(this.state.session)}
           </form>
         </div>
     );

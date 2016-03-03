@@ -1,6 +1,7 @@
 var React = require('react');
 var ApiUtil = require('../utils/api_util');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
+var SessionStore = require('../stores/session');
 
 var CommentForm = React.createClass({
 	mixins: [LinkedStateMixin],
@@ -11,7 +12,8 @@ var CommentForm = React.createClass({
     return {
       body: "",
 			articleId: this.props.articleId,
-			user_id: ""
+			user_id: "",
+			session: SessionStore.all()
     };
   },
 
@@ -25,12 +27,38 @@ var CommentForm = React.createClass({
 		ApiUtil.fetchArticles();
 	},
 
+	componentDidMount: function() {
+		this.sessionStoreListener = SessionStore.addListener(this._onChange);
+		ApiUtil.fetchSessions();
+	},
+
+	_onChange: function () {
+		this.setState({ session: SessionStore.all()});
+		// this.navigateToArticle();
+	},
+
+	componentWillUnmount: function() {
+		this.sessionStoreListener.remove();
+	},
+
 	componentWillReceiveProps: function (propUpdate) {
 		this.setState({
 			body: "",
 			articleId: this.props.articleId,
 			user_id: ""
 		});
+	},
+
+	postBtn: function(session) {
+		if (session.length === 0) {
+			return <div className='errPost'>Please login to post a comment!</div>;
+		} else {
+			return (
+				<input className="btn btn-xs btn-success comment-post-btn"
+					type="submit"
+					value="Post"/>
+			);
+		}
 	},
 
 	render: function(){
@@ -46,7 +74,7 @@ var CommentForm = React.createClass({
 							valueLink={this.linkState('body')}
 						/>
             <br/>
-						<input className="btn btn-xs btn-success comment-post-btn" type="submit" value="Post"/>
+						{this.postBtn(this.state.session)}
           </form>
         </div>
     );

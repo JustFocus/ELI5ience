@@ -43,6 +43,14 @@ var ArticleIndex = React.createClass({
     this.props.history.pushState(null, "articles/new");
   },
 
+  commentCount: function(commentsLength) {
+    if (commentsLength === 1){
+      return "1 Comment";
+    } else {
+      return commentsLength.toString() + " Comments";
+    }
+  },
+
 	render: function(){
     var handleClick = this.handleClick;
 		return(
@@ -78,10 +86,11 @@ var ArticleIndex = React.createClass({
                     role="button">
                     View article &raquo;
                   </a>
+                  <span className="comment-count">{this.commentCount(article.comments.length)}</span>
                 </p>
               </div>
             );
-          })}
+          }.bind(this))}
         </div>
       </span>
 		);
