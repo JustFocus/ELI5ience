@@ -1,6 +1,6 @@
 class Api::AnnotationsController < ApplicationController
 	def index
-    @annotations = Annotation.includes(:user)
+    @annotations = Annotation.includes(:user, :improvements)
     render 'index'
   end
 

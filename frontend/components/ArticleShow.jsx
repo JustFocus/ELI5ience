@@ -208,7 +208,6 @@ var ArticleShow = React.createClass({
 	},
 
 	commentLength: function () {
-
 		if (this.state.article.hasOwnProperty('comments')) {
 			return this.state.article.comments.length;
 		} else {
@@ -302,10 +301,9 @@ var ArticleShow = React.createClass({
 							}
 						}.bind(this)() }
 					</div>
-				</div >
 					<div className="well comment-sec">
-						<h5>{this.commentLength} Comments</h5>
-						<span >
+						<h5>{this.commentLength()} Article Comments</h5>
+						<span>
 							<CommentForm  articleId={this.props.params.articleId} />
 						</span>
 						<br></br>
@@ -313,6 +311,8 @@ var ArticleShow = React.createClass({
 							<CommentIndex comments={this.state.article.comments}/>
 						</span>
 					</div>
+				</div >
+
 			</div>
 		);
 	}

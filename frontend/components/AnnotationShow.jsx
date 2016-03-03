@@ -3,6 +3,8 @@ var ReactRouter = require('react-router');
 var ArticleStore = require('../stores/article');
 var SessionStore = require('../stores/session');
 var ApiUtil = require('../utils/api_util');
+var ImprovementForm = require('./ImprovementForm');
+var ImprovementIndex = require('./ImprovementIndex.jsx');
 
 var AnnotationShow = React.createClass({
 
@@ -37,15 +39,15 @@ var AnnotationShow = React.createClass({
 		}
   },
 
-	annotationBody: function(annotationId, annotations) {
+	findAnnotationById: function(annotationId, annotations) {
 		for (var i = 0; i < annotations.length; i++) {
 			if (annotationId === annotations[i].id.toString())
-				return {
-					body: annotations[i].body,
-					user_id: annotations[i].user_id
-				};
+				return annotations[i];
 		}
-		return ['', 0];
+		return {
+			id: 0,
+			improvements: []
+		};
 	},
 
 	delButton: function(annotationId){
@@ -69,20 +71,31 @@ var AnnotationShow = React.createClass({
 		}
 	},
 
-
 	render: function() {
 		var handleDelClick = this.handleDelClick;
 		var user = this.state.user;
 		var annotations = this.props.article.annotations;
-		var annotationId = this.props.annotationId;
-		var annotationDetails = this.annotationBody(annotationId, annotations);
-		var delButton = this.delButton(annotationId);
-
+		var annotation = this.findAnnotationById(this.props.annotationId, annotations);
+		var delButton = this.delButton(annotation.id);
 		return (
 			<div id="annotation">
-				{annotationDetails.body}
+				{annotation.body}
 				<br></br>
+				<br></br>
+				By: <strong>{annotation.username + " - "}</strong>
+				{annotation.expertise + " "}
 				{delButton}
+
+				<div className="well improv-sec">
+					<h5>{annotation.improvements.length || 0} Annotation Improvements</h5>
+					<span >
+						<ImprovementForm annotationId={annotation.id} />
+					</span>
+					<br></br>
+					<span>
+						<ImprovementIndex improvements={annotation.improvements}/>
+					</span>
+				</div>
 			</div>
 		);
 	}

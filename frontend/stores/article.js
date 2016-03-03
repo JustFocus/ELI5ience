@@ -33,6 +33,27 @@ var removeComment = function(comment){
 	// _articles.
   // _articles = articles.slice(0);
 };
+var findAnnotationById = function(id){
+  for (var i = 0; i < _articles.length; i++) {
+    for (var j = 0; j < _articles[i].annotations.length; j++) {
+      if (_articles[i].annotations[j].id === id) {
+        return [i, j];
+      }
+    }
+  }
+};
+
+var removeImprovement = function(improvement){
+  var articleAnnotation = findAnnotationById(improvement.annotation_id);
+  for (var i = 0; i < _articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements.length; i++) {
+    if (_articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements[i].id === improvement.id)  {
+      delete _articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements[i];
+      return _articles;
+    }
+  }
+  return _articles;
+};
+
 var removeAnnotation = function(annotation){
 	//TODO: this - necessary? should _articles be [] or {}
 	// _articles.
@@ -64,6 +85,17 @@ var insertComment = function(comment) {
       article.comments.push(comment);
     }
   });
+  return _articles;
+};
+
+var insertImprovement = function(improvement) {
+  var articleAnnotation = findAnnotationById(improvement.annotation_id);
+  for (var i = 0; i < _articles[articleAnnotation[0]].annotations.length; i++) {
+    if (_articles[articleAnnotation[0]].annotations[i].id === improvement.annotation_id)  {
+      _articles[articleAnnotation[0]].annotations[i].improvements.push(improvement);
+      return _articles;
+    }
+  }
   return _articles;
 };
 
@@ -106,16 +138,24 @@ ArticleStore.__onDispatch = function (payload) {
       resetUser(payload.user);
       ArticleStore.__emitChange();
       break;
-    case ArticleConstants.COMMENT_RECEIVED:
-      insertComment(payload.comment);
-      ArticleStore.__emitChange();
-      break;
     case ArticleConstants.COMMENTS_RECEIVED:
       insertComments(payload.comments);
       ArticleStore.__emitChange();
       break;
+    case ArticleConstants.COMMENT_RECEIVED:
+      insertComment(payload.comment);
+      ArticleStore.__emitChange();
+      break;
     case ArticleConstants.COMMENT_REMOVED:
       removeComment(payload.comment);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.IMPROVEMENT_RECEIVED:
+      insertImprovement(payload.improvement);
+      ArticleStore.__emitChange();
+      break;
+    case ArticleConstants.IMPROVEMENT_REMOVED:
+      removeImprovement(payload.improvement);
       ArticleStore.__emitChange();
       break;
     case ArticleConstants.ANNOTATION_RECEIVED:

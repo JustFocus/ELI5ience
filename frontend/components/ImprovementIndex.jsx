@@ -3,11 +3,11 @@ var ReactRouter = require('react-router');
 var ApiUtil = require('../utils/api_util');
 var SessionStore = require('../stores/session');
 
-var CommentIndex = React.createClass({
+var ImprovementIndex = React.createClass({
 
 	getInitialState: function() {
 		return{
-			comments: this.props.comments || [],
+			improvements: this.props.improvements || [],
 			sessions: SessionStore.all()
 		};
 	},
@@ -27,9 +27,9 @@ var CommentIndex = React.createClass({
 		 });
 	},
 
-	handleClick: function (comment) {
+	handleClick: function (improvement) {
 		if (confirm("Are you sure you want to delete your comment?")) {
-			ApiUtil.removeComment(comment.id);
+			ApiUtil.removeImprovement(improvement.id);
 			ApiUtil.fetchArticles();
 			ApiUtil.fetchSessions();
   	}
@@ -37,7 +37,7 @@ var CommentIndex = React.createClass({
 
 	componentWillReceiveProps: function() {
 		this.setState({
-			comments: this.props.comments || [],
+			improvements: this.props.improvements || [],
 			sessions: SessionStore.all()
 		});
 	},
@@ -48,15 +48,15 @@ var CommentIndex = React.createClass({
 		return (
 			<div>
 				<ul className="comment-list">
-					{this.state.comments.map(function(comment){
-						var boundClick = handleClick.bind(null, comment);
+					{this.state.improvements.map(function(improvement){
+						var boundClick = handleClick.bind(null, improvement);
 						if (this.state.sessions.length > 0) {
-							if ( this.state.sessions[0].id === comment.user_id ) {
+							if ( this.state.sessions[0].id === improvement.user_id ) {
 								delButton =
 									<a
 										className="btn btn-xs btn-danger"
 										onClick={boundClick}
-										comment={comment}
+										improvement={improvement}
 										role="button">
 										Delete
 									</a>;
@@ -65,21 +65,21 @@ var CommentIndex = React.createClass({
 							}
 						}
 						return (
-							<li className="list-group-item" key={comment.id}>
+							<li className="list-group-item" key={improvement.id}>
 								<div className="comment-user">
-								<strong>{comment.username + " - "}</strong>
-								{comment.expertise + " "}
+								<strong>{improvement.username + " - "}</strong>
+								{improvement.expertise + " "}
 								{delButton}
 								</div>
 								<br></br>
-								{comment.body}
+								{improvement.body}
 								<br></br>
 								<br></br>
 
 								<div className="comment-date"> {
-									new Date(comment.created_at).toDateString()
+									new Date(improvement.created_at).toDateString()
 									+ " " +
-									new Date(comment.created_at).toLocaleTimeString()
+									new Date(improvement.created_at).toLocaleTimeString()
 									}
 								</div>
 							</li>
@@ -93,4 +93,4 @@ var CommentIndex = React.createClass({
 });
 
 
-module.exports = CommentIndex;
+module.exports = ImprovementIndex;

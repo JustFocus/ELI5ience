@@ -54,7 +54,6 @@ var ArticleForm = React.createClass({
 	render: function(){
     return (
 			<div>
-				<br></br>
 				<div className="panel-heading user-pro-panel-heading">
 					<h3 className="panel-title">Create An Article!</h3>
 					<br></br>
@@ -70,6 +69,7 @@ var ArticleForm = React.createClass({
 
             <label className="sr-only">Body</label>
 						<textarea
+							style={{height: 150}}
 							className="form-control"
 							placeholder="Body"
 							required autofocus
@@ -81,6 +81,8 @@ var ArticleForm = React.createClass({
 								className="form-control"
 								placeholder="Image URL"
 								valueLink={this.linkState('imageLink')}/>
+						<br></br>
+
 						<label className="sr-only">Background Url</label>
 							<input
 								type="text"

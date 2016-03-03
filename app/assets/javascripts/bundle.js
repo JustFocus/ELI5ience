@@ -24411,6 +24411,20 @@
 	      }
 	    });
 	  },
+	  createImprovement: function (data) {
+	    $.post('api/improvements', { improvement: data }, function (improvement) {
+	      ApiActions.receiveSingleImprovement(improvement);
+	    });
+	  },
+	  removeImprovement: function (id) {
+	    $.ajax({
+	      url: 'api/improvements/' + id,
+	      type: 'DELETE',
+	      success: function (improvement) {
+	        ApiActions.removeSingleImprovement(improvement);
+	      }
+	    });
+	  },
 	
 	  fetchSessions: function () {
 	    $.get('api/session', function (sessions) {
@@ -24494,22 +24508,34 @@
 	      user: user
 	    });
 	  },
-	  receiveSingleComment: function (comment) {
-	    AppDispatcher.dispatch({
-	      actionType: ArticleConstants.COMMENT_RECEIVED,
-	      comment: comment
-	    });
-	  },
 	  receiveComments: function (comments) {
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.COMMENTS_RECEIVED,
 	      comments: comments
 	    });
 	  },
+	  receiveSingleComment: function (comment) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.COMMENT_RECEIVED,
+	      comment: comment
+	    });
+	  },
 	  removeSingleComment: function (comment) {
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.COMMENT_REMOVED,
 	      comment: comment
+	    });
+	  },
+	  receiveSingleImprovement: function (improvement) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.IMPROVEMENT_RECEIVED,
+	      improvement: improvement
+	    });
+	  },
+	  removeSingleImprovement: function (improvement) {
+	    AppDispatcher.dispatch({
+	      actionType: ArticleConstants.IMPROVEMENT_REMOVED,
+	      improvement: improvement
 	    });
 	  },
 	  receiveSessions: function (sessions) {
@@ -24865,12 +24891,14 @@
 	  ARTICLES_RECEIVED: "ARTICLES_RECEIVED",
 	  ARTICLE_REMOVED: "ARTICLE_REMOVED",
 	  USER_RECEIVED: "USER_RECEIVED",
-	  COMMENT_RECEIVED: "COMMENT_RECEIVED",
 	  COMMENTS_RECEIVED: "COMMENTS_RECEIVED",
+	  COMMENT_RECEIVED: "COMMENT_RECEIVED",
 	  COMMENT_REMOVED: "COMMENT_REMOVED",
 	  ANNOTATION_RECEIVED: "ANNOTATION_RECEIVED",
 	  ANNOTATIONS_RECEIVED: "ANNOTATIONS_RECEIVED",
-	  ANNOTATION_REMOVED: "ANNOTATION_REMOVED"
+	  ANNOTATION_REMOVED: "ANNOTATION_REMOVED",
+	  IMPROVEMENT_RECEIVED: "IMPROVEMENT_RECEIVED",
+	  IMPROVEMENT_REMOVED: "IMPROVEMENT_REMOVED"
 	};
 	
 	module.exports = ArticleConstants;
@@ -24937,7 +24965,6 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement('br', null),
 				React.createElement(
 					'div',
 					{ className: 'panel-heading user-pro-panel-heading' },
@@ -24968,6 +24995,7 @@
 							'Body'
 						),
 						React.createElement('textarea', {
+							style: { height: 150 },
 							className: 'form-control',
 							placeholder: 'Body',
 							required: true, autofocus: true,
@@ -24983,6 +25011,7 @@
 							className: 'form-control',
 							placeholder: 'Image URL',
 							valueLink: this.linkState('imageLink') }),
+						React.createElement('br', null),
 						React.createElement(
 							'label',
 							{ className: 'sr-only' },
@@ -25174,6 +25203,27 @@
 	  // _articles.
 	  // _articles = articles.slice(0);
 	};
+	var findAnnotationById = function (id) {
+	  for (var i = 0; i < _articles.length; i++) {
+	    for (var j = 0; j < _articles[i].annotations.length; j++) {
+	      if (_articles[i].annotations[j].id === id) {
+	        return [i, j];
+	      }
+	    }
+	  }
+	};
+	
+	var removeImprovement = function (improvement) {
+	  var articleAnnotation = findAnnotationById(improvement.annotation_id);
+	  for (var i = 0; i < _articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements.length; i++) {
+	    if (_articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements[i].id === improvement.id) {
+	      delete _articles[articleAnnotation[0]].annotations[articleAnnotation[1]].improvements[i];
+	      return _articles;
+	    }
+	  }
+	  return _articles;
+	};
+	
 	var removeAnnotation = function (annotation) {
 	  //TODO: this - necessary? should _articles be [] or {}
 	  // _articles.
@@ -25205,6 +25255,17 @@
 	      article.comments.push(comment);
 	    }
 	  });
+	  return _articles;
+	};
+	
+	var insertImprovement = function (improvement) {
+	  var articleAnnotation = findAnnotationById(improvement.annotation_id);
+	  for (var i = 0; i < _articles[articleAnnotation[0]].annotations.length; i++) {
+	    if (_articles[articleAnnotation[0]].annotations[i].id === improvement.annotation_id) {
+	      _articles[articleAnnotation[0]].annotations[i].improvements.push(improvement);
+	      return _articles;
+	    }
+	  }
 	  return _articles;
 	};
 	
@@ -25247,16 +25308,24 @@
 	      resetUser(payload.user);
 	      ArticleStore.__emitChange();
 	      break;
-	    case ArticleConstants.COMMENT_RECEIVED:
-	      insertComment(payload.comment);
-	      ArticleStore.__emitChange();
-	      break;
 	    case ArticleConstants.COMMENTS_RECEIVED:
 	      insertComments(payload.comments);
 	      ArticleStore.__emitChange();
 	      break;
+	    case ArticleConstants.COMMENT_RECEIVED:
+	      insertComment(payload.comment);
+	      ArticleStore.__emitChange();
+	      break;
 	    case ArticleConstants.COMMENT_REMOVED:
 	      removeComment(payload.comment);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.IMPROVEMENT_RECEIVED:
+	      insertImprovement(payload.improvement);
+	      ArticleStore.__emitChange();
+	      break;
+	    case ArticleConstants.IMPROVEMENT_REMOVED:
+	      removeImprovement(payload.improvement);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.ANNOTATION_RECEIVED:
@@ -31918,7 +31987,6 @@
 		},
 	
 		commentLength: function () {
-	
 			if (this.state.article.hasOwnProperty('comments')) {
 				return this.state.article.comments.length;
 			} else {
@@ -32039,27 +32107,27 @@
 								);
 							}
 						}.bind(this)()
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'well comment-sec' },
-					React.createElement(
-						'h5',
-						null,
-						this.commentLength,
-						' Comments'
 					),
 					React.createElement(
-						'span',
-						null,
-						React.createElement(CommentForm, { articleId: this.props.params.articleId })
-					),
-					React.createElement('br', null),
-					React.createElement(
-						'span',
-						null,
-						React.createElement(CommentIndex, { comments: this.state.article.comments })
+						'div',
+						{ className: 'well comment-sec' },
+						React.createElement(
+							'h5',
+							null,
+							this.commentLength(),
+							' Article Comments'
+						),
+						React.createElement(
+							'span',
+							null,
+							React.createElement(CommentForm, { articleId: this.props.params.articleId })
+						),
+						React.createElement('br', null),
+						React.createElement(
+							'span',
+							null,
+							React.createElement(CommentIndex, { comments: this.state.article.comments })
+						)
 					)
 				)
 			);
@@ -32235,19 +32303,15 @@
 										return React.createElement(
 											'div',
 											{ key: article.id },
+											delButton,
 											React.createElement(
 												'a',
 												{
 													href: "#/articles/" + article.id,
-													onClick: this.boundArticleClick,
-													className: 'list-group-item user-article',
-													style: {
-														color: '#CCC'
-													}
+													onClick: this.boundArticleClick
 												},
-												article.title
-											),
-											delButton
+												" " + article.title
+											)
 										);
 									}
 								}.bind(this))
@@ -32629,19 +32693,24 @@
 										role: 'button' },
 									'Delete'
 								);
+							} else {
+								delButton = React.createElement('span', null);
 							}
 						}
 						return React.createElement(
 							'li',
 							{ className: 'list-group-item', key: comment.id },
 							React.createElement(
-								'strong',
-								null,
-								comment.username + " - "
+								'div',
+								{ className: 'comment-user' },
+								React.createElement(
+									'strong',
+									null,
+									comment.username + " - "
+								),
+								comment.expertise + " ",
+								delButton
 							),
-							comment.expertise + " ",
-							delButton,
-							React.createElement('br', null),
 							React.createElement('br', null),
 							comment.body,
 							React.createElement('br', null),
@@ -32705,6 +32774,8 @@
 	var ArticleStore = __webpack_require__(219);
 	var SessionStore = __webpack_require__(246);
 	var ApiUtil = __webpack_require__(208);
+	var ImprovementForm = __webpack_require__(250);
+	var ImprovementIndex = __webpack_require__(251);
 	
 	var AnnotationShow = React.createClass({
 		displayName: 'AnnotationShow',
@@ -32741,14 +32812,14 @@
 			}
 		},
 	
-		annotationBody: function (annotationId, annotations) {
+		findAnnotationById: function (annotationId, annotations) {
 			for (var i = 0; i < annotations.length; i++) {
-				if (annotationId === annotations[i].id.toString()) return {
-					body: annotations[i].body,
-					user_id: annotations[i].user_id
-				};
+				if (annotationId === annotations[i].id.toString()) return annotations[i];
 			}
-			return ['', 0];
+			return {
+				id: 0,
+				improvements: []
+			};
 		},
 	
 		delButton: function (annotationId) {
@@ -32776,16 +32847,43 @@
 			var handleDelClick = this.handleDelClick;
 			var user = this.state.user;
 			var annotations = this.props.article.annotations;
-			var annotationId = this.props.annotationId;
-			var annotationDetails = this.annotationBody(annotationId, annotations);
-			var delButton = this.delButton(annotationId);
-	
+			var annotation = this.findAnnotationById(this.props.annotationId, annotations);
+			var delButton = this.delButton(annotation.id);
 			return React.createElement(
 				'div',
 				{ id: 'annotation' },
-				annotationDetails.body,
+				annotation.body,
 				React.createElement('br', null),
-				delButton
+				React.createElement('br', null),
+				'By: ',
+				React.createElement(
+					'strong',
+					null,
+					annotation.username + " - "
+				),
+				annotation.expertise + " ",
+				delButton,
+				React.createElement(
+					'div',
+					{ className: 'well improv-sec' },
+					React.createElement(
+						'h5',
+						null,
+						annotation.improvements.length || 0,
+						' Annotation Improvements'
+					),
+					React.createElement(
+						'span',
+						null,
+						React.createElement(ImprovementForm, { annotationId: annotation.id })
+					),
+					React.createElement('br', null),
+					React.createElement(
+						'span',
+						null,
+						React.createElement(ImprovementIndex, { improvements: annotation.improvements })
+					)
+				)
 			);
 		}
 	});
@@ -32858,6 +32956,180 @@
 	});
 	
 	module.exports = AnnotationForm;
+
+/***/ },
+/* 250 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ApiUtil = __webpack_require__(208);
+	var LinkedStateMixin = __webpack_require__(239);
+	
+	var ImprovementForm = React.createClass({
+		displayName: 'ImprovementForm',
+	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
+		getInitialState: function () {
+			return {
+				body: "",
+				annotationId: this.props.annotationId,
+				user_id: ""
+			};
+		},
+	
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var improvement = {
+				body: this.state.body,
+				annotation_id: this.state.annotationId
+			};
+			ApiUtil.createImprovement(improvement);
+			ApiUtil.fetchArticles();
+		},
+	
+		componentWillReceiveProps: function (propUpdate) {
+			this.setState({
+				body: "",
+				annotationId: this.props.annotationId,
+				user_id: ""
+			});
+		},
+	
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement('br', null),
+					React.createElement('input', {
+						type: 'text',
+						required: true, autofocus: true,
+						placeholder: 'Add an improvement...',
+						className: 'form-control comment-form',
+						valueLink: this.linkState('body')
+					}),
+					React.createElement('br', null),
+					React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn', type: 'submit', value: 'Post' })
+				)
+			);
+		}
+	});
+	
+	module.exports = ImprovementForm;
+
+/***/ },
+/* 251 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ApiUtil = __webpack_require__(208);
+	var SessionStore = __webpack_require__(246);
+	
+	var ImprovementIndex = React.createClass({
+		displayName: 'ImprovementIndex',
+	
+	
+		getInitialState: function () {
+			return {
+				improvements: this.props.improvements || [],
+				sessions: SessionStore.all()
+			};
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({
+				sessions: SessionStore.all()
+			});
+		},
+	
+		handleClick: function (improvement) {
+			if (confirm("Are you sure you want to delete your comment?")) {
+				ApiUtil.removeImprovement(improvement.id);
+				ApiUtil.fetchArticles();
+				ApiUtil.fetchSessions();
+			}
+		},
+	
+		componentWillReceiveProps: function () {
+			this.setState({
+				improvements: this.props.improvements || [],
+				sessions: SessionStore.all()
+			});
+		},
+	
+		render: function () {
+			var handleClick = this.handleClick;
+			var delButton;
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'ul',
+					{ className: 'comment-list' },
+					this.state.improvements.map(function (improvement) {
+						var boundClick = handleClick.bind(null, improvement);
+						if (this.state.sessions.length > 0) {
+							if (this.state.sessions[0].id === improvement.user_id) {
+								delButton = React.createElement(
+									'a',
+									{
+										className: 'btn btn-xs btn-danger',
+										onClick: boundClick,
+										improvement: improvement,
+										role: 'button' },
+									'Delete'
+								);
+							} else {
+								delButton = React.createElement('span', null);
+							}
+						}
+						return React.createElement(
+							'li',
+							{ className: 'list-group-item', key: improvement.id },
+							React.createElement(
+								'div',
+								{ className: 'comment-user' },
+								React.createElement(
+									'strong',
+									null,
+									improvement.username + " - "
+								),
+								improvement.expertise + " ",
+								delButton
+							),
+							React.createElement('br', null),
+							improvement.body,
+							React.createElement('br', null),
+							React.createElement('br', null),
+							React.createElement(
+								'div',
+								{ className: 'comment-date' },
+								' ',
+								new Date(improvement.created_at).toDateString() + " " + new Date(improvement.created_at).toLocaleTimeString()
+							)
+						);
+					}.bind(this))
+				)
+			);
+		}
+	});
+	
+	module.exports = ImprovementIndex;
 
 /***/ }
 /******/ ]);

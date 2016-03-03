@@ -7,6 +7,7 @@ json.expertise article.user.expertise
 
 json.comments article.comments do |comment|
 	json.id comment.id
+	json.article_id comment.article_id
 	json.body comment.body
 	json.user_id comment.user_id
 	json.created_at comment.created_at
@@ -24,6 +25,15 @@ json.annotations article.annotations do |annotation|
 	json.created_at annotation.created_at
 	json.username annotation.user.username
 	json.expertise annotation.user.expertise
+		json.improvements annotation.improvements do |improvement|
+			json.id improvement.id
+			json.annotation_id improvement.annotation_id
+			json.body improvement.body
+			json.user_id improvement.user_id
+			json.created_at improvement.created_at
+			json.username improvement.user.username
+			json.expertise improvement.user.expertise
+		end
 end
 
 

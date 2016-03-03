@@ -110,17 +110,13 @@ var User = React.createClass({
 											}
 											return (
 												<div key={article.id}>
+													{delButton}
 													<a
 														href={"#/articles/" + article.id}
 														onClick={this.boundArticleClick}
-														className="list-group-item user-article"
-														style={{
-															  color: '#CCC'
-														}}
 													>
-														{article.title}
+														{" " + article.title}
 													</a>
-													{delButton}
 												</div>
 											);
 										}

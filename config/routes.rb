@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :articles
     resources :comments, only: [:create, :destroy]
     resources :annotations, only: [:create, :destroy, :update]
+    resources :improvements, only: [:create, :destroy]
   end
 
   root "static_pages#root"

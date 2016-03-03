@@ -56,6 +56,20 @@ var ApiUtil = {
       }
     });
   },
+  createImprovement: function(data) {
+    $.post('api/improvements', { improvement: data }, function (improvement) {
+      ApiActions.receiveSingleImprovement(improvement);
+    });
+  },
+  removeImprovement: function(id) {
+    $.ajax({
+      url: 'api/improvements/' + id,
+      type: 'DELETE',
+      success: function(improvement){
+        ApiActions.removeSingleImprovement(improvement);
+      }
+    });
+  },
 
   fetchSessions: function() {
     $.get('api/session', function(sessions){

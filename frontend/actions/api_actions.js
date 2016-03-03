@@ -26,22 +26,34 @@ var ApiActions = {
       user: user
     });
   },
-  receiveSingleComment: function(comment){
-    AppDispatcher.dispatch({
-      actionType: ArticleConstants.COMMENT_RECEIVED,
-      comment: comment
-    });
-  },
   receiveComments: function(comments){
     AppDispatcher.dispatch({
       actionType: ArticleConstants.COMMENTS_RECEIVED,
       comments: comments
     });
   },
+  receiveSingleComment: function(comment){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.COMMENT_RECEIVED,
+      comment: comment
+    });
+  },
   removeSingleComment: function(comment){
     AppDispatcher.dispatch({
       actionType: ArticleConstants.COMMENT_REMOVED,
       comment: comment
+    });
+  },
+  receiveSingleImprovement: function(improvement){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.IMPROVEMENT_RECEIVED,
+      improvement: improvement
+    });
+  },
+  removeSingleImprovement: function(improvement){
+    AppDispatcher.dispatch({
+      actionType: ArticleConstants.IMPROVEMENT_REMOVED,
+      improvement: improvement
     });
   },
   receiveSessions: function(sessions){

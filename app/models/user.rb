@@ -13,6 +13,9 @@ class User < ActiveRecord::Base
 	has_many :comments,
 	dependent: :destroy
 
+	has_many :improvements,
+	dependent: :destroy
+
 	attr_reader :password
 
 	after_initialize :ensure_session_token
