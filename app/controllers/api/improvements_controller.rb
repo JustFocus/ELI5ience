@@ -6,23 +6,32 @@ class Api::ImprovementsController < ApplicationController
   end
 
 	def show
-		improvement = Improvement.find_by(id: params[:id])
-		render json: improvement
+		improvement = Improvement.includes(:user).find_by(id: params[:id])
+		render 'show'
 	end
 
   def create
 		improvement = params[:improvement]
 		improvement[:user_id] = current_user.id
-		#TODO: Add error if user is not logged in
-    improvement = Improvement.create!(improvement_params)
-    render json: improvement
+    # improvement = Improvement.new(improvement_params)
+		improvement = Improvement.create(improvement_params)
+		if improvement
+			@improvement = Improvement.includes(:user).find_by(id: improvement.id)
+			render 'show'
+		else
+			flash.now[:errors] = improvement.errors.full_messages
+			render json: improvement.errors.full_messages
+		end
+
+
+
   end
 
 	def destroy
 		improvement = Improvement.find_by(id: params[:id])
-		# article = Article.find_by(id: params[:improvement][:article_id])
+		@improvement = Improvement.includes(:user).find_by(id: improvement.id)
 		improvement.destroy
-    render json: improvement
+		render 'show'
 	end
 
 	private

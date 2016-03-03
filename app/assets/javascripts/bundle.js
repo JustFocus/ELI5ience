@@ -24398,16 +24398,16 @@
 	  },
 	
 	  createComment: function (data) {
-	    $.post('api/comments', { comment: data }, function (comments) {
-	      ApiActions.receiveComments(comments);
+	    $.post('api/comments', { comment: data }, function (comment) {
+	      ApiActions.receiveSingleComment(comment);
 	    });
 	  },
 	  removeComment: function (id) {
 	    $.ajax({
 	      url: 'api/comments/' + id,
 	      type: 'DELETE',
-	      success: function (comments) {
-	        ApiActions.receiveComments(comments);
+	      success: function (comment) {
+	        ApiActions.removeSingleComment(comment);
 	      }
 	    });
 	  },
@@ -24551,6 +24551,7 @@
 	    });
 	  },
 	  receiveAnnotations: function (annotations) {
+	    debugger;
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.ANNOTATIONS_RECEIVED,
 	      annotations: annotations
@@ -25199,9 +25200,17 @@
 	  // _articles = articles.slice(0);
 	};
 	var removeComment = function (comment) {
-	  //TODO: this - necessary? should _articles be [] or {}
-	  // _articles.
-	  // _articles = articles.slice(0);
+	  _articles.forEach(function (article, idx) {
+	    if (article.id === comment.article_id) {
+	      delete _articles[idx].comments[comment.id];
+	      for (var i = 0; i < _articles[idx].comments.length; i++) {
+	        if (_articles[idx].comments[i].id === comment.id) {
+	          _articles[idx].comments.splice(i, 1);
+	        }
+	      }
+	    }
+	  });
+	  return _articles;
 	};
 	var findAnnotationById = function (id) {
 	  for (var i = 0; i < _articles.length; i++) {
@@ -25260,12 +25269,14 @@
 	
 	var insertImprovement = function (improvement) {
 	  var articleAnnotation = findAnnotationById(improvement.annotation_id);
+	  debugger;
 	  for (var i = 0; i < _articles[articleAnnotation[0]].annotations.length; i++) {
 	    if (_articles[articleAnnotation[0]].annotations[i].id === improvement.annotation_id) {
 	      _articles[articleAnnotation[0]].annotations[i].improvements.push(improvement);
 	      return _articles;
 	    }
 	  }
+	  debugger;
 	  return _articles;
 	};
 	

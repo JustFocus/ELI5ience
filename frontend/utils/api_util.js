@@ -43,16 +43,16 @@ var ApiUtil = {
   },
 
   createComment: function(data) {
-    $.post('api/comments', { comment: data }, function (comments) {
-      ApiActions.receiveComments(comments);
+    $.post('api/comments', { comment: data }, function (comment) {
+      ApiActions.receiveSingleComment(comment);
     });
   },
   removeComment: function(id) {
     $.ajax({
       url: 'api/comments/' + id,
       type: 'DELETE',
-      success: function(comments){
-        ApiActions.receiveComments(comments);
+      success: function(comment){
+        ApiActions.removeSingleComment(comment);
       }
     });
   },

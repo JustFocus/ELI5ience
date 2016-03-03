@@ -5,8 +5,9 @@ class Api::CommentsController < ApplicationController
   end
 
 	def show
-		comment = Comment.find_by(id: params[:id])
-		render json: comment
+		@comment = Comment.includes(:user).find_by(id: params[:id])
+		debugger
+		render 'show'
 	end
 
   def create
@@ -14,16 +15,16 @@ class Api::CommentsController < ApplicationController
 		comment[:user_id] = current_user.id
 		#TODO: Add error if user is not logged in
     comment = Comment.create!(comment_params)
-		comments = Article.find_by(id: comment[:article_id]).comments
-    render json: comments
+
+		@comment = Comment.includes(:user).find_by(id: comment.id)
+		render 'show'
   end
 
 	def destroy
 		comment = Comment.find_by(id: params[:id])
-		# article = Article.find_by(id: params[:comment][:article_id])
+		@comment = Comment.includes(:user).find_by(id: comment.id)
 		comment.destroy
-		comments = Article.find_by(id: comment[:article_id]).comments
-    render json: comments
+		render 'show'
 	end
 
 	private

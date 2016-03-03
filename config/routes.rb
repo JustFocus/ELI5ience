@@ -8,9 +8,9 @@ Rails.application.routes.draw do
     resources :session, only: [:index]
     resources :users, only: [:show]
     resources :articles
-    resources :comments, only: [:create, :destroy]
-    resources :annotations, only: [:create, :destroy, :update]
-    resources :improvements, only: [:create, :destroy]
+    resources :comments, only: [:create, :destroy, :show]
+    resources :annotations, only: [:create, :destroy, :show]
+    resources :improvements, only: [:create, :destroy, :show]
   end
 
   root "static_pages#root"

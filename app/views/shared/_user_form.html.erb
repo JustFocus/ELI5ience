@@ -19,43 +19,43 @@
 </header>
 
 <div class="container">
-
-	<form class="form-signin" action="<%= action %>" method="POST">
-		<h2 class="form-signin-heading"><%= header %></h2>
-		<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-		<label for="inputEmail" class="sr-only" >Username
-		</label>
-		<input type="text"
-			id="inputEmail"
-			class="form-control"
-			placeholder="Username"
-			required autofocus
-			name="user[username]"
-			value="<%=@user.username%>">
-
-		<% if from_user %>
-			<label for="inputExpertise" class="sr-only">Expertise
+	<div class="create-login-cont">
+		<form class="form-signin" action="<%= action %>" method="POST">
+			<h2 class="form-signin-heading"><%= header %></h2>
+			<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+			<label for="inputEmail" class="sr-only" >Username
 			</label>
 			<input type="text"
-				id="inputExpertise"
+				id="inputEmail"
 				class="form-control"
-				placeholder="Expertise Eg: Engineering"
-				required autofocus
-				name="user[expertise]"
-				value="<%=@user.expertise%>">
-		<% end %>
+				placeholder="Username"
+				name="user[username]"
+				value="<%=@user.username%>">
 
-		<label for="inputPassword" class="sr-only">Password
-		</label>
-		<input type="password"
-			id="inputPassword"
-			class="form-control"
-			placeholder="Password"
-			required autofocus
-			name="user[password]"
-			value="<%=@user.password%>">
-		<br>
-		<input type="submit" class="btn btn-primary" value="<%= button_text %>">
+			<% if from_user %>
+				<label for="inputExpertise" class="sr-only">Expertise
+				</label>
+				<input type="text"
+					id="inputExpertise"
+					class="form-control"
+					placeholder="Expertise Eg: Engineering"
+					required autofocus
+					name="user[expertise]"
+					value="<%=@user.expertise%>">
+			<% end %>
+
+			<label for="inputPassword" class="sr-only">Password
+			</label>
+			<input type="password"
+				id="inputPassword"
+				class="form-control"
+				placeholder="Password"
+				name="user[password]"
+				value="<%=@user.password%>">
+			<br>
+			<input type="submit" class="btn btn-primary" value="<%= button_text %>">
+		</form>
+
 		<form class="guest-button" action=" <%= session_url %>" method="POST">
 			<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
@@ -66,14 +66,11 @@
 			<input type="submit" class="btn btn-default" class="guest-submit" value="Log In as Guest">
 
 		</form>
-	</form>
-
-
+	</div>
 </div>
 
-
 <% if flash[:errors] && !current_user %>
-  <div class="errors">
+  <div class="acct-errors">
     <% flash[:errors].each do |error| %>
       <p><b><%= error %></b></p>
     <% end %>
