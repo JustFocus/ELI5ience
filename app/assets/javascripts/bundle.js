@@ -32119,13 +32119,13 @@
 						),
 						React.createElement(
 							'span',
-							null,
+							{ className: 'comment-form-cont' },
 							React.createElement(CommentForm, { articleId: this.props.params.articleId })
 						),
 						React.createElement('br', null),
 						React.createElement(
 							'span',
-							null,
+							{ className: 'comment-idx-cont' },
 							React.createElement(CommentIndex, { comments: this.state.article.comments })
 						)
 					)

@@ -303,11 +303,11 @@ var ArticleShow = React.createClass({
 					</div>
 					<div className="well comment-sec">
 						<h5>{this.commentLength()} Article Comments</h5>
-						<span>
+						<span className="comment-form-cont">
 							<CommentForm  articleId={this.props.params.articleId} />
 						</span>
 						<br></br>
-						<span>
+						<span className="comment-idx-cont">
 							<CommentIndex comments={this.state.article.comments}/>
 						</span>
 					</div>
