@@ -4,6 +4,7 @@ var ReactRouter = require('react-router');
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute;
+var BrowserHistory = ReactRouter.BrowserHistory;
 
 var ArticleShow = require('./components/ArticleShow');
 var ArticleForm = require('./components/ArticleForm');

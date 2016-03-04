@@ -2,6 +2,7 @@ var React = require('react');
 var ApiUtil = require('../utils/api_util');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
 var ArticleStore = require('../stores/article');
+var SessionStore = require('../stores/session');
 
 var AnnotationForm = React.createClass({
 	mixins: [LinkedStateMixin],
@@ -11,9 +12,24 @@ var AnnotationForm = React.createClass({
 	getInitialState: function(){
     return {
       body: "",
-			annotation: null
+			annotation: null,
+			session: SessionStore.all()
     };
   },
+
+	componentDidMount: function() {
+		this.sessionStoreListener = SessionStore.addListener(this._onChange);
+		ApiUtil.fetchSessions();
+	},
+
+	_onChange: function () {
+		this.setState({ session: SessionStore.all()});
+		// this.navigateToArticle();
+	},
+
+	componentWillUnmount: function() {
+		this.sessionStoreListener.remove();
+	},
 
 	handleSubmit: function(event){
 		event.preventDefault();
@@ -27,7 +43,21 @@ var AnnotationForm = React.createClass({
 		ApiUtil.fetchArticles();
 		this.props.submitCallback();
 	},
-	
+
+	postBtn: function(session) {
+		if (session.length === 0) {
+			return <div className='errPost'>Login to create an annotation!</div>;
+		} else {
+			return (
+				<input
+					className="btn btn-xs btn-success user-create-art"
+					type="submit"
+					value="Create annotation"
+				/>
+			);
+		}
+	},
+
 	render: function(){
     return (
 			<div>
@@ -39,11 +69,7 @@ var AnnotationForm = React.createClass({
 						required autofocus
 						valueLink={this.linkState('body')}/>
           <br/>
-					<input
-						className="btn btn-xs btn-success user-create-art"
-						type="submit"
-						value="Create annotation"
-					/>
+					{this.postBtn(this.state.session)}
         </form>
 			</div>
     );

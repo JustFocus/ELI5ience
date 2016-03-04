@@ -50,6 +50,7 @@
 	var Router = ReactRouter.Router;
 	var Route = ReactRouter.Route;
 	var IndexRoute = ReactRouter.IndexRoute;
+	var BrowserHistory = ReactRouter.BrowserHistory;
 	
 	var ArticleShow = __webpack_require__(237);
 	var ArticleForm = __webpack_require__(217);
@@ -24951,7 +24952,9 @@
 		},
 		componentWillUnmount: function () {
 			this.sessionStoreListener.remove();
-			this.createListener.remove();
+			if (this.createListener) {
+				this.createListener.remove();
+			}
 		},
 		_onChange: function () {
 			this.setState({ session: SessionStore.all() });
@@ -24973,7 +24976,7 @@
 				return React.createElement(
 					'div',
 					{ className: 'errlogin' },
-					'Please login to create an article!'
+					'Login to create an article!'
 				);
 			} else {
 				return React.createElement('input', {
@@ -25078,17 +25081,16 @@
 	  return ArticleStore.all();
 	}
 	
-	// TODO: Search
-	// function _getFilterParams() {
-	//   return FilterParamsStore.params();
-	// }
-	
 	var ArticleIndex = React.createClass({
 	  displayName: 'ArticleIndex',
 	
 	
 	  getInitialState: function () {
 	    return { articles: ArticleStore.all() };
+	  },
+	
+	  componentWillReceiveProps: function () {
+	    debugger;
 	  },
 	
 	  componentDidMount: function () {
@@ -25163,13 +25165,18 @@
 	              className: 'col-md-4' },
 	            React.createElement(
 	              'h2',
-	              null,
+	              { className: 'index-title' },
 	              article.title
 	            ),
 	            React.createElement(
 	              'p',
-	              null,
+	              { className: 'index-body' },
 	              article.body.slice(0, 300) + "..."
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'comment-count' },
+	              this.commentCount(article.comments.length)
 	            ),
 	            React.createElement(
 	              'p',
@@ -25182,11 +25189,6 @@
 	                  article: article,
 	                  role: 'button' },
 	                'View article »'
-	              ),
-	              React.createElement(
-	                'span',
-	                { className: 'comment-count' },
-	                this.commentCount(article.comments.length)
 	              )
 	            )
 	          );
@@ -31978,7 +31980,7 @@
 			for (var i = 0; i < this.state.article.annotations.length; i++) {
 				annStartIdx = this.state.article.annotations[i].selection_start;
 				annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
-				if (startIdx >= annStartIdx && startIdx <= annEndIdx || endIdx >= annStartIdx && endIdx <= annEndIdx) {
+				if (startIdx >= annStartIdx && startIdx <= annEndIdx || endIdx >= annStartIdx && endIdx <= annEndIdx || startIdx <= annStartIdx && endIdx >= annEndIdx) {
 					return false;
 				}
 			}
@@ -32662,7 +32664,7 @@
 				return React.createElement(
 					'div',
 					{ className: 'errPost' },
-					'Please login to post a comment!'
+					'Login to post a comment!'
 				);
 			} else {
 				return React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn',
@@ -32974,6 +32976,7 @@
 	var ApiUtil = __webpack_require__(208);
 	var LinkedStateMixin = __webpack_require__(239);
 	var ArticleStore = __webpack_require__(219);
+	var SessionStore = __webpack_require__(246);
 	
 	var AnnotationForm = React.createClass({
 		displayName: 'AnnotationForm',
@@ -32985,8 +32988,23 @@
 		getInitialState: function () {
 			return {
 				body: "",
-				annotation: null
+				annotation: null,
+				session: SessionStore.all()
 			};
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+			// this.navigateToArticle();
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
 		},
 	
 		handleSubmit: function (event) {
@@ -33000,6 +33018,22 @@
 			ApiUtil.createAnnotation(annotation);
 			ApiUtil.fetchArticles();
 			this.props.submitCallback();
+		},
+	
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Login to create an annotation!'
+				);
+			} else {
+				return React.createElement('input', {
+					className: 'btn btn-xs btn-success user-create-art',
+					type: 'submit',
+					value: 'Create annotation'
+				});
+			}
 		},
 	
 		render: function () {
@@ -33020,11 +33054,7 @@
 						required: true, autofocus: true,
 						valueLink: this.linkState('body') }),
 					React.createElement('br', null),
-					React.createElement('input', {
-						className: 'btn btn-xs btn-success user-create-art',
-						type: 'submit',
-						value: 'Create annotation'
-					})
+					this.postBtn(this.state.session)
 				)
 			);
 		}
@@ -33089,7 +33119,7 @@
 				return React.createElement(
 					'div',
 					{ className: 'errPost' },
-					'Please login to suggest an improvement!'
+					'Login to suggest an improvement!'
 				);
 			} else {
 				return React.createElement('input', {

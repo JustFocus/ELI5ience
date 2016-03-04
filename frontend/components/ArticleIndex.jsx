@@ -11,15 +11,14 @@ function _getAllArticles() {
   return ArticleStore.all();
 }
 
-// TODO: Search
-// function _getFilterParams() {
-//   return FilterParamsStore.params();
-// }
-
 var ArticleIndex = React.createClass({
 
   getInitialState: function () {
     return { articles: ArticleStore.all() };
+  },
+
+  componentWillReceiveProps: function () {
+    debugger;
   },
 
   componentDidMount: function () {
@@ -76,8 +75,9 @@ var ArticleIndex = React.createClass({
             return (
               <div key={article.id}
                 className="col-md-4">
-                <h2>{article.title}</h2>
-                <p>{article.body.slice(0, 300) + "..."}</p>
+                <h2 className='index-title'>{article.title}</h2>
+                <p className='index-body'>{article.body.slice(0, 300) + "..."}</p>
+                <div className="comment-count">{this.commentCount(article.comments.length)}</div>
                 <p>
                   <a
                     className="btn btn-xs btn-primary btn-view-main"
@@ -86,7 +86,7 @@ var ArticleIndex = React.createClass({
                     role="button">
                     View article &raquo;
                   </a>
-                  <span className="comment-count">{this.commentCount(article.comments.length)}</span>
+
                 </p>
               </div>
             );

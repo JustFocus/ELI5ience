@@ -2,6 +2,8 @@ class SessionsController < ApplicationController
 
 	def new
 	 @user = User.new
+
+	 session[:referer_url] = url_for(:back)
 	 render :new
 	end
 
@@ -12,7 +14,9 @@ class SessionsController < ApplicationController
 		)
 		if user
 			sign_in(user)
-			redirect_to root_url
+			redirect_to(session[:referer_url])
+			# redirect_to request.env["HTTP_REFERER"]
+			# redirect_to(:root)
 		else
 			flash.now[:errors] = ["Invalid username or password"]
 			@user = User.new

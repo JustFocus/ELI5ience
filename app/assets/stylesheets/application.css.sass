@@ -35,17 +35,31 @@ body
   padding-bottom: 70px
 
 footer
-  background-color: #222
+  background-color: #555
   border-color: #090909
-  color: #777777
-  opacity: 0.7
+  color: #111
+  opacity: 0.9
 
 // row
 //   background-color: white !important
 //   opacity: 0.5 !important
 
+.art-details
+  background-image: no-repeat center center fixed
+
 .navbar-brand
   margin-top: -13px
+
+.navbar-fixed-bottom
+  margin-bottom: -10px
+
+.header-sign-out
+  text-align: right
+
+.footer-name
+  margin-left: 10px
+  font-weight: bold
+
 
 .jumbotron
   background-color: #111
@@ -70,12 +84,24 @@ footer
   border: 1px solid #808080
 
 .col-md-4
-  margin: 1px
-  width: 32.333333%
+  margin: 5px
+  width: 31.333333%
   background-color: #111
   color: #CCC
   border-radius: 5px
   border: 1px solid #808080
+
+.index-title
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.index-body
+  display: -webkit-box
+  -webkit-line-clamp: 5
+  -webkit-box-orient: vertical
+  overflow: hidden
+  text-overflow: ellipsis
 
 .navbar
   min-height: 0px
@@ -133,7 +159,6 @@ footer
   border-bottom: medium dotted #222
 
 .comment-count
-  margin-left: 33%
   font-weight: bold
   color: #666
 
@@ -184,6 +209,7 @@ footer
   background-color: #111
   color: #CCC
   opacity: 1
+  left: 20px
 
 
 .art-details
@@ -244,3 +270,18 @@ h5
   margin-left: -8px
   border-bottom: 1px solid #808080
   margin-right: 10px
+
+
+.example-enter
+  opacity: 0.01
+
+.example-enter.example-enter-active
+  opacity: 1
+  transition: opacity 500ms ease-in
+
+.example-leave
+  opacity: 1
+
+.example-leave.example-leave-active
+  opacity: 0.01
+  transition: opacity 300ms ease-in

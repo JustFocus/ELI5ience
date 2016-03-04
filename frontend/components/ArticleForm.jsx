@@ -37,7 +37,9 @@ var ArticleForm = React.createClass({
 	},
 	componentWillUnmount: function() {
 		this.sessionStoreListener.remove();
-		this.createListener.remove();
+		if (this.createListener) {
+			this.createListener.remove(); 
+		}
 	},
 	_onChange: function () {
 		this.setState({ session: SessionStore.all()});
@@ -59,7 +61,7 @@ var ArticleForm = React.createClass({
 	},
 	createBtn: function(session){
 		if (session.length === 0) {
-			return <div className='errlogin'>Please login to create an article!</div>;
+			return <div className='errlogin'>Login to create an article!</div>;
 		} else {
 			return (
 				<input

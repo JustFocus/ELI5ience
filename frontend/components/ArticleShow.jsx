@@ -151,8 +151,11 @@ var ArticleShow = React.createClass({
 		for (var i = 0; i < this.state.article.annotations.length; i++) {
 			annStartIdx = this.state.article.annotations[i].selection_start;
 			annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
-			if ( (startIdx >= annStartIdx && startIdx <= annEndIdx) ||
-					(endIdx >= annStartIdx && endIdx <= annEndIdx) ){
+			if (
+					(startIdx >= annStartIdx && startIdx <= annEndIdx) ||
+					(endIdx >= annStartIdx && endIdx <= annEndIdx) ||
+				 	(startIdx <= annStartIdx && endIdx >= annEndIdx)
+				){
 						return false;
 				}
 		}
@@ -301,6 +304,7 @@ var ArticleShow = React.createClass({
 							}
 						}.bind(this)() }
 					</div>
+
 					<div className="well comment-sec">
 						<h5>{this.commentLength()} Article Comments</h5>
 						<span className="comment-form-cont">

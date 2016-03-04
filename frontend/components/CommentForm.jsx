@@ -51,7 +51,7 @@ var CommentForm = React.createClass({
 
 	postBtn: function(session) {
 		if (session.length === 0) {
-			return <div className='errPost'>Please login to post a comment!</div>;
+			return <div className='errPost'>Login to post a comment!</div>;
 		} else {
 			return (
 				<input className="btn btn-xs btn-success comment-post-btn"
