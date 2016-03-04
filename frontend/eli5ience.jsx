@@ -4,7 +4,7 @@ var ReactRouter = require('react-router');
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute;
-var BrowserHistory = ReactRouter.BrowserHistory;
+var browserHistory = ReactRouter.browserHistory;
 
 var ArticleShow = require('./components/ArticleShow');
 var ArticleForm = require('./components/ArticleForm');
@@ -46,7 +46,7 @@ var routes = (
 window.loadApp = function () {
   var root = document.getElementById('content');
 
-  ReactDOM.render(<Router>{routes}</Router>, root);
+  ReactDOM.render(<Router history={browserHistory}>{routes}</Router>, root);
 };
 
 // TODO: Routing Future Routes

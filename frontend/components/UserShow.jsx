@@ -3,6 +3,7 @@ var ReactRouter = require('react-router');
 var ArticleStore = require('../stores/article');
 var SessionStore = require('../stores/session');
 var ApiUtil = require('../utils/api_util');
+var browserHistory = require('react-router').browserHistory;
 
 var User = React.createClass({
 
@@ -46,11 +47,11 @@ var User = React.createClass({
   },
 
 	handleArticleClick: function(article) {
-		this.props.history.pushState(null, "articles/" + article.id );
+		browserHistory.push("articles/" + article.id );
 	},
 
 	newArticleClick: function() {
-		this.props.history.pushState(null, "articles/new");
+		browserHistory.push("articles/new");
 	},
 
 	render: function() {

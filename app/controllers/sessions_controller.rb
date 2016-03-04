@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 	def new
 	 @user = User.new
 
-	 session[:referer_url] = url_for(:back)
+	 session[:referer_url] = request.env["HTTP_REFERER"]
 	 render :new
 	end
 

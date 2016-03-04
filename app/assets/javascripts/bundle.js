@@ -50,14 +50,14 @@
 	var Router = ReactRouter.Router;
 	var Route = ReactRouter.Route;
 	var IndexRoute = ReactRouter.IndexRoute;
-	var BrowserHistory = ReactRouter.BrowserHistory;
+	var browserHistory = ReactRouter.browserHistory;
 	
-	var ArticleShow = __webpack_require__(237);
-	var ArticleForm = __webpack_require__(217);
-	var ArticleIndex = __webpack_require__(218);
-	var UserShow = __webpack_require__(238);
-	var AnnotationShow = __webpack_require__(247);
-	var AnnotationForm = __webpack_require__(249);
+	var ArticleShow = __webpack_require__(208);
+	var ArticleForm = __webpack_require__(216);
+	var ArticleIndex = __webpack_require__(246);
+	var UserShow = __webpack_require__(247);
+	var AnnotationShow = __webpack_require__(243);
+	var AnnotationForm = __webpack_require__(242);
 	
 	//TODO: Search
 	// var Search = require('./components/Search');
@@ -96,7 +96,7 @@
 	
 	  ReactDOM.render(React.createElement(
 	    Router,
-	    null,
+	    { history: browserHistory },
 	    routes
 	  ), root);
 	};
@@ -24354,7 +24354,352 @@
 /* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ApiActions = __webpack_require__(209);
+	var React = __webpack_require__(1);
+	var ReactDOM = __webpack_require__(158);
+	var ReactRouter = __webpack_require__(159);
+	var ApiUtil = __webpack_require__(209);
+	var ArticleForm = __webpack_require__(216);
+	var ArticleStore = __webpack_require__(221);
+	var CommentForm = __webpack_require__(240);
+	var CommentIndex = __webpack_require__(241);
+	var AnnotationForm = __webpack_require__(242);
+	var AnnotationShow = __webpack_require__(243);
+	
+	var ArticleShow = React.createClass({
+		displayName: 'ArticleShow',
+	
+	
+		getInitialState: function () {
+			var articleId = this.props.params.articleId;
+			var article = this._findArticleById(articleId) || { comments: [] };
+			return {
+				article: article,
+				annotationDisplay: 0,
+				selection_start: 0,
+				selection_length: 0
+			};
+		},
+	
+		componentDidMount: function () {
+			// TODO: only fetch articles if we don't have user info in _findArticleById
+			this.articleListener = ArticleStore.addListener(this._onChange);
+			ApiUtil.fetchArticles();
+		},
+	
+		componentWillUnmount: function () {
+			this.articleListener.remove();
+		},
+	
+		componentWillReceiveProps: function (propUpdate) {
+			this.setState({
+				articleId: propUpdate.params.articleId,
+				article: this._findArticleById(propUpdate.params.articleId)
+			});
+		},
+	
+		_onChange: function () {
+			this.setState({
+				article: this._findArticleById(this.props.params.articleId) || {}
+			});
+		},
+	
+		_findArticleById: function (id) {
+			var foundArticle;
+			ArticleStore.all().forEach(function (article) {
+				if (id == article.id) {
+					foundArticle = article;
+				}
+			}.bind(this));
+	
+			return foundArticle;
+		},
+	
+		// _linkifyBody: function(body) {
+		// 	var linkedBody = body;
+		// 	this.state.article.annotations.forEach(function(annotation){
+		// 		linkedBody = linkedBody.slice(
+		// 			0,
+		// 			annotation.selection_start
+		// 		) + <a href='#'> +
+		// 		linkedBody.slice(annotation.selection_start);
+		// 		linkedBody = linkedBody.slice(
+		// 			0,
+		// 			annotation.selection_start + annotation.selection_length
+		// 		) + </a> +
+		// 		linkedBody.slice(annotation.selection_start + annotation.selection_length);
+		// 	});
+		// 	return linkedBody;
+		// },
+	
+		splitBodySections: function (sortedAnnotations) {
+			var sections = [];
+			if (this.hasOwnProperty('state')) {
+				if (this.state.article.hasOwnProperty('annotations')) {
+					for (var i = 1; i < sortedAnnotations.length; i++) {
+						sections.push(this.state.article.body.slice(sortedAnnotations[i - 1].selection_start + sortedAnnotations[i - 1].selection_length, sortedAnnotations[i].selection_start));
+					}
+				}
+			}
+			return sections;
+		},
+	
+		splitLinkSecitons: function (sortedAnnotations) {
+			var sections = [];
+			if (this.hasOwnProperty('state')) {
+				if (this.state.article.hasOwnProperty('annotations')) {
+					for (var i = 0; i < sortedAnnotations.length; i++) {
+						sections.push(this.state.article.body.slice(sortedAnnotations[i].selection_start, sortedAnnotations[i].selection_start + sortedAnnotations[i].selection_length));
+					}
+				}
+			}
+			return sections;
+		},
+	
+		splitBodyFL: function (sortedAnnotations) {
+			var sections = [];
+			if (this.hasOwnProperty('state')) {
+				if (this.state.article.hasOwnProperty('annotations')) {
+					if (sortedAnnotations.length === 0) {
+						return [this.state.article.body, ''];
+					}
+					sections.push(this.state.article.body.slice(0, sortedAnnotations[0].selection_start));
+					sections.push(this.state.article.body.slice(sortedAnnotations[sortedAnnotations.length - 1].selection_start + sortedAnnotations[sortedAnnotations.length - 1].selection_length, this.state.article.body.length));
+				}
+			}
+			return sections;
+		},
+	
+		bodyContains: function (text, startIdx) {
+			if (startIdx >= 0) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+	
+		uniqueText: function (text, startIdx) {
+			if (startIdx === this.state.article.body.lastIndexOf(text)) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+	
+		uniqueSelection: function (text, startIdx) {
+			var endIdx = startIdx + text.length;
+			var annStartIdx;
+			var annEndIdx;
+			for (var i = 0; i < this.state.article.annotations.length; i++) {
+				annStartIdx = this.state.article.annotations[i].selection_start;
+				annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
+				if (startIdx >= annStartIdx && startIdx <= annEndIdx || endIdx >= annStartIdx && endIdx <= annEndIdx || startIdx <= annStartIdx && endIdx >= annEndIdx) {
+					return false;
+				}
+			}
+			return true;
+		},
+	
+		sortAnnotations: function (array) {
+			var key = 'selection_start';
+			if (this.state.article.hasOwnProperty('annotations')) {
+				return array.sort(function (a, b) {
+					var x = a[key];var y = b[key];
+					return x < y ? -1 : x > y ? 1 : 0;
+				});
+			}
+		},
+	
+		handleMouseUp: function (e) {
+			// console.log(window.getSelection().toString());
+			// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
+			// this.props.children = null;
+			// this.setState({mounted: false});
+			var textSelection = window.getSelection().toString();
+			var textIdx = this.state.article.body.indexOf(textSelection);
+			if (this.bodyContains(textSelection, textIdx) && this.uniqueText(textSelection, textIdx) && this.uniqueSelection(textSelection, textIdx)) {
+				this.setState({
+					annotationDisplay: 2,
+					selection_start: textIdx,
+					selection_length: textSelection.length
+				});
+				return true;
+			} else {
+				this.setState({
+					annotationDisplay: 0,
+					selection_start: 0,
+					selection_length: 0
+				});
+				return false;
+			}
+		},
+	
+		linkClickHandler: function () {
+			this.setState({ annotationDisplay: 1 });
+		},
+	
+		resetFormView: function () {
+			this.setState({
+				annotationDisplay: 0,
+				selection_start: 0,
+				selection_length: 0
+			});
+		},
+	
+		commentLength: function () {
+			if (this.state.article.hasOwnProperty('comments')) {
+				return this.state.article.comments.length;
+			} else {
+				return 0;
+			}
+		},
+	
+		render: function () {
+			// var article = this.props.article;
+			var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
+			var handleClick = this.handleClick;
+			var bodyFristLast = this.splitBodyFL(sortedAnnotations);
+			var bodySections = this.splitBodySections(sortedAnnotations);
+			var linkSections = this.splitLinkSecitons(sortedAnnotations);
+			var Link = ReactRouter.Link;
+			var validText = false;
+			return React.createElement(
+				'div',
+				null,
+				React.createElement('br', null),
+				React.createElement('br', null),
+				React.createElement(
+					'div',
+					{ className: 'well art-details' },
+					React.createElement(
+						'h1',
+						null,
+						this.state.article.title
+					),
+					this.state.article.image_link,
+					React.createElement('br', null),
+					this.state.article.background_link,
+					React.createElement('br', null),
+					React.createElement(
+						'span',
+						null,
+						this.state.article.locked,
+						React.createElement('br', null),
+						React.createElement(
+							'strong',
+							null,
+							'Submitted by: '
+						),
+						this.state.article.username,
+						React.createElement('br', null),
+						React.createElement(
+							'strong',
+							null,
+							'Expertise: '
+						),
+						this.state.article.expertise
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'body-ann-cont' },
+					React.createElement(
+						'div',
+						{ className: 'well art-body' },
+						function () {
+							if (this.hasOwnProperty('state')) {
+								if (this.state.article.hasOwnProperty('annotations')) {
+									return React.createElement(
+										'div',
+										{ onMouseUp: this.handleMouseUp },
+										bodyFristLast.shift(),
+										this.state.article.annotations.map(function (annotation) {
+											return React.createElement(
+												'div',
+												{ key: annotation.id, className: 'art-sec' },
+												React.createElement(
+													'a',
+													{
+														href: "/#/articles/" + this.state.article.id + "/annotations/" + annotation.id,
+														onClick: this.linkClickHandler,
+														className: "ann-link" + annotation.id },
+													linkSections.shift()
+												),
+												bodySections.shift()
+											);
+										}.bind(this)),
+										bodyFristLast.shift()
+									);
+								}
+							}
+						}.bind(this)()
+					),
+					React.createElement(
+						'div',
+						{ className: 'well art-annotation', articles: this.props.articles },
+						function () {
+							if (this.state.annotationDisplay === 1) {
+								return React.createElement(AnnotationShow, {
+									article: this.state.article,
+									annotationId: this.props.params.annotationId
+								});
+							} else if (this.state.annotationDisplay === 2) {
+								return React.createElement(AnnotationForm, {
+									articleId: this.props.params.articleId,
+									selectionStart: this.state.selection_start,
+									selectionLength: this.state.selection_length,
+									submitCallback: this.resetFormView
+								});
+							} else {
+								return React.createElement(
+									'div',
+									null,
+									React.createElement(
+										'strong',
+										null,
+										"<-----",
+										' ',
+										React.createElement('br', null),
+										'Select Text to create an annotation, or click a link to display an annotation',
+										React.createElement('br', null),
+										"<-----"
+									)
+								);
+							}
+						}.bind(this)()
+					),
+					React.createElement(
+						'div',
+						{ className: 'well comment-sec' },
+						React.createElement(
+							'h5',
+							null,
+							this.commentLength(),
+							' Article Comments'
+						),
+						React.createElement(
+							'span',
+							{ className: 'comment-form-cont' },
+							React.createElement(CommentForm, { articleId: this.props.params.articleId })
+						),
+						React.createElement('br', null),
+						React.createElement(
+							'span',
+							{ className: 'comment-idx-cont' },
+							React.createElement(CommentIndex, { comments: this.state.article.comments })
+						)
+					)
+				)
+			);
+		}
+	});
+	
+	module.exports = ArticleShow;
+
+/***/ },
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ApiActions = __webpack_require__(210);
 	
 	var ApiUtil = {
 	  // TODO: Users API?
@@ -24478,11 +24823,11 @@
 	module.exports = ApiUtil;
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(210);
-	var ArticleConstants = __webpack_require__(214);
+	var AppDispatcher = __webpack_require__(211);
+	var ArticleConstants = __webpack_require__(215);
 	
 	var ApiActions = {
 	  receiveAll: function (articles) {
@@ -24569,15 +24914,15 @@
 	module.exports = ApiActions;
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Dispatcher = __webpack_require__(211).Dispatcher;
+	var Dispatcher = __webpack_require__(212).Dispatcher;
 	
 	module.exports = new Dispatcher();
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -24589,11 +24934,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(212);
+	module.exports.Dispatcher = __webpack_require__(213);
 
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24615,7 +24960,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	var _prefix = 'ID_';
 	
@@ -24830,7 +25175,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24885,7 +25230,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports) {
 
 	var ArticleConstants = {
@@ -24906,16 +25251,15 @@
 	module.exports = ArticleConstants;
 
 /***/ },
-/* 215 */,
-/* 216 */,
-/* 217 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var ApiUtil = __webpack_require__(208);
-	var LinkedStateMixin = __webpack_require__(239);
-	var ArticleStore = __webpack_require__(219);
-	var SessionStore = __webpack_require__(246);
+	var ApiUtil = __webpack_require__(209);
+	var LinkedStateMixin = __webpack_require__(217);
+	var ArticleStore = __webpack_require__(221);
+	var SessionStore = __webpack_require__(239);
+	var browserHistory = __webpack_require__(159).browserHistory;
 	
 	var ArticleForm = React.createClass({
 		displayName: 'ArticleForm',
@@ -24962,10 +25306,10 @@
 		},
 		navigateToArticle: function () {
 			this.setState({ article: ArticleStore.mostRecent() });
-			this.props.history.pushState(null, "articles/" + this.state.article.id);
+			browserHistory.push("articles/" + this.state.article.id);
 		},
 		navigateToHome: function () {
-			this.props.history.pushState(null, "/");
+			browserHistory.push("/");
 		},
 		handleCancel: function (event) {
 			event.preventDefault();
@@ -25066,148 +25410,242 @@
 	module.exports = ArticleForm;
 
 /***/ },
+/* 217 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(218);
+
+/***/ },
 /* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(1);
-	var ArticleStore = __webpack_require__(219);
-	var ApiUtil = __webpack_require__(208);
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule LinkedStateMixin
+	 * @typechecks static-only
+	 */
 	
-	// TODO: Search
-	// var FilterParamsStore = require('../stores/filter_params');
-	// var Filters = require('./Filters');
+	'use strict';
 	
-	function _getAllArticles() {
-	  return ArticleStore.all();
-	}
+	var ReactLink = __webpack_require__(219);
+	var ReactStateSetters = __webpack_require__(220);
 	
-	var ArticleIndex = React.createClass({
-	  displayName: 'ArticleIndex',
-	
-	
-	  getInitialState: function () {
-	    return { articles: ArticleStore.all() };
-	  },
-	
-	  componentWillReceiveProps: function () {
-	    debugger;
-	  },
-	
-	  componentDidMount: function () {
-	    this.articleStoreListener = ArticleStore.addListener(this._onChange);
-	    ApiUtil.fetchArticles();
-	  },
-	
-	  componentWillUnmount: function () {
-	    this.articleStoreListener.remove();
-	  },
-	
-	  _onChange: function () {
-	    this.setState({ articles: ArticleStore.all() });
-	  },
-	
-	  handleClick: function (article) {
-	    this.props.history.pushState(null, "articles/" + article.id);
-	  },
-	
-	  newArticleClick: function () {
-	    this.props.history.pushState(null, "articles/new");
-	  },
-	
-	  commentCount: function (commentsLength) {
-	    if (commentsLength === 1) {
-	      return "1 Comment";
-	    } else {
-	      return commentsLength.toString() + " Comments";
-	    }
-	  },
-	
-	  render: function () {
-	    var handleClick = this.handleClick;
-	    return React.createElement(
-	      'span',
-	      null,
-	      React.createElement(
-	        'div',
-	        { className: 'jumbotron' },
-	        React.createElement(
-	          'div',
-	          { className: 'container jumbo' },
-	          React.createElement(
-	            'h1',
-	            { className: 'jumbo-header', style: { color: '#CCC' } },
-	            'Welcome to ELI5ience!'
-	          ),
-	          React.createElement(
-	            'p',
-	            { className: 'subheader' },
-	            'A place where users can post and annotate articles. '
-	          ),
-	          React.createElement(
-	            'a',
-	            {
-	              className: 'btn btn-xs btn-success',
-	              onClick: this.newArticleClick,
-	              role: 'button' },
-	            'Create article »'
-	          )
-	        )
-	      ),
-	      React.createElement('hr', null),
-	      React.createElement(
-	        'div',
-	        { className: 'container' },
-	        this.state.articles.map(function (article) {
-	          var boundClick = handleClick.bind(null, article);
-	          return React.createElement(
-	            'div',
-	            { key: article.id,
-	              className: 'col-md-4' },
-	            React.createElement(
-	              'h2',
-	              { className: 'index-title' },
-	              article.title
-	            ),
-	            React.createElement(
-	              'p',
-	              { className: 'index-body' },
-	              article.body.slice(0, 300) + "..."
-	            ),
-	            React.createElement(
-	              'div',
-	              { className: 'comment-count' },
-	              this.commentCount(article.comments.length)
-	            ),
-	            React.createElement(
-	              'p',
-	              null,
-	              React.createElement(
-	                'a',
-	                {
-	                  className: 'btn btn-xs btn-primary btn-view-main',
-	                  onClick: boundClick,
-	                  article: article,
-	                  role: 'button' },
-	                'View article »'
-	              )
-	            )
-	          );
-	        }.bind(this))
-	      )
-	    );
+	/**
+	 * A simple mixin around ReactLink.forState().
+	 */
+	var LinkedStateMixin = {
+	  /**
+	   * Create a ReactLink that's linked to part of this component's state. The
+	   * ReactLink will have the current value of this.state[key] and will call
+	   * setState() when a change is requested.
+	   *
+	   * @param {string} key state key to update. Note: you may want to use keyOf()
+	   * if you're using Google Closure Compiler advanced mode.
+	   * @return {ReactLink} ReactLink instance linking to the state.
+	   */
+	  linkState: function (key) {
+	    return new ReactLink(this.state[key], ReactStateSetters.createStateKeySetter(this, key));
 	  }
+	};
 	
-	});
-	
-	module.exports = ArticleIndex;
+	module.exports = LinkedStateMixin;
 
 /***/ },
 /* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(220).Store;
-	var ArticleConstants = __webpack_require__(214);
-	var AppDispatcher = __webpack_require__(210);
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactLink
+	 * @typechecks static-only
+	 */
+	
+	'use strict';
+	
+	/**
+	 * ReactLink encapsulates a common pattern in which a component wants to modify
+	 * a prop received from its parent. ReactLink allows the parent to pass down a
+	 * value coupled with a callback that, when invoked, expresses an intent to
+	 * modify that value. For example:
+	 *
+	 * React.createClass({
+	 *   getInitialState: function() {
+	 *     return {value: ''};
+	 *   },
+	 *   render: function() {
+	 *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
+	 *     return <input valueLink={valueLink} />;
+	 *   },
+	 *   _handleValueChange: function(newValue) {
+	 *     this.setState({value: newValue});
+	 *   }
+	 * });
+	 *
+	 * We have provided some sugary mixins to make the creation and
+	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
+	 */
+	
+	var React = __webpack_require__(2);
+	
+	/**
+	 * @param {*} value current value of the link
+	 * @param {function} requestChange callback to request a change
+	 */
+	function ReactLink(value, requestChange) {
+	  this.value = value;
+	  this.requestChange = requestChange;
+	}
+	
+	/**
+	 * Creates a PropType that enforces the ReactLink API and optionally checks the
+	 * type of the value being passed inside the link. Example:
+	 *
+	 * MyComponent.propTypes = {
+	 *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
+	 * }
+	 */
+	function createLinkTypeChecker(linkType) {
+	  var shapes = {
+	    value: typeof linkType === 'undefined' ? React.PropTypes.any.isRequired : linkType.isRequired,
+	    requestChange: React.PropTypes.func.isRequired
+	  };
+	  return React.PropTypes.shape(shapes);
+	}
+	
+	ReactLink.PropTypes = {
+	  link: createLinkTypeChecker
+	};
+	
+	module.exports = ReactLink;
+
+/***/ },
+/* 220 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactStateSetters
+	 */
+	
+	'use strict';
+	
+	var ReactStateSetters = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (component, funcReturningState) {
+	    return function (a, b, c, d, e, f) {
+	      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
+	      if (partialState) {
+	        component.setState(partialState);
+	      }
+	    };
+	  },
+	
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (component, key) {
+	    // Memoize the setters.
+	    var cache = component.__keySetters || (component.__keySetters = {});
+	    return cache[key] || (cache[key] = createStateKeySetter(component, key));
+	  }
+	};
+	
+	function createStateKeySetter(component, key) {
+	  // Partial state is allocated outside of the function closure so it can be
+	  // reused with every call, avoiding memory allocation when this function
+	  // is called.
+	  var partialState = {};
+	  return function stateKeySetter(value) {
+	    partialState[key] = value;
+	    component.setState(partialState);
+	  };
+	}
+	
+	ReactStateSetters.Mixin = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateSetter(function(xValue) {
+	   *     return {x: xValue};
+	   *   })(1);
+	   *
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (funcReturningState) {
+	    return ReactStateSetters.createStateSetter(this, funcReturningState);
+	  },
+	
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateKeySetter('x')(1);
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (key) {
+	    return ReactStateSetters.createStateKeySetter(this, key);
+	  }
+	};
+	
+	module.exports = ReactStateSetters;
+
+/***/ },
+/* 221 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(222).Store;
+	var ArticleConstants = __webpack_require__(215);
+	var AppDispatcher = __webpack_require__(211);
 	
 	var ArticleStore = new Store(AppDispatcher);
 	
@@ -25393,7 +25831,7 @@
 	module.exports = ArticleStore;
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -25405,15 +25843,15 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Container = __webpack_require__(221);
-	module.exports.MapStore = __webpack_require__(224);
-	module.exports.Mixin = __webpack_require__(236);
-	module.exports.ReduceStore = __webpack_require__(225);
-	module.exports.Store = __webpack_require__(226);
+	module.exports.Container = __webpack_require__(223);
+	module.exports.MapStore = __webpack_require__(226);
+	module.exports.Mixin = __webpack_require__(238);
+	module.exports.ReduceStore = __webpack_require__(227);
+	module.exports.Store = __webpack_require__(228);
 
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25435,10 +25873,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStoreGroup = __webpack_require__(222);
+	var FluxStoreGroup = __webpack_require__(224);
 	
-	var invariant = __webpack_require__(213);
-	var shallowEqual = __webpack_require__(223);
+	var invariant = __webpack_require__(214);
+	var shallowEqual = __webpack_require__(225);
 	
 	var DEFAULT_OPTIONS = {
 	  pure: true,
@@ -25596,7 +26034,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 222 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25615,7 +26053,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	/**
 	 * FluxStoreGroup allows you to execute a callback on every dispatch after
@@ -25677,7 +26115,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 223 */
+/* 225 */
 /***/ function(module, exports) {
 
 	/**
@@ -25732,7 +26170,7 @@
 	module.exports = shallowEqual;
 
 /***/ },
-/* 224 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25753,10 +26191,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxReduceStore = __webpack_require__(225);
-	var Immutable = __webpack_require__(235);
+	var FluxReduceStore = __webpack_require__(227);
+	var Immutable = __webpack_require__(237);
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	/**
 	 * This is a simple store. It allows caching key value pairs. An implementation
@@ -25882,7 +26320,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 225 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25903,10 +26341,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStore = __webpack_require__(226);
+	var FluxStore = __webpack_require__(228);
 	
-	var abstractMethod = __webpack_require__(234);
-	var invariant = __webpack_require__(213);
+	var abstractMethod = __webpack_require__(236);
+	var invariant = __webpack_require__(214);
 	
 	var FluxReduceStore = (function (_FluxStore) {
 	  _inherits(FluxReduceStore, _FluxStore);
@@ -25989,7 +26427,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 226 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26008,11 +26446,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _require = __webpack_require__(227);
+	var _require = __webpack_require__(229);
 	
 	var EventEmitter = _require.EventEmitter;
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	/**
 	 * This class should be extended by the stores in your application, like so:
@@ -26172,7 +26610,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 227 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26185,14 +26623,14 @@
 	 */
 	
 	var fbemitter = {
-	  EventEmitter: __webpack_require__(228)
+	  EventEmitter: __webpack_require__(230)
 	};
 	
 	module.exports = fbemitter;
 
 
 /***/ },
-/* 228 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26211,11 +26649,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var EmitterSubscription = __webpack_require__(229);
-	var EventSubscriptionVendor = __webpack_require__(231);
+	var EmitterSubscription = __webpack_require__(231);
+	var EventSubscriptionVendor = __webpack_require__(233);
 	
-	var emptyFunction = __webpack_require__(233);
-	var invariant = __webpack_require__(232);
+	var emptyFunction = __webpack_require__(235);
+	var invariant = __webpack_require__(234);
 	
 	/**
 	 * @class BaseEventEmitter
@@ -26389,7 +26827,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 229 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26410,7 +26848,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var EventSubscription = __webpack_require__(230);
+	var EventSubscription = __webpack_require__(232);
 	
 	/**
 	 * EmitterSubscription represents a subscription with listener and context data.
@@ -26442,7 +26880,7 @@
 	module.exports = EmitterSubscription;
 
 /***/ },
-/* 230 */
+/* 232 */
 /***/ function(module, exports) {
 
 	/**
@@ -26496,7 +26934,7 @@
 	module.exports = EventSubscription;
 
 /***/ },
-/* 231 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26515,7 +26953,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(232);
+	var invariant = __webpack_require__(234);
 	
 	/**
 	 * EventSubscriptionVendor stores a set of EventSubscriptions that are
@@ -26605,7 +27043,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 232 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26660,7 +27098,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 233 */
+/* 235 */
 /***/ function(module, exports) {
 
 	/**
@@ -26702,7 +27140,7 @@
 	module.exports = emptyFunction;
 
 /***/ },
-/* 234 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26719,7 +27157,7 @@
 	
 	'use strict';
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	function abstractMethod(className, methodName) {
 	   true ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Subclasses of %s must override %s() with their own implementation.', className, methodName) : invariant(false) : undefined;
@@ -26729,7 +27167,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 235 */
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31716,7 +32154,7 @@
 	}));
 
 /***/ },
-/* 236 */
+/* 238 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -31733,9 +32171,9 @@
 	
 	'use strict';
 	
-	var FluxStoreGroup = __webpack_require__(222);
+	var FluxStoreGroup = __webpack_require__(224);
 	
-	var invariant = __webpack_require__(213);
+	var invariant = __webpack_require__(214);
 	
 	/**
 	 * `FluxContainer` should be preferred over this mixin, but it requires using
@@ -31839,359 +32277,809 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 237 */
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(222).Store;
+	var SessionConstants = __webpack_require__(215);
+	var AppDispatcher = __webpack_require__(211);
+	
+	var SessionStore = new Store(AppDispatcher);
+	
+	var _sessions = [];
+	
+	var resetSessions = function (sessions) {
+	  if (sessions[0] !== null) {
+	    _sessions = sessions.slice(0);
+	  } else {
+	    _sessions = [];
+	  }
+	};
+	
+	SessionStore.all = function () {
+	  return _sessions.slice(0);
+	};
+	
+	SessionStore.__onDispatch = function (payload) {
+	  switch (payload.actionType) {
+	    case SessionConstants.SESSIONS_RECEIVED:
+	      resetSessions(payload.sessions);
+	      SessionStore.__emitChange();
+	      break;
+	  }
+	};
+	
+	module.exports = SessionStore;
+
+/***/ },
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var ReactDOM = __webpack_require__(158);
-	var ReactRouter = __webpack_require__(159);
-	var ApiUtil = __webpack_require__(208);
-	var ArticleForm = __webpack_require__(217);
-	var ArticleStore = __webpack_require__(219);
-	var CommentForm = __webpack_require__(243);
-	var CommentIndex = __webpack_require__(245);
-	var AnnotationForm = __webpack_require__(249);
-	var AnnotationShow = __webpack_require__(247);
+	var ApiUtil = __webpack_require__(209);
+	var LinkedStateMixin = __webpack_require__(217);
+	var SessionStore = __webpack_require__(239);
 	
-	var ArticleShow = React.createClass({
-		displayName: 'ArticleShow',
+	var CommentForm = React.createClass({
+		displayName: 'CommentForm',
 	
-	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
 		getInitialState: function () {
-			var articleId = this.props.params.articleId;
-			var article = this._findArticleById(articleId) || { comments: [] };
 			return {
-				article: article,
-				annotationDisplay: 0,
-				selection_start: 0,
-				selection_length: 0
+				body: "",
+				articleId: this.props.articleId,
+				user_id: "",
+				session: SessionStore.all()
 			};
 		},
 	
-		componentDidMount: function () {
-			// TODO: only fetch articles if we don't have user info in _findArticleById
-			this.articleListener = ArticleStore.addListener(this._onChange);
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var comment = {
+				body: this.state.body,
+				article_id: this.state.articleId
+			};
+			ApiUtil.createComment(comment);
 			ApiUtil.fetchArticles();
 		},
 	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+			// this.navigateToArticle();
+		},
+	
 		componentWillUnmount: function () {
-			this.articleListener.remove();
+			this.sessionStoreListener.remove();
 		},
 	
 		componentWillReceiveProps: function (propUpdate) {
 			this.setState({
-				articleId: propUpdate.params.articleId,
-				article: this._findArticleById(propUpdate.params.articleId)
+				body: "",
+				articleId: this.props.articleId,
+				user_id: ""
 			});
 		},
 	
-		_onChange: function () {
-			this.setState({
-				article: this._findArticleById(this.props.params.articleId) || {}
-			});
-		},
-	
-		_findArticleById: function (id) {
-			var foundArticle;
-			ArticleStore.all().forEach(function (article) {
-				if (id == article.id) {
-					foundArticle = article;
-				}
-			}.bind(this));
-	
-			return foundArticle;
-		},
-	
-		// _linkifyBody: function(body) {
-		// 	var linkedBody = body;
-		// 	this.state.article.annotations.forEach(function(annotation){
-		// 		linkedBody = linkedBody.slice(
-		// 			0,
-		// 			annotation.selection_start
-		// 		) + <a href='#'> +
-		// 		linkedBody.slice(annotation.selection_start);
-		// 		linkedBody = linkedBody.slice(
-		// 			0,
-		// 			annotation.selection_start + annotation.selection_length
-		// 		) + </a> +
-		// 		linkedBody.slice(annotation.selection_start + annotation.selection_length);
-		// 	});
-		// 	return linkedBody;
-		// },
-	
-		splitBodySections: function (sortedAnnotations) {
-			var sections = [];
-			if (this.hasOwnProperty('state')) {
-				if (this.state.article.hasOwnProperty('annotations')) {
-					for (var i = 1; i < sortedAnnotations.length; i++) {
-						sections.push(this.state.article.body.slice(sortedAnnotations[i - 1].selection_start + sortedAnnotations[i - 1].selection_length, sortedAnnotations[i].selection_start));
-					}
-				}
-			}
-			return sections;
-		},
-	
-		splitLinkSecitons: function (sortedAnnotations) {
-			var sections = [];
-			if (this.hasOwnProperty('state')) {
-				if (this.state.article.hasOwnProperty('annotations')) {
-					for (var i = 0; i < sortedAnnotations.length; i++) {
-						sections.push(this.state.article.body.slice(sortedAnnotations[i].selection_start, sortedAnnotations[i].selection_start + sortedAnnotations[i].selection_length));
-					}
-				}
-			}
-			return sections;
-		},
-	
-		splitBodyFL: function (sortedAnnotations) {
-			var sections = [];
-			if (this.hasOwnProperty('state')) {
-				if (this.state.article.hasOwnProperty('annotations')) {
-					if (sortedAnnotations.length === 0) {
-						return [this.state.article.body, ''];
-					}
-					sections.push(this.state.article.body.slice(0, sortedAnnotations[0].selection_start));
-					sections.push(this.state.article.body.slice(sortedAnnotations[sortedAnnotations.length - 1].selection_start + sortedAnnotations[sortedAnnotations.length - 1].selection_length, this.state.article.body.length));
-				}
-			}
-			return sections;
-		},
-	
-		bodyContains: function (text, startIdx) {
-			if (startIdx >= 0) {
-				return true;
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Login to post a comment!'
+				);
 			} else {
-				return false;
-			}
-		},
-	
-		uniqueText: function (text, startIdx) {
-			if (startIdx === this.state.article.body.lastIndexOf(text)) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-	
-		uniqueSelection: function (text, startIdx) {
-			var endIdx = startIdx + text.length;
-			var annStartIdx;
-			var annEndIdx;
-			for (var i = 0; i < this.state.article.annotations.length; i++) {
-				annStartIdx = this.state.article.annotations[i].selection_start;
-				annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
-				if (startIdx >= annStartIdx && startIdx <= annEndIdx || endIdx >= annStartIdx && endIdx <= annEndIdx || startIdx <= annStartIdx && endIdx >= annEndIdx) {
-					return false;
-				}
-			}
-			return true;
-		},
-	
-		sortAnnotations: function (array) {
-			var key = 'selection_start';
-			if (this.state.article.hasOwnProperty('annotations')) {
-				return array.sort(function (a, b) {
-					var x = a[key];var y = b[key];
-					return x < y ? -1 : x > y ? 1 : 0;
-				});
-			}
-		},
-	
-		handleMouseUp: function (e) {
-			// console.log(window.getSelection().toString());
-			// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
-			// this.props.children = null;
-			// this.setState({mounted: false});
-			var textSelection = window.getSelection().toString();
-			var textIdx = this.state.article.body.indexOf(textSelection);
-			if (this.bodyContains(textSelection, textIdx) && this.uniqueText(textSelection, textIdx) && this.uniqueSelection(textSelection, textIdx)) {
-				this.setState({
-					annotationDisplay: 2,
-					selection_start: textIdx,
-					selection_length: textSelection.length
-				});
-				return true;
-			} else {
-				this.setState({
-					annotationDisplay: 0,
-					selection_start: 0,
-					selection_length: 0
-				});
-				return false;
-			}
-		},
-	
-		linkClickHandler: function () {
-			this.setState({ annotationDisplay: 1 });
-		},
-	
-		resetFormView: function () {
-			this.setState({
-				annotationDisplay: 0,
-				selection_start: 0,
-				selection_length: 0
-			});
-		},
-	
-		commentLength: function () {
-			if (this.state.article.hasOwnProperty('comments')) {
-				return this.state.article.comments.length;
-			} else {
-				return 0;
+				return React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn',
+					type: 'submit',
+					value: 'Post' });
 			}
 		},
 	
 		render: function () {
-			// var article = this.props.article;
-			var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
-			var handleClick = this.handleClick;
-			var bodyFristLast = this.splitBodyFL(sortedAnnotations);
-			var bodySections = this.splitBodySections(sortedAnnotations);
-			var linkSections = this.splitLinkSecitons(sortedAnnotations);
-			var Link = ReactRouter.Link;
-			var validText = false;
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement('br', null),
+					React.createElement('input', {
+						type: 'text',
+						required: true, autofocus: true,
+						placeholder: 'Add a comment...',
+						className: 'form-control comment-form',
+						valueLink: this.linkState('body')
+					}),
+					React.createElement('br', null),
+					this.postBtn(this.state.session)
+				)
+			);
+		}
+	});
+	
+	module.exports = CommentForm;
+
+/***/ },
+/* 241 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ApiUtil = __webpack_require__(209);
+	var SessionStore = __webpack_require__(239);
+	
+	var CommentIndex = React.createClass({
+		displayName: 'CommentIndex',
+	
+	
+		getInitialState: function () {
+			return {
+				comments: this.props.comments || [],
+				sessions: SessionStore.all()
+			};
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({
+				sessions: SessionStore.all()
+			});
+		},
+	
+		handleClick: function (comment) {
+			if (confirm("Are you sure you want to delete your comment?")) {
+				ApiUtil.removeComment(comment.id);
+				ApiUtil.fetchArticles();
+				ApiUtil.fetchSessions();
+			}
+		},
+	
+		componentWillReceiveProps: function () {
+			this.setState({
+				comments: this.props.comments || [],
+				sessions: SessionStore.all()
+			});
+		},
+	
+		render: function () {
+			var handleClick = this.handleClick;
+			var delButton;
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'ul',
+					{ className: 'comment-list' },
+					this.state.comments.map(function (comment) {
+						var boundClick = handleClick.bind(null, comment);
+						if (this.state.sessions.length > 0) {
+							if (this.state.sessions[0].id === comment.user_id) {
+								delButton = React.createElement(
+									'a',
+									{
+										className: 'btn btn-xs btn-danger',
+										onClick: boundClick,
+										comment: comment,
+										role: 'button' },
+									'Delete'
+								);
+							} else {
+								delButton = React.createElement('span', null);
+							}
+						}
+						return React.createElement(
+							'li',
+							{ className: 'list-group-item', key: comment.id },
+							React.createElement(
+								'div',
+								{ className: 'comment-user' },
+								React.createElement(
+									'strong',
+									null,
+									comment.username + " - "
+								),
+								comment.expertise + " ",
+								delButton
+							),
+							React.createElement('br', null),
+							comment.body,
+							React.createElement('br', null),
+							React.createElement('br', null),
+							React.createElement(
+								'div',
+								{ className: 'comment-date' },
+								' ',
+								new Date(comment.created_at).toDateString() + " " + new Date(comment.created_at).toLocaleTimeString()
+							)
+						);
+					}.bind(this))
+				)
+			);
+		}
+	});
+	
+	module.exports = CommentIndex;
+
+/***/ },
+/* 242 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ApiUtil = __webpack_require__(209);
+	var LinkedStateMixin = __webpack_require__(217);
+	var ArticleStore = __webpack_require__(221);
+	var SessionStore = __webpack_require__(239);
+	
+	var AnnotationForm = React.createClass({
+		displayName: 'AnnotationForm',
+	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
+		getInitialState: function () {
+			return {
+				body: "",
+				annotation: null,
+				session: SessionStore.all()
+			};
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+			// this.navigateToArticle();
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var annotation = {
+				body: this.state.body,
+				article_id: this.props.articleId,
+				selection_start: this.props.selectionStart,
+				selection_length: this.props.selectionLength
+			};
+			ApiUtil.createAnnotation(annotation);
+			ApiUtil.fetchArticles();
+			this.props.submitCallback();
+		},
+	
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Login to create an annotation!'
+				);
+			} else {
+				return React.createElement('input', {
+					className: 'btn btn-xs btn-success user-create-art',
+					type: 'submit',
+					value: 'Create annotation'
+				});
+			}
+		},
+	
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement(
+						'label',
+						{ className: 'sr-only' },
+						'Body'
+					),
+					React.createElement('textarea', {
+						className: 'form-control comment-form',
+						placeholder: 'Add annotation...',
+						required: true, autofocus: true,
+						valueLink: this.linkState('body') }),
+					React.createElement('br', null),
+					this.postBtn(this.state.session)
+				)
+			);
+		}
+	});
+	
+	module.exports = AnnotationForm;
+
+/***/ },
+/* 243 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ArticleStore = __webpack_require__(221);
+	var SessionStore = __webpack_require__(239);
+	var ApiUtil = __webpack_require__(209);
+	var ImprovementForm = __webpack_require__(244);
+	var ImprovementIndex = __webpack_require__(245);
+	
+	var AnnotationShow = React.createClass({
+		displayName: 'AnnotationShow',
+	
+	
+		getInitialState: function () {
+			return {
+				user: ArticleStore.authors(),
+				articles: ArticleStore.all(),
+				sessions: SessionStore.all()
+			};
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({
+				sessions: SessionStore.all()
+			});
+		},
+	
+		handleDelClick: function (annotationId) {
+			if (confirm("Are you sure you want to delete your annotation?")) {
+				ApiUtil.removeAnnotation(annotationId);
+				ApiUtil.fetchArticles();
+				ApiUtil.fetchSessions();
+			}
+		},
+	
+		findAnnotationById: function (annotationId, annotations) {
+			for (var i = 0; i < annotations.length; i++) {
+				if (annotationId === annotations[i].id.toString()) return annotations[i];
+			}
+			return {
+				id: 0,
+				improvements: []
+			};
+		},
+	
+		delButton: function (annotationId) {
+			var userId;
+			for (var i = 0; i < this.props.article.annotations.length; i++) {
+				if (this.props.article.annotations[i].id == annotationId) {
+					userId = this.props.article.annotations[i].user_id;
+				}
+			}
+			if (this.state.sessions.length > 0) {
+				if (this.state.sessions[0].id === userId) {
+					return React.createElement(
+						'a',
+						{
+							className: 'btn btn-xs btn-danger',
+							onClick: this.handleDelClick.bind(null, annotationId),
+							role: 'button' },
+						'Delete'
+					);
+				} else return '';
+			}
+		},
+	
+		render: function () {
+			var handleDelClick = this.handleDelClick;
+			var user = this.state.user;
+			var annotations = this.props.article.annotations;
+			var annotation = this.findAnnotationById(this.props.annotationId, annotations);
+			var delButton = this.delButton(annotation.id);
+			return React.createElement(
+				'div',
+				{ id: 'annotation' },
+				annotation.body,
 				React.createElement('br', null),
 				React.createElement('br', null),
+				'By: ',
+				React.createElement(
+					'strong',
+					null,
+					annotation.username + " - "
+				),
+				annotation.expertise + " ",
+				delButton,
 				React.createElement(
 					'div',
-					{ className: 'well art-details' },
+					{ className: 'well improv-sec' },
 					React.createElement(
-						'h1',
+						'h5',
 						null,
-						this.state.article.title
+						annotation.improvements.length || 0,
+						' Annotation Improvements'
 					),
-					this.state.article.image_link,
-					React.createElement('br', null),
-					this.state.article.background_link,
+					React.createElement(
+						'span',
+						null,
+						React.createElement(ImprovementForm, { annotationId: annotation.id })
+					),
 					React.createElement('br', null),
 					React.createElement(
 						'span',
 						null,
-						this.state.article.locked,
-						React.createElement('br', null),
-						React.createElement(
-							'strong',
-							null,
-							'Submitted by: '
-						),
-						this.state.article.username,
-						React.createElement('br', null),
-						React.createElement(
-							'strong',
-							null,
-							'Expertise: '
-						),
-						this.state.article.expertise
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'body-ann-cont' },
-					React.createElement(
-						'div',
-						{ className: 'well art-body' },
-						function () {
-							if (this.hasOwnProperty('state')) {
-								if (this.state.article.hasOwnProperty('annotations')) {
-									return React.createElement(
-										'div',
-										{ onMouseUp: this.handleMouseUp },
-										bodyFristLast.shift(),
-										this.state.article.annotations.map(function (annotation) {
-											return React.createElement(
-												'div',
-												{ key: annotation.id, className: 'art-sec' },
-												React.createElement(
-													'a',
-													{
-														href: "/#/articles/" + this.state.article.id + "/annotations/" + annotation.id,
-														onClick: this.linkClickHandler,
-														className: "ann-link" + annotation.id },
-													linkSections.shift()
-												),
-												bodySections.shift()
-											);
-										}.bind(this)),
-										bodyFristLast.shift()
-									);
-								}
-							}
-						}.bind(this)()
-					),
-					React.createElement(
-						'div',
-						{ className: 'well art-annotation', articles: this.props.articles },
-						function () {
-							if (this.state.annotationDisplay === 1) {
-								return React.createElement(AnnotationShow, {
-									article: this.state.article,
-									annotationId: this.props.params.annotationId
-								});
-							} else if (this.state.annotationDisplay === 2) {
-								return React.createElement(AnnotationForm, {
-									articleId: this.props.params.articleId,
-									selectionStart: this.state.selection_start,
-									selectionLength: this.state.selection_length,
-									submitCallback: this.resetFormView
-								});
-							} else {
-								return React.createElement(
-									'div',
-									null,
-									React.createElement(
-										'strong',
-										null,
-										"<-----",
-										' ',
-										React.createElement('br', null),
-										'Select Text to create an annotation, or click a link to display an annotation',
-										React.createElement('br', null),
-										"<-----"
-									)
-								);
-							}
-						}.bind(this)()
-					),
-					React.createElement(
-						'div',
-						{ className: 'well comment-sec' },
-						React.createElement(
-							'h5',
-							null,
-							this.commentLength(),
-							' Article Comments'
-						),
-						React.createElement(
-							'span',
-							{ className: 'comment-form-cont' },
-							React.createElement(CommentForm, { articleId: this.props.params.articleId })
-						),
-						React.createElement('br', null),
-						React.createElement(
-							'span',
-							{ className: 'comment-idx-cont' },
-							React.createElement(CommentIndex, { comments: this.state.article.comments })
-						)
+						React.createElement(ImprovementIndex, { improvements: annotation.improvements })
 					)
 				)
 			);
 		}
 	});
 	
-	module.exports = ArticleShow;
+	module.exports = AnnotationShow;
 
 /***/ },
-/* 238 */
+/* 244 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ApiUtil = __webpack_require__(209);
+	var LinkedStateMixin = __webpack_require__(217);
+	var SessionStore = __webpack_require__(239);
+	
+	var ImprovementForm = React.createClass({
+		displayName: 'ImprovementForm',
+	
+		mixins: [LinkedStateMixin],
+		contextTypes: {
+			router: React.PropTypes.func
+		},
+		getInitialState: function () {
+			return {
+				body: "",
+				annotationId: this.props.annotationId,
+				user_id: "",
+				session: SessionStore.all()
+			};
+		},
+	
+		handleSubmit: function (event) {
+			event.preventDefault();
+			var improvement = {
+				body: this.state.body,
+				annotation_id: this.state.annotationId
+			};
+			ApiUtil.createImprovement(improvement);
+			ApiUtil.fetchArticles();
+		},
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+		_onChange: function () {
+			this.setState({ session: SessionStore.all() });
+		},
+	
+		componentWillReceiveProps: function (propUpdate) {
+			this.setState({
+				body: "",
+				annotationId: this.props.annotationId,
+				user_id: ""
+			});
+		},
+		postBtn: function (session) {
+			if (session.length === 0) {
+				return React.createElement(
+					'div',
+					{ className: 'errPost' },
+					'Login to suggest an improvement!'
+				);
+			} else {
+				return React.createElement('input', {
+					className: 'btn btn-xs btn-success comment-post-btn',
+					type: 'submit',
+					value: 'Post' });
+			}
+		},
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'form',
+					{ onSubmit: this.handleSubmit },
+					React.createElement('br', null),
+					React.createElement('input', {
+						type: 'text',
+						required: true, autofocus: true,
+						placeholder: 'Add an improvement...',
+						className: 'form-control comment-form',
+						valueLink: this.linkState('body')
+					}),
+					React.createElement('br', null),
+					this.postBtn(this.state.session)
+				)
+			);
+		}
+	});
+	
+	module.exports = ImprovementForm;
+
+/***/ },
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
 	var ReactRouter = __webpack_require__(159);
-	var ArticleStore = __webpack_require__(219);
-	var SessionStore = __webpack_require__(246);
-	var ApiUtil = __webpack_require__(208);
+	var ApiUtil = __webpack_require__(209);
+	var SessionStore = __webpack_require__(239);
+	
+	var ImprovementIndex = React.createClass({
+		displayName: 'ImprovementIndex',
+	
+	
+		getInitialState: function () {
+			return {
+				improvements: this.props.improvements || [],
+				sessions: SessionStore.all()
+			};
+		},
+	
+		componentWillUnmount: function () {
+			this.sessionStoreListener.remove();
+		},
+	
+		componentDidMount: function () {
+			this.sessionStoreListener = SessionStore.addListener(this._onChange);
+			ApiUtil.fetchSessions();
+		},
+	
+		_onChange: function () {
+			this.setState({
+				sessions: SessionStore.all()
+			});
+		},
+	
+		handleClick: function (improvement) {
+			if (confirm("Are you sure you want to delete your comment?")) {
+				ApiUtil.removeImprovement(improvement.id);
+				ApiUtil.fetchArticles();
+				ApiUtil.fetchSessions();
+			}
+		},
+	
+		componentWillReceiveProps: function () {
+			this.setState({
+				improvements: this.props.improvements || [],
+				sessions: SessionStore.all()
+			});
+		},
+	
+		render: function () {
+			var handleClick = this.handleClick;
+			var delButton;
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'ul',
+					{ className: 'comment-list' },
+					this.state.improvements.map(function (improvement) {
+						var boundClick = handleClick.bind(null, improvement);
+						if (this.state.sessions.length > 0) {
+							if (this.state.sessions[0].id === improvement.user_id) {
+								delButton = React.createElement(
+									'a',
+									{
+										className: 'btn btn-xs btn-danger',
+										onClick: boundClick,
+										improvement: improvement,
+										role: 'button' },
+									'Delete'
+								);
+							} else {
+								delButton = React.createElement('span', null);
+							}
+						}
+						return React.createElement(
+							'li',
+							{ className: 'list-group-item', key: improvement.id },
+							React.createElement(
+								'div',
+								{ className: 'comment-user' },
+								React.createElement(
+									'strong',
+									null,
+									improvement.username + " - "
+								),
+								improvement.expertise + " ",
+								delButton
+							),
+							React.createElement('br', null),
+							improvement.body,
+							React.createElement('br', null),
+							React.createElement('br', null),
+							React.createElement(
+								'div',
+								{ className: 'comment-date' },
+								' ',
+								new Date(improvement.created_at).toDateString() + " " + new Date(improvement.created_at).toLocaleTimeString()
+							)
+						);
+					}.bind(this))
+				)
+			);
+		}
+	});
+	
+	module.exports = ImprovementIndex;
+
+/***/ },
+/* 246 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ArticleStore = __webpack_require__(221);
+	var ApiUtil = __webpack_require__(209);
+	var browserHistory = __webpack_require__(159).browserHistory;
+	
+	// TODO: Search
+	// var FilterParamsStore = require('../stores/filter_params');
+	// var Filters = require('./Filters');
+	
+	function _getAllArticles() {
+	  return ArticleStore.all();
+	}
+	
+	var ArticleIndex = React.createClass({
+	  displayName: 'ArticleIndex',
+	
+	
+	  getInitialState: function () {
+	    return { articles: ArticleStore.all() };
+	  },
+	
+	  componentWillReceiveProps: function () {
+	    debugger;
+	  },
+	
+	  componentDidMount: function () {
+	    this.articleStoreListener = ArticleStore.addListener(this._onChange);
+	    ApiUtil.fetchArticles();
+	  },
+	
+	  componentWillUnmount: function () {
+	    this.articleStoreListener.remove();
+	  },
+	
+	  _onChange: function () {
+	    this.setState({ articles: ArticleStore.all() });
+	  },
+	
+	  handleClick: function (article) {
+	    browserHistory.push("articles/" + article.id);
+	  },
+	
+	  newArticleClick: function () {
+	    browserHistory.push("articles/new");
+	  },
+	
+	  commentCount: function (commentsLength) {
+	    if (commentsLength === 1) {
+	      return "1 Comment";
+	    } else {
+	      return commentsLength.toString() + " Comments";
+	    }
+	  },
+	
+	  render: function () {
+	    var handleClick = this.handleClick;
+	    return React.createElement(
+	      'span',
+	      null,
+	      React.createElement(
+	        'div',
+	        { className: 'jumbotron' },
+	        React.createElement(
+	          'div',
+	          { className: 'container jumbo' },
+	          React.createElement(
+	            'h1',
+	            { className: 'jumbo-header', style: { color: '#CCC' } },
+	            'Welcome to ELI5ience!'
+	          ),
+	          React.createElement(
+	            'p',
+	            { className: 'subheader' },
+	            'A place where users can post and annotate articles. '
+	          ),
+	          React.createElement(
+	            'a',
+	            {
+	              className: 'btn btn-xs btn-success',
+	              onClick: this.newArticleClick,
+	              role: 'button' },
+	            'Create article »'
+	          )
+	        )
+	      ),
+	      React.createElement('hr', null),
+	      React.createElement(
+	        'div',
+	        { className: 'container' },
+	        this.state.articles.map(function (article) {
+	          var boundClick = handleClick.bind(null, article);
+	          return React.createElement(
+	            'div',
+	            { key: article.id,
+	              className: 'col-md-4' },
+	            React.createElement(
+	              'h2',
+	              { className: 'index-title' },
+	              article.title
+	            ),
+	            React.createElement(
+	              'p',
+	              { className: 'index-body' },
+	              article.body.slice(0, 300) + "..."
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'comment-count' },
+	              this.commentCount(article.comments.length)
+	            ),
+	            React.createElement(
+	              'p',
+	              null,
+	              React.createElement(
+	                'a',
+	                {
+	                  className: 'btn btn-xs btn-primary btn-view-main',
+	                  onClick: boundClick,
+	                  article: article,
+	                  role: 'button' },
+	                'View article »'
+	              )
+	            )
+	          );
+	        }.bind(this))
+	      )
+	    );
+	  }
+	
+	});
+	
+	module.exports = ArticleIndex;
+
+/***/ },
+/* 247 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactRouter = __webpack_require__(159);
+	var ArticleStore = __webpack_require__(221);
+	var SessionStore = __webpack_require__(239);
+	var ApiUtil = __webpack_require__(209);
+	var browserHistory = __webpack_require__(159).browserHistory;
 	
 	var User = React.createClass({
 		displayName: 'User',
@@ -32237,11 +33125,11 @@
 		},
 	
 		handleArticleClick: function (article) {
-			this.props.history.pushState(null, "articles/" + article.id);
+			browserHistory.push("articles/" + article.id);
 		},
 	
 		newArticleClick: function () {
-			this.props.history.pushState(null, "articles/new");
+			browserHistory.push("articles/new");
 		},
 	
 		render: function () {
@@ -32371,895 +33259,6 @@
 	});
 	
 	module.exports = User;
-
-/***/ },
-/* 239 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(240);
-
-/***/ },
-/* 240 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule LinkedStateMixin
-	 * @typechecks static-only
-	 */
-	
-	'use strict';
-	
-	var ReactLink = __webpack_require__(241);
-	var ReactStateSetters = __webpack_require__(242);
-	
-	/**
-	 * A simple mixin around ReactLink.forState().
-	 */
-	var LinkedStateMixin = {
-	  /**
-	   * Create a ReactLink that's linked to part of this component's state. The
-	   * ReactLink will have the current value of this.state[key] and will call
-	   * setState() when a change is requested.
-	   *
-	   * @param {string} key state key to update. Note: you may want to use keyOf()
-	   * if you're using Google Closure Compiler advanced mode.
-	   * @return {ReactLink} ReactLink instance linking to the state.
-	   */
-	  linkState: function (key) {
-	    return new ReactLink(this.state[key], ReactStateSetters.createStateKeySetter(this, key));
-	  }
-	};
-	
-	module.exports = LinkedStateMixin;
-
-/***/ },
-/* 241 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactLink
-	 * @typechecks static-only
-	 */
-	
-	'use strict';
-	
-	/**
-	 * ReactLink encapsulates a common pattern in which a component wants to modify
-	 * a prop received from its parent. ReactLink allows the parent to pass down a
-	 * value coupled with a callback that, when invoked, expresses an intent to
-	 * modify that value. For example:
-	 *
-	 * React.createClass({
-	 *   getInitialState: function() {
-	 *     return {value: ''};
-	 *   },
-	 *   render: function() {
-	 *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
-	 *     return <input valueLink={valueLink} />;
-	 *   },
-	 *   _handleValueChange: function(newValue) {
-	 *     this.setState({value: newValue});
-	 *   }
-	 * });
-	 *
-	 * We have provided some sugary mixins to make the creation and
-	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
-	 */
-	
-	var React = __webpack_require__(2);
-	
-	/**
-	 * @param {*} value current value of the link
-	 * @param {function} requestChange callback to request a change
-	 */
-	function ReactLink(value, requestChange) {
-	  this.value = value;
-	  this.requestChange = requestChange;
-	}
-	
-	/**
-	 * Creates a PropType that enforces the ReactLink API and optionally checks the
-	 * type of the value being passed inside the link. Example:
-	 *
-	 * MyComponent.propTypes = {
-	 *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
-	 * }
-	 */
-	function createLinkTypeChecker(linkType) {
-	  var shapes = {
-	    value: typeof linkType === 'undefined' ? React.PropTypes.any.isRequired : linkType.isRequired,
-	    requestChange: React.PropTypes.func.isRequired
-	  };
-	  return React.PropTypes.shape(shapes);
-	}
-	
-	ReactLink.PropTypes = {
-	  link: createLinkTypeChecker
-	};
-	
-	module.exports = ReactLink;
-
-/***/ },
-/* 242 */
-/***/ function(module, exports) {
-
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactStateSetters
-	 */
-	
-	'use strict';
-	
-	var ReactStateSetters = {
-	  /**
-	   * Returns a function that calls the provided function, and uses the result
-	   * of that to set the component's state.
-	   *
-	   * @param {ReactCompositeComponent} component
-	   * @param {function} funcReturningState Returned callback uses this to
-	   *                                      determine how to update state.
-	   * @return {function} callback that when invoked uses funcReturningState to
-	   *                    determined the object literal to setState.
-	   */
-	  createStateSetter: function (component, funcReturningState) {
-	    return function (a, b, c, d, e, f) {
-	      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
-	      if (partialState) {
-	        component.setState(partialState);
-	      }
-	    };
-	  },
-	
-	  /**
-	   * Returns a single-argument callback that can be used to update a single
-	   * key in the component's state.
-	   *
-	   * Note: this is memoized function, which makes it inexpensive to call.
-	   *
-	   * @param {ReactCompositeComponent} component
-	   * @param {string} key The key in the state that you should update.
-	   * @return {function} callback of 1 argument which calls setState() with
-	   *                    the provided keyName and callback argument.
-	   */
-	  createStateKeySetter: function (component, key) {
-	    // Memoize the setters.
-	    var cache = component.__keySetters || (component.__keySetters = {});
-	    return cache[key] || (cache[key] = createStateKeySetter(component, key));
-	  }
-	};
-	
-	function createStateKeySetter(component, key) {
-	  // Partial state is allocated outside of the function closure so it can be
-	  // reused with every call, avoiding memory allocation when this function
-	  // is called.
-	  var partialState = {};
-	  return function stateKeySetter(value) {
-	    partialState[key] = value;
-	    component.setState(partialState);
-	  };
-	}
-	
-	ReactStateSetters.Mixin = {
-	  /**
-	   * Returns a function that calls the provided function, and uses the result
-	   * of that to set the component's state.
-	   *
-	   * For example, these statements are equivalent:
-	   *
-	   *   this.setState({x: 1});
-	   *   this.createStateSetter(function(xValue) {
-	   *     return {x: xValue};
-	   *   })(1);
-	   *
-	   * @param {function} funcReturningState Returned callback uses this to
-	   *                                      determine how to update state.
-	   * @return {function} callback that when invoked uses funcReturningState to
-	   *                    determined the object literal to setState.
-	   */
-	  createStateSetter: function (funcReturningState) {
-	    return ReactStateSetters.createStateSetter(this, funcReturningState);
-	  },
-	
-	  /**
-	   * Returns a single-argument callback that can be used to update a single
-	   * key in the component's state.
-	   *
-	   * For example, these statements are equivalent:
-	   *
-	   *   this.setState({x: 1});
-	   *   this.createStateKeySetter('x')(1);
-	   *
-	   * Note: this is memoized function, which makes it inexpensive to call.
-	   *
-	   * @param {string} key The key in the state that you should update.
-	   * @return {function} callback of 1 argument which calls setState() with
-	   *                    the provided keyName and callback argument.
-	   */
-	  createStateKeySetter: function (key) {
-	    return ReactStateSetters.createStateKeySetter(this, key);
-	  }
-	};
-	
-	module.exports = ReactStateSetters;
-
-/***/ },
-/* 243 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ApiUtil = __webpack_require__(208);
-	var LinkedStateMixin = __webpack_require__(239);
-	var SessionStore = __webpack_require__(246);
-	
-	var CommentForm = React.createClass({
-		displayName: 'CommentForm',
-	
-		mixins: [LinkedStateMixin],
-		contextTypes: {
-			router: React.PropTypes.func
-		},
-		getInitialState: function () {
-			return {
-				body: "",
-				articleId: this.props.articleId,
-				user_id: "",
-				session: SessionStore.all()
-			};
-		},
-	
-		handleSubmit: function (event) {
-			event.preventDefault();
-			var comment = {
-				body: this.state.body,
-				article_id: this.state.articleId
-			};
-			ApiUtil.createComment(comment);
-			ApiUtil.fetchArticles();
-		},
-	
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-	
-		_onChange: function () {
-			this.setState({ session: SessionStore.all() });
-			// this.navigateToArticle();
-		},
-	
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-	
-		componentWillReceiveProps: function (propUpdate) {
-			this.setState({
-				body: "",
-				articleId: this.props.articleId,
-				user_id: ""
-			});
-		},
-	
-		postBtn: function (session) {
-			if (session.length === 0) {
-				return React.createElement(
-					'div',
-					{ className: 'errPost' },
-					'Login to post a comment!'
-				);
-			} else {
-				return React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn',
-					type: 'submit',
-					value: 'Post' });
-			}
-		},
-	
-		render: function () {
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'form',
-					{ onSubmit: this.handleSubmit },
-					React.createElement('br', null),
-					React.createElement('input', {
-						type: 'text',
-						required: true, autofocus: true,
-						placeholder: 'Add a comment...',
-						className: 'form-control comment-form',
-						valueLink: this.linkState('body')
-					}),
-					React.createElement('br', null),
-					this.postBtn(this.state.session)
-				)
-			);
-		}
-	});
-	
-	module.exports = CommentForm;
-
-/***/ },
-/* 244 */,
-/* 245 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ReactRouter = __webpack_require__(159);
-	var ApiUtil = __webpack_require__(208);
-	var SessionStore = __webpack_require__(246);
-	
-	var CommentIndex = React.createClass({
-		displayName: 'CommentIndex',
-	
-	
-		getInitialState: function () {
-			return {
-				comments: this.props.comments || [],
-				sessions: SessionStore.all()
-			};
-		},
-	
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-	
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-	
-		_onChange: function () {
-			this.setState({
-				sessions: SessionStore.all()
-			});
-		},
-	
-		handleClick: function (comment) {
-			if (confirm("Are you sure you want to delete your comment?")) {
-				ApiUtil.removeComment(comment.id);
-				ApiUtil.fetchArticles();
-				ApiUtil.fetchSessions();
-			}
-		},
-	
-		componentWillReceiveProps: function () {
-			this.setState({
-				comments: this.props.comments || [],
-				sessions: SessionStore.all()
-			});
-		},
-	
-		render: function () {
-			var handleClick = this.handleClick;
-			var delButton;
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'ul',
-					{ className: 'comment-list' },
-					this.state.comments.map(function (comment) {
-						var boundClick = handleClick.bind(null, comment);
-						if (this.state.sessions.length > 0) {
-							if (this.state.sessions[0].id === comment.user_id) {
-								delButton = React.createElement(
-									'a',
-									{
-										className: 'btn btn-xs btn-danger',
-										onClick: boundClick,
-										comment: comment,
-										role: 'button' },
-									'Delete'
-								);
-							} else {
-								delButton = React.createElement('span', null);
-							}
-						}
-						return React.createElement(
-							'li',
-							{ className: 'list-group-item', key: comment.id },
-							React.createElement(
-								'div',
-								{ className: 'comment-user' },
-								React.createElement(
-									'strong',
-									null,
-									comment.username + " - "
-								),
-								comment.expertise + " ",
-								delButton
-							),
-							React.createElement('br', null),
-							comment.body,
-							React.createElement('br', null),
-							React.createElement('br', null),
-							React.createElement(
-								'div',
-								{ className: 'comment-date' },
-								' ',
-								new Date(comment.created_at).toDateString() + " " + new Date(comment.created_at).toLocaleTimeString()
-							)
-						);
-					}.bind(this))
-				)
-			);
-		}
-	});
-	
-	module.exports = CommentIndex;
-
-/***/ },
-/* 246 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Store = __webpack_require__(220).Store;
-	var SessionConstants = __webpack_require__(214);
-	var AppDispatcher = __webpack_require__(210);
-	
-	var SessionStore = new Store(AppDispatcher);
-	
-	var _sessions = [];
-	
-	var resetSessions = function (sessions) {
-	  if (sessions[0] !== null) {
-	    _sessions = sessions.slice(0);
-	  } else {
-	    _sessions = [];
-	  }
-	};
-	
-	SessionStore.all = function () {
-	  return _sessions.slice(0);
-	};
-	
-	SessionStore.__onDispatch = function (payload) {
-	  switch (payload.actionType) {
-	    case SessionConstants.SESSIONS_RECEIVED:
-	      resetSessions(payload.sessions);
-	      SessionStore.__emitChange();
-	      break;
-	  }
-	};
-	
-	module.exports = SessionStore;
-
-/***/ },
-/* 247 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ReactRouter = __webpack_require__(159);
-	var ArticleStore = __webpack_require__(219);
-	var SessionStore = __webpack_require__(246);
-	var ApiUtil = __webpack_require__(208);
-	var ImprovementForm = __webpack_require__(250);
-	var ImprovementIndex = __webpack_require__(251);
-	
-	var AnnotationShow = React.createClass({
-		displayName: 'AnnotationShow',
-	
-	
-		getInitialState: function () {
-			return {
-				user: ArticleStore.authors(),
-				articles: ArticleStore.all(),
-				sessions: SessionStore.all()
-			};
-		},
-	
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-	
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-	
-		_onChange: function () {
-			this.setState({
-				sessions: SessionStore.all()
-			});
-		},
-	
-		handleDelClick: function (annotationId) {
-			if (confirm("Are you sure you want to delete your annotation?")) {
-				ApiUtil.removeAnnotation(annotationId);
-				ApiUtil.fetchArticles();
-				ApiUtil.fetchSessions();
-			}
-		},
-	
-		findAnnotationById: function (annotationId, annotations) {
-			for (var i = 0; i < annotations.length; i++) {
-				if (annotationId === annotations[i].id.toString()) return annotations[i];
-			}
-			return {
-				id: 0,
-				improvements: []
-			};
-		},
-	
-		delButton: function (annotationId) {
-			var userId;
-			for (var i = 0; i < this.props.article.annotations.length; i++) {
-				if (this.props.article.annotations[i].id == annotationId) {
-					userId = this.props.article.annotations[i].user_id;
-				}
-			}
-			if (this.state.sessions.length > 0) {
-				if (this.state.sessions[0].id === userId) {
-					return React.createElement(
-						'a',
-						{
-							className: 'btn btn-xs btn-danger',
-							onClick: this.handleDelClick.bind(null, annotationId),
-							role: 'button' },
-						'Delete'
-					);
-				} else return '';
-			}
-		},
-	
-		render: function () {
-			var handleDelClick = this.handleDelClick;
-			var user = this.state.user;
-			var annotations = this.props.article.annotations;
-			var annotation = this.findAnnotationById(this.props.annotationId, annotations);
-			var delButton = this.delButton(annotation.id);
-			return React.createElement(
-				'div',
-				{ id: 'annotation' },
-				annotation.body,
-				React.createElement('br', null),
-				React.createElement('br', null),
-				'By: ',
-				React.createElement(
-					'strong',
-					null,
-					annotation.username + " - "
-				),
-				annotation.expertise + " ",
-				delButton,
-				React.createElement(
-					'div',
-					{ className: 'well improv-sec' },
-					React.createElement(
-						'h5',
-						null,
-						annotation.improvements.length || 0,
-						' Annotation Improvements'
-					),
-					React.createElement(
-						'span',
-						null,
-						React.createElement(ImprovementForm, { annotationId: annotation.id })
-					),
-					React.createElement('br', null),
-					React.createElement(
-						'span',
-						null,
-						React.createElement(ImprovementIndex, { improvements: annotation.improvements })
-					)
-				)
-			);
-		}
-	});
-	
-	module.exports = AnnotationShow;
-
-/***/ },
-/* 248 */,
-/* 249 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ApiUtil = __webpack_require__(208);
-	var LinkedStateMixin = __webpack_require__(239);
-	var ArticleStore = __webpack_require__(219);
-	var SessionStore = __webpack_require__(246);
-	
-	var AnnotationForm = React.createClass({
-		displayName: 'AnnotationForm',
-	
-		mixins: [LinkedStateMixin],
-		contextTypes: {
-			router: React.PropTypes.func
-		},
-		getInitialState: function () {
-			return {
-				body: "",
-				annotation: null,
-				session: SessionStore.all()
-			};
-		},
-	
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-	
-		_onChange: function () {
-			this.setState({ session: SessionStore.all() });
-			// this.navigateToArticle();
-		},
-	
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-	
-		handleSubmit: function (event) {
-			event.preventDefault();
-			var annotation = {
-				body: this.state.body,
-				article_id: this.props.articleId,
-				selection_start: this.props.selectionStart,
-				selection_length: this.props.selectionLength
-			};
-			ApiUtil.createAnnotation(annotation);
-			ApiUtil.fetchArticles();
-			this.props.submitCallback();
-		},
-	
-		postBtn: function (session) {
-			if (session.length === 0) {
-				return React.createElement(
-					'div',
-					{ className: 'errPost' },
-					'Login to create an annotation!'
-				);
-			} else {
-				return React.createElement('input', {
-					className: 'btn btn-xs btn-success user-create-art',
-					type: 'submit',
-					value: 'Create annotation'
-				});
-			}
-		},
-	
-		render: function () {
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'form',
-					{ onSubmit: this.handleSubmit },
-					React.createElement(
-						'label',
-						{ className: 'sr-only' },
-						'Body'
-					),
-					React.createElement('textarea', {
-						className: 'form-control comment-form',
-						placeholder: 'Add annotation...',
-						required: true, autofocus: true,
-						valueLink: this.linkState('body') }),
-					React.createElement('br', null),
-					this.postBtn(this.state.session)
-				)
-			);
-		}
-	});
-	
-	module.exports = AnnotationForm;
-
-/***/ },
-/* 250 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ApiUtil = __webpack_require__(208);
-	var LinkedStateMixin = __webpack_require__(239);
-	var SessionStore = __webpack_require__(246);
-	
-	var ImprovementForm = React.createClass({
-		displayName: 'ImprovementForm',
-	
-		mixins: [LinkedStateMixin],
-		contextTypes: {
-			router: React.PropTypes.func
-		},
-		getInitialState: function () {
-			return {
-				body: "",
-				annotationId: this.props.annotationId,
-				user_id: "",
-				session: SessionStore.all()
-			};
-		},
-	
-		handleSubmit: function (event) {
-			event.preventDefault();
-			var improvement = {
-				body: this.state.body,
-				annotation_id: this.state.annotationId
-			};
-			ApiUtil.createImprovement(improvement);
-			ApiUtil.fetchArticles();
-		},
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-		_onChange: function () {
-			this.setState({ session: SessionStore.all() });
-		},
-	
-		componentWillReceiveProps: function (propUpdate) {
-			this.setState({
-				body: "",
-				annotationId: this.props.annotationId,
-				user_id: ""
-			});
-		},
-		postBtn: function (session) {
-			if (session.length === 0) {
-				return React.createElement(
-					'div',
-					{ className: 'errPost' },
-					'Login to suggest an improvement!'
-				);
-			} else {
-				return React.createElement('input', {
-					className: 'btn btn-xs btn-success comment-post-btn',
-					type: 'submit',
-					value: 'Post' });
-			}
-		},
-		render: function () {
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'form',
-					{ onSubmit: this.handleSubmit },
-					React.createElement('br', null),
-					React.createElement('input', {
-						type: 'text',
-						required: true, autofocus: true,
-						placeholder: 'Add an improvement...',
-						className: 'form-control comment-form',
-						valueLink: this.linkState('body')
-					}),
-					React.createElement('br', null),
-					this.postBtn(this.state.session)
-				)
-			);
-		}
-	});
-	
-	module.exports = ImprovementForm;
-
-/***/ },
-/* 251 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ReactRouter = __webpack_require__(159);
-	var ApiUtil = __webpack_require__(208);
-	var SessionStore = __webpack_require__(246);
-	
-	var ImprovementIndex = React.createClass({
-		displayName: 'ImprovementIndex',
-	
-	
-		getInitialState: function () {
-			return {
-				improvements: this.props.improvements || [],
-				sessions: SessionStore.all()
-			};
-		},
-	
-		componentWillUnmount: function () {
-			this.sessionStoreListener.remove();
-		},
-	
-		componentDidMount: function () {
-			this.sessionStoreListener = SessionStore.addListener(this._onChange);
-			ApiUtil.fetchSessions();
-		},
-	
-		_onChange: function () {
-			this.setState({
-				sessions: SessionStore.all()
-			});
-		},
-	
-		handleClick: function (improvement) {
-			if (confirm("Are you sure you want to delete your comment?")) {
-				ApiUtil.removeImprovement(improvement.id);
-				ApiUtil.fetchArticles();
-				ApiUtil.fetchSessions();
-			}
-		},
-	
-		componentWillReceiveProps: function () {
-			this.setState({
-				improvements: this.props.improvements || [],
-				sessions: SessionStore.all()
-			});
-		},
-	
-		render: function () {
-			var handleClick = this.handleClick;
-			var delButton;
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'ul',
-					{ className: 'comment-list' },
-					this.state.improvements.map(function (improvement) {
-						var boundClick = handleClick.bind(null, improvement);
-						if (this.state.sessions.length > 0) {
-							if (this.state.sessions[0].id === improvement.user_id) {
-								delButton = React.createElement(
-									'a',
-									{
-										className: 'btn btn-xs btn-danger',
-										onClick: boundClick,
-										improvement: improvement,
-										role: 'button' },
-									'Delete'
-								);
-							} else {
-								delButton = React.createElement('span', null);
-							}
-						}
-						return React.createElement(
-							'li',
-							{ className: 'list-group-item', key: improvement.id },
-							React.createElement(
-								'div',
-								{ className: 'comment-user' },
-								React.createElement(
-									'strong',
-									null,
-									improvement.username + " - "
-								),
-								improvement.expertise + " ",
-								delButton
-							),
-							React.createElement('br', null),
-							improvement.body,
-							React.createElement('br', null),
-							React.createElement('br', null),
-							React.createElement(
-								'div',
-								{ className: 'comment-date' },
-								' ',
-								new Date(improvement.created_at).toDateString() + " " + new Date(improvement.created_at).toLocaleTimeString()
-							)
-						);
-					}.bind(this))
-				)
-			);
-		}
-	});
-	
-	module.exports = ImprovementIndex;
 
 /***/ }
 /******/ ]);

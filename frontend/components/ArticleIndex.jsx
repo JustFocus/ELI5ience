@@ -1,6 +1,7 @@
 var React = require('react');
 var ArticleStore = require('../stores/article');
 var ApiUtil = require('../utils/api_util');
+var browserHistory = require('react-router').browserHistory;
 
 // TODO: Search
 // var FilterParamsStore = require('../stores/filter_params');
@@ -35,11 +36,11 @@ var ArticleIndex = React.createClass({
   },
 
   handleClick: function (article) {
-    this.props.history.pushState(null, "articles/" + article.id );
+    browserHistory.push("articles/" + article.id );
   },
 
   newArticleClick: function() {
-    this.props.history.pushState(null, "articles/new");
+    browserHistory.push("articles/new");
   },
 
   commentCount: function(commentsLength) {

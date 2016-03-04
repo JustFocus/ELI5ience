@@ -3,6 +3,7 @@ var ApiUtil = require('../utils/api_util');
 var LinkedStateMixin = require('react-addons-linked-state-mixin');
 var ArticleStore = require('../stores/article');
 var SessionStore = require('../stores/session');
+var browserHistory = require('react-router').browserHistory;
 
 var ArticleForm = React.createClass({
 	mixins: [LinkedStateMixin],
@@ -38,7 +39,7 @@ var ArticleForm = React.createClass({
 	componentWillUnmount: function() {
 		this.sessionStoreListener.remove();
 		if (this.createListener) {
-			this.createListener.remove(); 
+			this.createListener.remove();
 		}
 	},
 	_onChange: function () {
@@ -47,13 +48,12 @@ var ArticleForm = React.createClass({
   },
 	navigateToArticle: function(){
 		this.setState({ article: ArticleStore.mostRecent() });
-		this.props.history.pushState(
-			null,
+		browserHistory.push(
 			"articles/" + this.state.article.id
 		);
 	},
 	navigateToHome: function(){
-		this.props.history.pushState(null, "/");
+		browserHistory.push("/");
 	},
 	handleCancel: function(event){
 		event.preventDefault();
