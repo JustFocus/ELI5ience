@@ -24553,6 +24553,11 @@
 			}
 		},
 	
+		handleHover: function () {
+			// document.getElementById('anim').className =
+			document.getElementById('anim').classList.remove('headShake', 'animated', 'infinite');
+		},
+	
 		render: function () {
 			// var article = this.props.article;
 			var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
@@ -24621,7 +24626,7 @@
 													{
 														href: "/#/articles/" + this.state.article.id + "/annotations/" + annotation.id,
 														onClick: this.linkClickHandler,
-														className: "ann-link" + annotation.id },
+														className: "ann-link " + annotation.id },
 													linkSections.shift()
 												),
 												bodySections.shift()
@@ -24633,40 +24638,51 @@
 							}
 						}.bind(this)()
 					),
-					React.createElement(
-						'div',
-						{ className: 'well art-annotation', articles: this.props.articles },
-						function () {
-							if (this.state.annotationDisplay === 1) {
-								return React.createElement(AnnotationShow, {
+					function () {
+						if (this.state.annotationDisplay === 1) {
+							return React.createElement(
+								'div',
+								{ className: 'well art-annotation', articles: this.props.articles },
+								React.createElement(AnnotationShow, {
 									article: this.state.article,
 									annotationId: this.props.params.annotationId
-								});
-							} else if (this.state.annotationDisplay === 2) {
-								return React.createElement(AnnotationForm, {
+								})
+							);
+						} else if (this.state.annotationDisplay === 2) {
+							return React.createElement(
+								'div',
+								{ className: 'well art-annotation', articles: this.props.articles },
+								React.createElement(AnnotationForm, {
 									articleId: this.props.params.articleId,
 									selectionStart: this.state.selection_start,
 									selectionLength: this.state.selection_length,
 									submitCallback: this.resetFormView
-								});
-							} else {
-								return React.createElement(
-									'div',
+								})
+							);
+						} else {
+							return React.createElement(
+								'div',
+								{ id: 'toolTip',
+									id: 'anim',
+									className: 'well art-annotation headShake animated infinite',
+									articles: this.props.articles,
+									onMouseEnter: this.handleHover
+								},
+								React.createElement(
+									'p',
 									null,
 									React.createElement(
 										'strong',
 										null,
-										"<-----",
-										' ',
-										React.createElement('br', null),
-										'Select Text to create an annotation, or click a link to display an annotation',
-										React.createElement('br', null),
-										"<-----"
+										'Select Text to create an annotation, or click a link to display an annotation'
 									)
-								);
-							}
-						}.bind(this)()
-					),
+								),
+								React.createElement('div', { id: 'tailShadow' }),
+								React.createElement('div', { id: 'tail1' }),
+								React.createElement('div', { id: 'tail2' })
+							);
+						}
+					}.bind(this)(),
 					React.createElement(
 						'div',
 						{ className: 'well comment-sec' },

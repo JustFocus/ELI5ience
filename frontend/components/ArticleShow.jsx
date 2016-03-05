@@ -218,6 +218,11 @@ var ArticleShow = React.createClass({
 		}
 	},
 
+	handleHover: function() {
+		// document.getElementById('anim').className =
+    document.getElementById('anim').classList.remove('headShake', 'animated', 'infinite');
+	},
+
 	render: function() {
 		// var article = this.props.article;
 		var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
@@ -263,7 +268,7 @@ var ArticleShow = React.createClass({
 															<a
 																href={"/#/articles/" + this.state.article.id +"/annotations/" + annotation.id}
 																onClick={this.linkClickHandler}
-																className={"ann-link" + annotation.id}>
+																className={"ann-link " + annotation.id}>
 																{linkSections.shift()}
 															</a>
 															{bodySections.shift()}
@@ -278,32 +283,47 @@ var ArticleShow = React.createClass({
 							}.bind(this)()
 						}
 					</div>
-					<div className="well art-annotation" articles={this.props.articles}>
 						{ function () {
 							if (this.state.annotationDisplay === 1){
-								return <AnnotationShow
-									article={this.state.article}
-									annotationId={this.props.params.annotationId}
-									/>;
+								return (
+									<div className="well art-annotation" articles={this.props.articles}>
+										<AnnotationShow
+										article={this.state.article}
+										annotationId={this.props.params.annotationId}
+										/>
+									</div>
+								);
 							} else if (this.state.annotationDisplay === 2){
 								return (
-									<AnnotationForm
-									articleId={this.props.params.articleId}
-									selectionStart={this.state.selection_start}
-									selectionLength={this.state.selection_length}
-									submitCallback={this.resetFormView}
-									/>
+									<div className="well art-annotation" articles={this.props.articles}>
+										<AnnotationForm
+										articleId={this.props.params.articleId}
+										selectionStart={this.state.selection_start}
+										selectionLength={this.state.selection_length}
+										submitCallback={this.resetFormView}
+										/>
+									</div>
 								);
 							} else {
-								return (<div>
-									<strong>{"<-----"} <br></br>
-									Select Text to create an annotation, or click a link to display an annotation
-									<br></br>
-									{"<-----"}</strong>
-								</div>);
+								return (
+										<div id="toolTip"
+											id="anim"
+											className="well art-annotation headShake animated infinite"
+											articles={this.props.articles}
+											onMouseEnter={this.handleHover}
+										>
+									    <p>
+												<strong>
+													Select Text to create an annotation, or click a link to display an annotation
+												</strong>
+											</p>
+									    <div id="tailShadow"></div>
+									    <div id="tail1"></div>
+									    <div id="tail2"></div>
+										</div>
+								);
 							}
 						}.bind(this)() }
-					</div>
 
 					<div className="well comment-sec">
 						<h5>{this.commentLength()} Article Comments</h5>
