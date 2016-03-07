@@ -67,8 +67,12 @@ var CommentIndex = React.createClass({
 						return (
 							<li className="list-group-item" key={comment.id}>
 								<div className="comment-user">
-								<strong>{comment.username + " - "}</strong>
-								{comment.expertise + " "}
+								<strong>
+									<a
+										href={"/#/users/" + comment.user_id}
+									>{comment.username }</a>
+								</strong>
+								{" - " + comment.expertise + " "}
 								{delButton}
 								</div>
 								<br></br>

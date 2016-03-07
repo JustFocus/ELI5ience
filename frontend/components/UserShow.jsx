@@ -51,6 +51,19 @@ var User = React.createClass({
 		this.props.history.pushState(null, "articles/new");
 	},
 
+	createButton: function() {
+		if (this.state.sessions.length > 0) {
+			if ( this.state.sessions[0].id === this.state.user.id ) {
+				return <a
+					className="btn btn-xs btn-success user-create-art"
+					onClick={this.newArticleClick}
+					role="button">
+					Create article &raquo;
+				</a>;
+			}
+		}
+	},
+
 	render: function() {
 		var handleDelClick = this.handleDelClick;
 		var handleArticleClick = this.handleArticleClick;
@@ -84,12 +97,7 @@ var User = React.createClass({
 								<h3 className="panel-title">{this.state.user.username + "'s"} Articles:</h3>
 							</div>
 							<div className="panel-body">
-								<a
-									className="btn btn-xs btn-success user-create-art"
-									onClick={this.newArticleClick}
-									role="button">
-									Create article &raquo;
-								</a>
+								{this.createButton()}
 								<div className="list-group">
 									{this.state.articles.map(function(article){
 										var boundDelClick = handleDelClick.bind(null, article);
@@ -97,13 +105,15 @@ var User = React.createClass({
 										if (article.author_id === this.state.user.id) {
 											if (this.state.sessions.length > 0) {
 												if ( this.state.sessions[0].id === this.state.user.id ) {
-													delButton = <a
-																				className="btn btn-xs btn-danger user-del"
-																				onClick={boundDelClick}
-																				article={article}
-																				role="button">
-																				Delete
-																			</a>;
+													delButton =
+													<a
+														className="btn btn-xs btn-danger user-del"
+														onClick={boundDelClick}
+														article={article}
+														role="button"
+													>
+														Delete
+													</a>;
 												}
 											}
 											return (

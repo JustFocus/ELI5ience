@@ -67,7 +67,12 @@ var ImprovementIndex = React.createClass({
 						return (
 							<li className="list-group-item" key={improvement.id}>
 								<div className="comment-user">
-								<strong>{improvement.username + " - "}</strong>
+									<strong>
+										<a
+											href={"/#/users/" + improvement.user_id}
+										>{improvement.username }</a>
+									</strong>
+									{" - " + improvement.expertise + " "}
 								{improvement.expertise + " "}
 								{delButton}
 								</div>

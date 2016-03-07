@@ -82,8 +82,13 @@ var AnnotationShow = React.createClass({
 				{annotation.body}
 				<br></br>
 				<br></br>
-				By: <strong>{annotation.username + " - "}</strong>
-				{annotation.expertise + " "}
+				By:
+				<strong>
+					<a
+						href={"/#/users/" + annotation.user_id}
+					>{" " + annotation.username}</a>
+				</strong>
+				{" - " + annotation.expertise + " "}
 				{delButton}
 
 				<div className="well improv-sec">

@@ -224,7 +224,9 @@ var ArticleShow = React.createClass({
 						{this.state.article.locked}
 						<br></br>
 						<strong>Submitted by: </strong>
-						{this.state.article.username}
+							<a
+								href={"/#/users/" + this.state.article.author_id}
+							>{" " + this.state.article.username}</a>
 						<br></br>
 						<strong>Expertise: </strong>
 						{this.state.article.expertise}

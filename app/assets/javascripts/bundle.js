@@ -24558,7 +24558,13 @@
 							null,
 							'Submitted by: '
 						),
-						this.state.article.username,
+						React.createElement(
+							'a',
+							{
+								href: "/#/users/" + this.state.article.author_id
+							},
+							" " + this.state.article.username
+						),
 						React.createElement('br', null),
 						React.createElement(
 							'strong',
@@ -32437,9 +32443,15 @@
 								React.createElement(
 									'strong',
 									null,
-									comment.username + " - "
+									React.createElement(
+										'a',
+										{
+											href: "/#/users/" + comment.user_id
+										},
+										comment.username
+									)
 								),
-								comment.expertise + " ",
+								" - " + comment.expertise + " ",
 								delButton
 							),
 							React.createElement('br', null),
@@ -32663,13 +32675,19 @@
 				annotation.body,
 				React.createElement('br', null),
 				React.createElement('br', null),
-				'By: ',
+				'By:',
 				React.createElement(
 					'strong',
 					null,
-					annotation.username + " - "
+					React.createElement(
+						'a',
+						{
+							href: "/#/users/" + annotation.user_id
+						},
+						" " + annotation.username
+					)
 				),
-				annotation.expertise + " ",
+				" - " + annotation.expertise + " ",
 				delButton,
 				React.createElement(
 					'div',
@@ -32873,8 +32891,15 @@
 								React.createElement(
 									'strong',
 									null,
-									improvement.username + " - "
+									React.createElement(
+										'a',
+										{
+											href: "/#/users/" + improvement.user_id
+										},
+										improvement.username
+									)
 								),
+								" - " + improvement.expertise + " ",
 								improvement.expertise + " ",
 								delButton
 							),
@@ -33086,6 +33111,21 @@
 			this.props.history.pushState(null, "articles/new");
 		},
 	
+		createButton: function () {
+			if (this.state.sessions.length > 0) {
+				if (this.state.sessions[0].id === this.state.user.id) {
+					return React.createElement(
+						'a',
+						{
+							className: 'btn btn-xs btn-success user-create-art',
+							onClick: this.newArticleClick,
+							role: 'button' },
+						'Create article »'
+					);
+				}
+			}
+		},
+	
 		render: function () {
 			var handleDelClick = this.handleDelClick;
 			var handleArticleClick = this.handleArticleClick;
@@ -33161,14 +33201,7 @@
 						React.createElement(
 							'div',
 							{ className: 'panel-body' },
-							React.createElement(
-								'a',
-								{
-									className: 'btn btn-xs btn-success user-create-art',
-									onClick: this.newArticleClick,
-									role: 'button' },
-								'Create article »'
-							),
+							this.createButton(),
 							React.createElement(
 								'div',
 								{ className: 'list-group' },
@@ -33184,7 +33217,8 @@
 														className: 'btn btn-xs btn-danger user-del',
 														onClick: boundDelClick,
 														article: article,
-														role: 'button' },
+														role: 'button'
+													},
 													'Delete'
 												);
 											}
