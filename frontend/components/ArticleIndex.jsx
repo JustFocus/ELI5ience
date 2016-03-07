@@ -51,7 +51,7 @@ var ArticleIndex = React.createClass({
         <div className="jumbotron">
           <div className="container jumbo">
             <h1 className="jumbo-header" style={{color: '#CCC'}}>Welcome to ELI5ience!</h1>
-            <p className="subheader">A place where users can post and annotate articles. </p>
+            <p className="subheader">Annotate science-based articles with "ELI5" (Explain Like I'm 5) breakdowns. </p>
             <a
               className="btn btn-xs btn-success"
               onClick={this.newArticleClick}

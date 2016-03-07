@@ -32992,7 +32992,7 @@
 	          React.createElement(
 	            'p',
 	            { className: 'subheader' },
-	            'A place where users can post and annotate articles. '
+	            'Annotate science-based articles with "ELI5" (Explain Like I\'m 5) breakdowns. '
 	          ),
 	          React.createElement(
 	            'a',
