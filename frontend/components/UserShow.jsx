@@ -20,13 +20,11 @@ var User = React.createClass({
 	},
 
 	componentDidMount: function () {
-		// this.articleStoreUserListener = ArticleStore.addListener();
 		this.articleStoreListener = ArticleStore.addListener(this._onChange);
 		this.sessionStoreListener = SessionStore.addListener(this._onChange);
 		ApiUtil.fetchUser(this.props.params.userId);
 		ApiUtil.fetchArticles();
 		ApiUtil.fetchSessions();
-		// ApiUtil.fetchArticles();
 	},
 
 	_onChange: function () {

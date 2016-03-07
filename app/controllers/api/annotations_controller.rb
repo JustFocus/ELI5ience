@@ -12,7 +12,6 @@ class Api::AnnotationsController < ApplicationController
   def create
 		annotation = params[:annotation]
 		annotation[:author_id] = current_user.id
-		#TODO: Add error if user is not logged in
     annotation = Annotation.create!(annotation_params)
 		annotations = Article.find_by(id: annotation[:article_id]).annotations
     render json: annotations
@@ -20,7 +19,6 @@ class Api::AnnotationsController < ApplicationController
 
 	def destroy
 		annotation = Annotation.find_by(id: params[:id])
-		#TODO: check if author is current user
 		annotation.destroy
 		annotations = Article.find_by(id: annotation[:article_id]).annotations
 		render json: annotation
@@ -28,7 +26,6 @@ class Api::AnnotationsController < ApplicationController
 
 	def update
 		annotation = Annotation.find_by(id: params[:id])
-		#TODO: check if author is current user
 		annotation.update(params)
 		annotations = Article.find_by(id: annotation[:article_id]).annotations
 		render json: annotations

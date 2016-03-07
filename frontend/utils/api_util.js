@@ -1,22 +1,6 @@
 var ApiActions = require('../actions/api_actions');
 
 var ApiUtil = {
-  // TODO: Users API?
-  // fetchUsers: function(){
-  //   $.get('api/users', function(users){
-  //     ApiActions.receiveAll(users);
-  //   });
-  // },
-  // fetchUser: function(){
-  //   $.get('api/users/:id', function(user){
-  //     ApiActions.receiveAll(user);
-  //   });
-  // },
-  // createUser: function(data){
-  //   $.post('api/users', { user: data }, function(user) {
-  //     ApiActions.receiveAll([user]);
-  //   });
-  // }
   createAnnotation: function(data) {
     $.post('api/annotations', { annotation: data }, function (annotations) {
       ApiActions.receiveAnnotations(annotations);

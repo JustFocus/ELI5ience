@@ -6,7 +6,6 @@ class Api::CommentsController < ApplicationController
 
 	def show
 		@comment = Comment.includes(:user).find_by(id: params[:id])
-		debugger
 		render 'show'
 	end
 

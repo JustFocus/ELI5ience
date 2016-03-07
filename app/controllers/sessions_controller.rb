@@ -13,8 +13,6 @@ class SessionsController < ApplicationController
 		)
 		if user
 			sign_in(user)
-			# redirect_to(session[:referer_url])
-			# redirect_to request.env["HTTP_REFERER"]
 			redirect_to(:root)
 		else
 			flash.now[:errors] = ["Invalid username or password"]
@@ -26,7 +24,6 @@ class SessionsController < ApplicationController
 	def destroy
 		current_user.reset_session_token!
 	  session[:session_token] = nil
-		#TODO: change redirect to keep current page
 	  redirect_to root_url
 	end
 

@@ -2,11 +2,6 @@ var React = require('react');
 var ArticleStore = require('../stores/article');
 var ApiUtil = require('../utils/api_util');
 
-// TODO: Search
-// var FilterParamsStore = require('../stores/filter_params');
-// var Filters = require('./Filters');
-
-
 function _getAllArticles() {
   return ArticleStore.all();
 }

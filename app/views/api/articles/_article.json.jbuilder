@@ -3,8 +3,6 @@ json.author_id article.user.id
 json.username article.user.username
 json.expertise article.user.expertise
 
-# json.comments article.comments, :body, :created_at
-
 json.comments article.comments do |comment|
 	json.id comment.id
 	json.article_id comment.article_id
@@ -14,7 +12,6 @@ json.comments article.comments do |comment|
 	json.username comment.user.username
 	json.expertise comment.user.expertise
 end
-
 
 json.annotations article.annotations do |annotation|
 	json.id annotation.id
@@ -35,15 +32,3 @@ json.annotations article.annotations do |annotation|
 			json.expertise improvement.user.expertise
 		end
 end
-
-
-# TODO: votes/ratings
-# json.average_rating article.average_rating
-
-# TODO: annotation and votes with articles
-# json.annotations do
-#   json.partial! 'api/annotations/review', collection: article.annotations, as: :annotation
-# end
-# json.votes do
-#   json.partial! 'api/votes/review', collection: article.votes, as: :vote
-# end

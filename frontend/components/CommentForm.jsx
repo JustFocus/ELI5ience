@@ -34,7 +34,6 @@ var CommentForm = React.createClass({
 
 	_onChange: function () {
 		this.setState({ session: SessionStore.all()});
-		// this.navigateToArticle();
 	},
 
 	componentWillUnmount: function() {

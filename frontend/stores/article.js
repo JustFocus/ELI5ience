@@ -23,11 +23,6 @@ var resetArticle = function(article){
   _recentArticle = article;
 };
 
-var removeArticle = function(article){
-	//TODO: this - necessary? should _articles be [] or {}
-	// _articles.
-  // _articles = articles.slice(0);
-};
 var removeComment = function(comment){
   _articles.forEach(function(article, idx){
     if (article.id === comment.article_id) {
@@ -143,10 +138,6 @@ ArticleStore.__onDispatch = function (payload) {
       break;
 		case ArticleConstants.ARTICLE_RECEIVED:
 			resetArticle(payload.article);
-			ArticleStore.__emitChange();
-			break;
-		case ArticleConstants.ARTICLE_REMOVED:
-			removeArticle(payload.article);
 			ArticleStore.__emitChange();
 			break;
     case ArticleConstants.USER_RECEIVED:

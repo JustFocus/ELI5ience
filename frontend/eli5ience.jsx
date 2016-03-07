@@ -13,11 +13,6 @@ var UserShow = require('./components/UserShow');
 var AnnotationShow = require('./components/AnnotationShow');
 var AnnotationForm = require('./components/AnnotationForm');
 
-//TODO: Search
-// var Search = require('./components/Search');
-
-//TODO: Routing
-
 var App = React.createClass({
   render: function(){
     return (
@@ -29,7 +24,6 @@ var App = React.createClass({
 });
 
 
-// TODO: Routing Routes and Router
 var routes = (
   <Route path="/" component={App}>
     <IndexRoute component={ArticleIndex}/>
@@ -48,10 +42,3 @@ window.loadApp = function () {
 
   ReactDOM.render(<Router>{routes}</Router>, root);
 };
-
-// TODO: Routing Future Routes
-// <Route path="annotation" component={AnnotationShow}>
-//  // <Route path="improvements" component={ImprovementsIndex} />
-//  </Route>
-//  <Route path="annotation/new" component={AnnotationNew}>
-// </Route>

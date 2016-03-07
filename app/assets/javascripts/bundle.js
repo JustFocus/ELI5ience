@@ -59,11 +59,6 @@
 	var AnnotationShow = __webpack_require__(243);
 	var AnnotationForm = __webpack_require__(242);
 	
-	//TODO: Search
-	// var Search = require('./components/Search');
-	
-	//TODO: Routing
-	
 	var App = React.createClass({
 	  displayName: 'App',
 	
@@ -76,7 +71,6 @@
 	  }
 	});
 	
-	// TODO: Routing Routes and Router
 	var routes = React.createElement(
 	  Route,
 	  { path: '/', component: App },
@@ -100,13 +94,6 @@
 	    routes
 	  ), root);
 	};
-	
-	// TODO: Routing Future Routes
-	// <Route path="annotation" component={AnnotationShow}>
-	//  // <Route path="improvements" component={ImprovementsIndex} />
-	//  </Route>
-	//  <Route path="annotation/new" component={AnnotationNew}>
-	// </Route>
 
 /***/ },
 /* 1 */
@@ -24381,7 +24368,6 @@
 		},
 	
 		componentDidMount: function () {
-			// TODO: only fetch articles if we don't have user info in _findArticleById
 			this.articleListener = ArticleStore.addListener(this._onChange);
 			ApiUtil.fetchArticles();
 		},
@@ -24413,23 +24399,6 @@
 	
 			return foundArticle;
 		},
-	
-		// _linkifyBody: function(body) {
-		// 	var linkedBody = body;
-		// 	this.state.article.annotations.forEach(function(annotation){
-		// 		linkedBody = linkedBody.slice(
-		// 			0,
-		// 			annotation.selection_start
-		// 		) + <a href='#'> +
-		// 		linkedBody.slice(annotation.selection_start);
-		// 		linkedBody = linkedBody.slice(
-		// 			0,
-		// 			annotation.selection_start + annotation.selection_length
-		// 		) + </a> +
-		// 		linkedBody.slice(annotation.selection_start + annotation.selection_length);
-		// 	});
-		// 	return linkedBody;
-		// },
 	
 		splitBodySections: function (sortedAnnotations) {
 			var sections = [];
@@ -24510,15 +24479,9 @@
 		},
 	
 		handleMouseUp: function (e) {
-			// console.log(window.getSelection().toString());
-			// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
-			// this.props.children = null;
-			// this.setState({mounted: false});
 			var textSelection = window.getSelection().toString();
 			var textIdx = this.state.article.body.indexOf(textSelection);
-			if (this.bodyContains(textSelection, textIdx) &&
-			// this.uniqueText(textSelection, textIdx) &&
-			this.uniqueSelection(textSelection, textIdx)) {
+			if (this.bodyContains(textSelection, textIdx) && this.uniqueSelection(textSelection, textIdx)) {
 				this.setState({
 					annotationDisplay: 2,
 					selection_start: textIdx,
@@ -24556,12 +24519,10 @@
 		},
 	
 		handleHover: function () {
-			// document.getElementById('anim').className =
 			document.getElementById('anim').classList.remove('headShake', 'animated', 'infinite');
 		},
 	
 		render: function () {
-			// var article = this.props.article;
 			var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
 			var handleClick = this.handleClick;
 			var bodyFristLast = this.splitBodyFL(sortedAnnotations);
@@ -24722,22 +24683,6 @@
 	var ApiActions = __webpack_require__(210);
 	
 	var ApiUtil = {
-	  // TODO: Users API?
-	  // fetchUsers: function(){
-	  //   $.get('api/users', function(users){
-	  //     ApiActions.receiveAll(users);
-	  //   });
-	  // },
-	  // fetchUser: function(){
-	  //   $.get('api/users/:id', function(user){
-	  //     ApiActions.receiveAll(user);
-	  //   });
-	  // },
-	  // createUser: function(data){
-	  //   $.post('api/users', { user: data }, function(user) {
-	  //     ApiActions.receiveAll([user]);
-	  //   });
-	  // }
 	  createAnnotation: function (data) {
 	    $.post('api/annotations', { annotation: data }, function (annotations) {
 	      ApiActions.receiveAnnotations(annotations);
@@ -25674,11 +25619,6 @@
 	  _recentArticle = article;
 	};
 	
-	var removeArticle = function (article) {
-	  //TODO: this - necessary? should _articles be [] or {}
-	  // _articles.
-	  // _articles = articles.slice(0);
-	};
 	var removeComment = function (comment) {
 	  _articles.forEach(function (article, idx) {
 	    if (article.id === comment.article_id) {
@@ -25794,10 +25734,6 @@
 	      break;
 	    case ArticleConstants.ARTICLE_RECEIVED:
 	      resetArticle(payload.article);
-	      ArticleStore.__emitChange();
-	      break;
-	    case ArticleConstants.ARTICLE_REMOVED:
-	      removeArticle(payload.article);
 	      ArticleStore.__emitChange();
 	      break;
 	    case ArticleConstants.USER_RECEIVED:
@@ -32364,7 +32300,6 @@
 	
 		_onChange: function () {
 			this.setState({ session: SessionStore.all() });
-			// this.navigateToArticle();
 		},
 	
 		componentWillUnmount: function () {
@@ -32558,7 +32493,6 @@
 	
 		_onChange: function () {
 			this.setState({ session: SessionStore.all() });
-			// this.navigateToArticle();
 		},
 	
 		componentWillUnmount: function () {
@@ -32971,10 +32905,6 @@
 	var ArticleStore = __webpack_require__(221);
 	var ApiUtil = __webpack_require__(209);
 	
-	// TODO: Search
-	// var FilterParamsStore = require('../stores/filter_params');
-	// var Filters = require('./Filters');
-	
 	function _getAllArticles() {
 	  return ArticleStore.all();
 	}
@@ -33125,13 +33055,11 @@
 		},
 	
 		componentDidMount: function () {
-			// this.articleStoreUserListener = ArticleStore.addListener();
 			this.articleStoreListener = ArticleStore.addListener(this._onChange);
 			this.sessionStoreListener = SessionStore.addListener(this._onChange);
 			ApiUtil.fetchUser(this.props.params.userId);
 			ApiUtil.fetchArticles();
 			ApiUtil.fetchSessions();
-			// ApiUtil.fetchArticles();
 		},
 	
 		_onChange: function () {

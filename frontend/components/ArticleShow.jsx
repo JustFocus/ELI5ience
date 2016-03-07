@@ -23,7 +23,6 @@ var ArticleShow = React.createClass({
 	},
 
 	componentDidMount: function () {
-		// TODO: only fetch articles if we don't have user info in _findArticleById
 		this.articleListener = ArticleStore.addListener(this._onChange);
 		ApiUtil.fetchArticles();
 	},
@@ -56,23 +55,6 @@ var ArticleShow = React.createClass({
 		return foundArticle;
 
 	},
-
-	// _linkifyBody: function(body) {
-	// 	var linkedBody = body;
-	// 	this.state.article.annotations.forEach(function(annotation){
-	// 		linkedBody = linkedBody.slice(
-	// 			0,
-	// 			annotation.selection_start
-	// 		) + <a href='#'> +
-	// 		linkedBody.slice(annotation.selection_start);
-	// 		linkedBody = linkedBody.slice(
-	// 			0,
-	// 			annotation.selection_start + annotation.selection_length
-	// 		) + </a> +
-	// 		linkedBody.slice(annotation.selection_start + annotation.selection_length);
-	// 	});
-	// 	return linkedBody;
-	// },
 
 	splitBodySections: function(sortedAnnotations) {
 		var sections = [];
@@ -173,14 +155,9 @@ var ArticleShow = React.createClass({
 	},
 
 	handleMouseUp: function(e) {
-		// console.log(window.getSelection().toString());
-		// ReactDOM.unmountComponentAtNode(document.getElementById('annotation'));
-		// this.props.children = null;
-		// this.setState({mounted: false});
 		var textSelection = window.getSelection().toString();
 		var textIdx = this.state.article.body.indexOf(textSelection);
 		if ( this.bodyContains(textSelection, textIdx) &&
-		// this.uniqueText(textSelection, textIdx) &&
 		this.uniqueSelection(textSelection, textIdx) ) {
 			this.setState({
 				annotationDisplay: 2,
@@ -219,12 +196,10 @@ var ArticleShow = React.createClass({
 	},
 
 	handleHover: function() {
-		// document.getElementById('anim').className =
     document.getElementById('anim').classList.remove('headShake', 'animated', 'infinite');
 	},
 
 	render: function() {
-		// var article = this.props.article;
 		var sortedAnnotations = this.sortAnnotations(this.state.article.annotations);
 		var handleClick = this.handleClick;
 		var bodyFristLast = this.splitBodyFL(sortedAnnotations);

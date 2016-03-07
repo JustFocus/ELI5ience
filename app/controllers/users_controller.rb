@@ -1,11 +1,5 @@
 class UsersController < ApplicationController
 
-
-	# TODO: Redirects/renders
-	# def new
-	# 	@user = User.new
-	# end
-
 	def new
 		@user = User.new
 		render :new
