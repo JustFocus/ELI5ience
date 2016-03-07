@@ -23,7 +23,7 @@ class Api::AnnotationsController < ApplicationController
 		#TODO: check if author is current user
 		annotation.destroy
 		annotations = Article.find_by(id: annotation[:article_id]).annotations
-		render json: annotations
+		render json: annotation
 	end
 
 	def update

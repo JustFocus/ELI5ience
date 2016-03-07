@@ -26,8 +26,8 @@ var ApiUtil = {
     $.ajax({
       url: 'api/annotations/' + id,
       type: 'DELETE',
-      success: function(annotations){
-        ApiActions.receiveAnnotations(annotations);
+      success: function(annotation){
+        ApiActions.removeSingleAnnotation(annotation);
       }
     });
   },

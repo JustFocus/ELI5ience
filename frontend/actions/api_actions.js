@@ -69,7 +69,6 @@ var ApiActions = {
     });
   },
   receiveAnnotations: function(annotations){
-    debugger;
     AppDispatcher.dispatch({
       actionType: ArticleConstants.ANNOTATIONS_RECEIVED,
       annotations: annotations

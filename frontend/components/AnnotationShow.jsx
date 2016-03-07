@@ -31,7 +31,7 @@ var AnnotationShow = React.createClass({
 		 });
 	},
 
-	handleDelClick: function (annotationId) {
+	handleDelClick: function (annotationId, articleId) {
 		if (confirm("Are you sure you want to delete your annotation?")) {
 			ApiUtil.removeAnnotation(annotationId);
 			ApiUtil.fetchArticles();
@@ -50,7 +50,7 @@ var AnnotationShow = React.createClass({
 		};
 	},
 
-	delButton: function(annotationId){
+	delButton: function(annotationId, articleId){
 		var userId;
 		for (var i = 0; i < this.props.article.annotations.length; i++) {
 			if (this.props.article.annotations[i].id == annotationId) {
@@ -62,7 +62,7 @@ var AnnotationShow = React.createClass({
 				return (
 					<a
 						className="btn btn-xs btn-danger"
-						onClick={this.handleDelClick.bind(null, annotationId)}
+						onClick={this.handleDelClick.bind(this, annotationId, articleId)}
 						role="button">
 						Delete
 					</a>);
@@ -76,7 +76,7 @@ var AnnotationShow = React.createClass({
 		var user = this.state.user;
 		var annotations = this.props.article.annotations;
 		var annotation = this.findAnnotationById(this.props.annotationId, annotations);
-		var delButton = this.delButton(annotation.id);
+		var delButton = this.delButton(annotation.id, this.props.article.id);
 		return (
 			<div id="annotation">
 				{annotation.body}

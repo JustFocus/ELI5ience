@@ -18,7 +18,6 @@ var ArticleIndex = React.createClass({
   },
 
   componentWillReceiveProps: function () {
-    debugger;
   },
 
   componentDidMount: function () {

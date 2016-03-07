@@ -15,6 +15,7 @@ var ArticleForm = React.createClass({
       body: "",
 			imageLink: "",
 			backgroundLink: "",
+			backgroundLink2: "",
 			article: null,
 			session: SessionStore.all()
     };
@@ -27,6 +28,7 @@ var ArticleForm = React.createClass({
 			body: this.state.body,
 			image_link: this.state.imageLink,
 			background_link: this.state.backgroundLink,
+			background_link2: this.state.backgrundLink2
 		};
 		ApiUtil.createArticle(article);
 		this.createListener = ArticleStore.addListener(this.navigateToArticle);
@@ -38,7 +40,7 @@ var ArticleForm = React.createClass({
 	componentWillUnmount: function() {
 		this.sessionStoreListener.remove();
 		if (this.createListener) {
-			this.createListener.remove(); 
+			this.createListener.remove();
 		}
 	},
 	_onChange: function () {
@@ -72,6 +74,14 @@ var ArticleForm = React.createClass({
 			);
 		}
 	},
+	cloudinaryData: function() {
+		return {
+			api_key: 487765971445433,
+			timestamp: Date.now(),
+			signature: 'J5-QYdGfmi8sXKMqhJ3RsQ0ngik',
+			callback: 'https://www.eli5ience.com/api/articles'
+		};
+	},
 	render: function(){
     return (
 			<div>
@@ -95,21 +105,6 @@ var ArticleForm = React.createClass({
 							placeholder="Body"
 							required autofocus
 							valueLink={this.linkState('body')}/>
-            <br/>
-						<label className="sr-only">Image Url</label>
-							<input
-								type="text"
-								className="form-control"
-								placeholder="Image URL"
-								valueLink={this.linkState('imageLink')}/>
-						<br></br>
-
-						<label className="sr-only">Background Url</label>
-							<input
-								type="text"
-								className="form-control"
-								placeholder="Background URL"
-								valueLink={this.linkState('backgroundLink')}/>
             <br/>
 						{this.createBtn(this.state.session)}
           </form>

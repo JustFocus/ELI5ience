@@ -61,6 +61,15 @@ var AnnotationForm = React.createClass({
 	render: function(){
     return (
 			<div>
+				<div>
+					<strong>Creating annotation for:</strong>
+					<br></br>
+					<br></br>
+					<em>{'"' + this.props.selectedText + '"'}</em>
+					<br></br>
+					<br></br>
+					<br></br>
+				</div>
         <form onSubmit={this.handleSubmit}>
           <label className="sr-only">Body</label>
 					<textarea

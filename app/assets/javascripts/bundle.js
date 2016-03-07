@@ -24516,7 +24516,9 @@
 			// this.setState({mounted: false});
 			var textSelection = window.getSelection().toString();
 			var textIdx = this.state.article.body.indexOf(textSelection);
-			if (this.bodyContains(textSelection, textIdx) && this.uniqueText(textSelection, textIdx) && this.uniqueSelection(textSelection, textIdx)) {
+			if (this.bodyContains(textSelection, textIdx) &&
+			// this.uniqueText(textSelection, textIdx) &&
+			this.uniqueSelection(textSelection, textIdx)) {
 				this.setState({
 					annotationDisplay: 2,
 					selection_start: textIdx,
@@ -24575,14 +24577,15 @@
 				React.createElement(
 					'div',
 					{ className: 'well art-details' },
+					React.createElement('img', {
+						width: '125', height: '200',
+						src: this.state.article.image_link,
+						className: 'article-img' }),
 					React.createElement(
 						'h1',
 						null,
 						this.state.article.title
 					),
-					this.state.article.image_link,
-					React.createElement('br', null),
-					this.state.article.background_link,
 					React.createElement('br', null),
 					React.createElement(
 						'span',
@@ -24654,6 +24657,7 @@
 								{ className: 'well art-annotation', articles: this.props.articles },
 								React.createElement(AnnotationForm, {
 									articleId: this.props.params.articleId,
+									selectedText: window.getSelection().toString(),
 									selectionStart: this.state.selection_start,
 									selectionLength: this.state.selection_length,
 									submitCallback: this.resetFormView
@@ -24743,8 +24747,8 @@
 	    $.ajax({
 	      url: 'api/annotations/' + id,
 	      type: 'DELETE',
-	      success: function (annotations) {
-	        ApiActions.receiveAnnotations(annotations);
+	      success: function (annotation) {
+	        ApiActions.removeSingleAnnotation(annotation);
 	      }
 	    });
 	  },
@@ -24913,7 +24917,6 @@
 	    });
 	  },
 	  receiveAnnotations: function (annotations) {
-	    debugger;
 	    AppDispatcher.dispatch({
 	      actionType: ArticleConstants.ANNOTATIONS_RECEIVED,
 	      annotations: annotations
@@ -25289,6 +25292,7 @@
 				body: "",
 				imageLink: "",
 				backgroundLink: "",
+				backgroundLink2: "",
 				article: null,
 				session: SessionStore.all()
 			};
@@ -25300,7 +25304,8 @@
 				title: this.state.title,
 				body: this.state.body,
 				image_link: this.state.imageLink,
-				background_link: this.state.backgroundLink
+				background_link: this.state.backgroundLink,
+				background_link2: this.state.backgrundLink2
 			};
 			ApiUtil.createArticle(article);
 			this.createListener = ArticleStore.addListener(this.navigateToArticle);
@@ -25345,6 +25350,14 @@
 				});
 			}
 		},
+		cloudinaryData: function () {
+			return {
+				api_key: 487765971445433,
+				timestamp: Date.now(),
+				signature: 'J5-QYdGfmi8sXKMqhJ3RsQ0ngik',
+				callback: 'https://www.eli5ience.com/api/articles'
+			};
+		},
 		render: function () {
 			return React.createElement(
 				'div',
@@ -25384,28 +25397,6 @@
 							placeholder: 'Body',
 							required: true, autofocus: true,
 							valueLink: this.linkState('body') }),
-						React.createElement('br', null),
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Image Url'
-						),
-						React.createElement('input', {
-							type: 'text',
-							className: 'form-control',
-							placeholder: 'Image URL',
-							valueLink: this.linkState('imageLink') }),
-						React.createElement('br', null),
-						React.createElement(
-							'label',
-							{ className: 'sr-only' },
-							'Background Url'
-						),
-						React.createElement('input', {
-							type: 'text',
-							className: 'form-control',
-							placeholder: 'Background URL',
-							valueLink: this.linkState('backgroundLink') }),
 						React.createElement('br', null),
 						this.createBtn(this.state.session)
 					),
@@ -25723,9 +25714,16 @@
 	};
 	
 	var removeAnnotation = function (annotation) {
-	  //TODO: this - necessary? should _articles be [] or {}
-	  // _articles.
-	  // _articles = articles.slice(0);
+	  _articles.forEach(function (article, idx) {
+	    if (article.id === annotation.article_id) {
+	      for (var i = 0; i < _articles[idx].annotations.length; i++) {
+	        if (_articles[idx].annotations[i].id === annotation.id) {
+	          _articles[idx].annotations.splice(i, 1);
+	        }
+	      }
+	    }
+	  });
+	  return _articles;
 	};
 	
 	var insertComments = function (comments) {
@@ -25758,14 +25756,12 @@
 	
 	var insertImprovement = function (improvement) {
 	  var articleAnnotation = findAnnotationById(improvement.annotation_id);
-	  debugger;
 	  for (var i = 0; i < _articles[articleAnnotation[0]].annotations.length; i++) {
 	    if (_articles[articleAnnotation[0]].annotations[i].id === improvement.annotation_id) {
 	      _articles[articleAnnotation[0]].annotations[i].improvements.push(improvement);
 	      return _articles;
 	    }
 	  }
-	  debugger;
 	  return _articles;
 	};
 	
@@ -32603,6 +32599,25 @@
 				'div',
 				null,
 				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'strong',
+						null,
+						'Creating annotation for:'
+					),
+					React.createElement('br', null),
+					React.createElement('br', null),
+					React.createElement(
+						'em',
+						null,
+						'"' + this.props.selectedText + '"'
+					),
+					React.createElement('br', null),
+					React.createElement('br', null),
+					React.createElement('br', null)
+				),
+				React.createElement(
 					'form',
 					{ onSubmit: this.handleSubmit },
 					React.createElement(
@@ -32663,7 +32678,7 @@
 			});
 		},
 	
-		handleDelClick: function (annotationId) {
+		handleDelClick: function (annotationId, articleId) {
 			if (confirm("Are you sure you want to delete your annotation?")) {
 				ApiUtil.removeAnnotation(annotationId);
 				ApiUtil.fetchArticles();
@@ -32681,7 +32696,7 @@
 			};
 		},
 	
-		delButton: function (annotationId) {
+		delButton: function (annotationId, articleId) {
 			var userId;
 			for (var i = 0; i < this.props.article.annotations.length; i++) {
 				if (this.props.article.annotations[i].id == annotationId) {
@@ -32694,7 +32709,7 @@
 						'a',
 						{
 							className: 'btn btn-xs btn-danger',
-							onClick: this.handleDelClick.bind(null, annotationId),
+							onClick: this.handleDelClick.bind(this, annotationId, articleId),
 							role: 'button' },
 						'Delete'
 					);
@@ -32707,7 +32722,7 @@
 			var user = this.state.user;
 			var annotations = this.props.article.annotations;
 			var annotation = this.findAnnotationById(this.props.annotationId, annotations);
-			var delButton = this.delButton(annotation.id);
+			var delButton = this.delButton(annotation.id, this.props.article.id);
 			return React.createElement(
 				'div',
 				{ id: 'annotation' },
@@ -32972,9 +32987,7 @@
 	    return { articles: ArticleStore.all() };
 	  },
 	
-	  componentWillReceiveProps: function () {
-	    debugger;
-	  },
+	  componentWillReceiveProps: function () {},
 	
 	  componentDidMount: function () {
 	    this.articleStoreListener = ArticleStore.addListener(this._onChange);

@@ -63,9 +63,16 @@ var removeImprovement = function(improvement){
 };
 
 var removeAnnotation = function(annotation){
-	//TODO: this - necessary? should _articles be [] or {}
-	// _articles.
-  // _articles = articles.slice(0);
+  _articles.forEach(function(article, idx){
+    if (article.id === annotation.article_id) {
+      for (var i = 0; i < _articles[idx].annotations.length; i++) {
+        if (_articles[idx].annotations[i].id === annotation.id) {
+          _articles[idx].annotations.splice(i, 1);
+        }
+      }
+    }
+  });
+  return _articles;
 };
 
 var insertComments = function(comments) {
@@ -98,14 +105,12 @@ var insertComment = function(comment) {
 
 var insertImprovement = function(improvement) {
   var articleAnnotation = findAnnotationById(improvement.annotation_id);
-  debugger;
   for (var i = 0; i < _articles[articleAnnotation[0]].annotations.length; i++) {
     if (_articles[articleAnnotation[0]].annotations[i].id === improvement.annotation_id)  {
       _articles[articleAnnotation[0]].annotations[i].improvements.push(improvement);
       return _articles;
     }
   }
-  debugger;
   return _articles;
 };
 

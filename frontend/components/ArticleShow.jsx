@@ -180,7 +180,7 @@ var ArticleShow = React.createClass({
 		var textSelection = window.getSelection().toString();
 		var textIdx = this.state.article.body.indexOf(textSelection);
 		if ( this.bodyContains(textSelection, textIdx) &&
-		this.uniqueText(textSelection, textIdx) &&
+		// this.uniqueText(textSelection, textIdx) &&
 		this.uniqueSelection(textSelection, textIdx) ) {
 			this.setState({
 				annotationDisplay: 2,
@@ -237,12 +237,13 @@ var ArticleShow = React.createClass({
 				<br></br>
 				<br></br>
 				<div className="well art-details">
+					<img
+						width="125" height="200"
+						src={this.state.article.image_link}
+						className="article-img"></img>
 					<h1>
 						{this.state.article.title}
 					</h1>
-					{this.state.article.image_link}
-					<br></br>
-					{this.state.article.background_link}
 					<br></br>
 					<span>
 						{this.state.article.locked}
@@ -253,6 +254,7 @@ var ArticleShow = React.createClass({
 						<strong>Expertise: </strong>
 						{this.state.article.expertise}
 					</span>
+
 				</div>
 				<div className="body-ann-cont">
 					<div className="well art-body">
@@ -298,6 +300,7 @@ var ArticleShow = React.createClass({
 									<div className="well art-annotation" articles={this.props.articles}>
 										<AnnotationForm
 										articleId={this.props.params.articleId}
+										selectedText={window.getSelection().toString()}
 										selectionStart={this.state.selection_start}
 										selectionLength={this.state.selection_length}
 										submitCallback={this.resetFormView}
