@@ -212,10 +212,12 @@ var ArticleShow = React.createClass({
 				<br></br>
 				<br></br>
 				<div className="well art-details">
-					<img
+					<a href={this.state.article.image_link}>
+						<img
 						width="125" height="200"
 						src={this.state.article.image_link}
 						className="article-img"></img>
+					</a>
 					<h1>
 						{this.state.article.title}
 					</h1>

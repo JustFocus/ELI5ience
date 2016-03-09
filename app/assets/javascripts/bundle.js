@@ -24538,10 +24538,14 @@
 				React.createElement(
 					'div',
 					{ className: 'well art-details' },
-					React.createElement('img', {
-						width: '125', height: '200',
-						src: this.state.article.image_link,
-						className: 'article-img' }),
+					React.createElement(
+						'a',
+						{ href: this.state.article.image_link },
+						React.createElement('img', {
+							width: '125', height: '200',
+							src: this.state.article.image_link,
+							className: 'article-img' })
+					),
 					React.createElement(
 						'h1',
 						null,
@@ -33025,8 +33029,10 @@
 	              article.body.slice(0, 300) + "..."
 	            ),
 	            React.createElement(
-	              'div',
-	              { className: 'comment-count' },
+	              'a',
+	              { className: 'comment-count',
+	                href: "/#/articles/" + article.id
+	              },
 	              this.commentCount(article.comments.length)
 	            ),
 	            React.createElement(

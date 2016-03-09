@@ -71,7 +71,9 @@ var ArticleIndex = React.createClass({
                 className="col-md-4">
                 <h2 className='index-title'>{article.title}</h2>
                 <p className='index-body'>{article.body.slice(0, 300) + "..."}</p>
-                <div className="comment-count">{this.commentCount(article.comments.length)}</div>
+                  <a className="comment-count"
+    								href={"/#/articles/" + article.id}
+    							>{this.commentCount(article.comments.length)}</a>
                 <p>
                   <a
                     className="btn btn-xs btn-primary btn-view-main"
