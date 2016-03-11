@@ -3,13 +3,32 @@
 - [Website Link][website]
 - [Heroku link][heroku]
 
+A science focused app for annotating difficult to understand articles. Based on RapGenius.
+
+ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
+
 [heroku]: eli5ience.herokuapp.com
 [website]: http://www.eli5ience.com/
 
-## Minimum Viable Product
+##Main Features
+- Annotate articles by selecting text on the article page
+  - Protections to prevent users from annotating over existing annotations.
+- Article pages show all existing annotations as links that open in-page
+- Post and delete comments on articles
+- Post and delete improvements on annotations
+- User view changes based on login status, will show delete/create buttons only when logged in
+- Create and delete articles
+- Sign Up/Login account management with user profiles
 
-ELI5ience is a web application inspired by Rap Genius built using Ruby on Rails
-and React.js. ELI5ience allows users to:
+##Additional Features
+- Custom authentication in rails
+- Session management on backend with frontend reference for tailored UX
+- Twitter bootstrap used for styling.
+
+
+#Original Design Docs
+
+## Minimum Viable Product
 
 <!-- This is a Markdown checklist. Use it to keep track of your
 progress. Put an x between the brackets for a checkmark: [x] -->
@@ -19,8 +38,8 @@ progress. Put an x between the brackets for a checkmark: [x] -->
 - [x] Create, read, and delete articles
 - [x] Create, read, and delete comments on articles
 - [x] Create, read, and delete annotations on articles
-- [ ] Create, read, edit, and delete improvements on annotations
-- [ ] Vote on annotations
+- [x] Create, read, edit, and delete improvements on annotations
+- [x] Vote on annotations
 
 
 ## Design Docs
@@ -105,24 +124,25 @@ the API.
 
 **Objective:** Improvements belong to annotations and can be viewed on annotations.
 
-- [ ] create `Improvement` model
+- [x] create `Improvement` model
 - build out API, Flux loop, and components for:
-  - [ ] Improvement CRUD
-  - [ ] viewing improvements on annotations
+  - [x] Improvement CRUD
+  - [x] viewing improvements on annotations
 
 ### Phase 8: [Styling Cleanup and Seeding (1 day)][phase-nine]
 
 **objective:** Make the site feel more cohesive and awesome.
 
-- [ ] Get feedback on my UI from others
-- [ ] Refactor HTML classes & CSS rules
-- [ ] Add modals, transitions, and other styling flourishes.
+- [x] Get feedback on my UI from others
+- [x] Refactor HTML classes & CSS rules
+- [x] Add modals, transitions, and other styling flourishes.
 
 ### Bonus Features (TBD)
-- [ ] Complex styling of articles and annotations using markdown-js.
+- [ ] Complex styling of articles and annotations using markdown-js
+- [ ] Improvement voting and metrics
 - [ ] Search for articles by tags or name
 - [ ] Pagination / infinite scroll for Articles Index
-- [ ] File upload for annotations
+- [ ] File upload for annotations and articles
 
 [phase-one]: ./docs/phases/phase1.md
 [phase-two]: ./docs/phases/phase2.md
