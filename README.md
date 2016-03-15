@@ -12,19 +12,24 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 
 ##Main Features
 - Annotate articles by selecting text on the article page
+  ![Annotating articles](./docs/ELI5Annotation.png)
   - Protections to prevent users from annotating over existing annotations.
+  ![Overlap Protection](./docs/ELI5Overlap.png)
 - Article pages show all existing annotations as links that open in-page
 - Post and delete comments on articles
 - Post and delete improvements on annotations
 - User view changes based on login status, will show delete/create buttons only when logged in
+  ![Annotating articles](./docs/ELI5Login.png)
+  ![Annotating articles](./docs/ELI5Allow.png)
 - Create and delete articles
 - Sign Up/Login account management with user profiles
 
-![image:](./docs/ELI5Annotation.png)
+
 
 ##Additional Features
 - Custom authentication in rails
 - Session management on backend with frontend reference for tailored UX
+![Annotating articles](./docs/ELI5Allow.png)
 - Twitter bootstrap used for styling.
 
 
