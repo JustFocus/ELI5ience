@@ -13,7 +13,7 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 ##Main Features
 - Annotate articles by selecting text on the article page
   ![Annotating articles](./docs/ELI5Annotation.png)
-  - Protections to prevent users from annotating over existing annotations.
+  - Protections to prevent users from annotating over existing annotations. Screenshot and code demonstrating overlap protection below.
   ![Overlap Protection](./docs/ELI5Overlap.png)
   ```javascript
     uniqueSelection: function(text, startIdx) {
@@ -37,7 +37,7 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 - Article pages show all existing annotations as links that open in-page
 - Post and delete comments on articles
 - Post and delete improvements on annotations
-- User view changes based on login status, will show delete/create buttons only when logged in
+- User view changes based on login status, will show delete/create buttons only when logged in. Code below creates button or login heads-up based on current session:
 ```javascript
   postBtn: function(session) {
     if (session.length === 0) {
