@@ -15,10 +15,42 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
   ![Annotating articles](./docs/ELI5Annotation.png)
   - Protections to prevent users from annotating over existing annotations.
   ![Overlap Protection](./docs/ELI5Overlap.png)
+  ```javascript
+    uniqueSelection: function(text, startIdx) {
+      var endIdx = startIdx + text.length;
+      var annStartIdx;
+      var annEndIdx;
+      for (var i = 0; i < this.state.article.annotations.length; i++) {
+        annStartIdx = this.state.article.annotations[i].selection_start;
+        annEndIdx = annStartIdx + this.state.article.annotations[i].selection_length;
+        if (
+            (startIdx >= annStartIdx && startIdx <= annEndIdx) ||
+            (endIdx >= annStartIdx && endIdx <= annEndIdx) ||
+            (startIdx <= annStartIdx && endIdx >= annEndIdx)
+          ){
+              return false;
+          }
+      }
+      return true;
+    },
+  ```
 - Article pages show all existing annotations as links that open in-page
 - Post and delete comments on articles
 - Post and delete improvements on annotations
 - User view changes based on login status, will show delete/create buttons only when logged in
+```javascript
+  postBtn: function(session) {
+    if (session.length === 0) {
+      return <div className='errPost'><a href='./session/new'>Login to post a comment!</a></div>;
+    } else {
+      return (
+        <input className="btn btn-xs btn-success comment-post-btn"
+          type="submit"
+          value="Post"/>
+      );
+    }
+  },
+```
   ![Annotating articles](./docs/ELI5Login.png)
   ![Annotating articles](./docs/ELI5Allow.png)
 - Create and delete articles
