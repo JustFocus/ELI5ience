@@ -20,6 +20,8 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 - Create and delete articles
 - Sign Up/Login account management with user profiles
 
+![image:](./docs/ELI5annotation.png)
+
 ##Additional Features
 - Custom authentication in rails
 - Session management on backend with frontend reference for tailored UX
@@ -29,9 +31,6 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 #Original Design Docs
 
 ## Minimum Viable Product
-
-<!-- This is a Markdown checklist. Use it to keep track of your
-progress. Put an x between the brackets for a checkmark: [x] -->
 
 - [x] Create an account
 - [x] Log in / Log out
