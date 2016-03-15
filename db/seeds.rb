@@ -104,8 +104,24 @@ Comment.create!(
 )
 
 Comment.create!(
+  body: "Merge this with Rocket Engines?",
+	user_id: "1",
+	article_id: "2",
+)
+
+Comment.create!(
   body: "Come check out my article",
 	user_id: "2",
+	article_id: "3",
+)
+Comment.create!(
+  body: "I'd like to see more like this.",
+	user_id: "3",
+	article_id: "3",
+)
+Comment.create!(
+  body: "Excellent!",
+	user_id: "1",
 	article_id: "3",
 )
 
@@ -119,6 +135,26 @@ Comment.create!(
   body: "I'll share this with friends.",
 	user_id: "1",
 	article_id: "5",
+)
+Comment.create!(
+  body: "This is relevant to my interests.",
+	user_id: "3",
+	article_id: "5",
+)
+Comment.create!(
+  body: "This is very well written.",
+	user_id: "1",
+	article_id: "6",
+)
+Comment.create!(
+  body: "I don't understand this at all. Need more annotations.",
+	user_id: "2",
+	article_id: "6",
+)
+Comment.create!(
+  body: "First.",
+	user_id: "4",
+	article_id: "6",
 )
 
 Annotation.create!(
@@ -194,7 +230,98 @@ Annotation.create!(
   selection_length: 151
 )
 
+Annotation.create!(
+  body: "Compressed air, for example.",
+	author_id: "2",
+	article_id: "1",
+  selection_start: 305,
+  selection_length: 26
+)
 
+Annotation.create!(
+  body: "Go as fast as possible as quickly as possible.",
+	author_id: "3",
+	article_id: "1",
+  selection_start: 572,
+  selection_length: 180
+)
+Annotation.create!(
+  body: "The slug is a unit of mass associated with Imperial units and United States customary units. It is a mass that accelerates by 1 ft/s2 when a force of one pound (lbF) is exerted on it. One slug has a mass of 32.174049 lbm or 14.593903 kg based on standard gravity, the international foot, and the avoirdupois pound.",
+	author_id: "4",
+	article_id: "2",
+  selection_start: 309,
+  selection_length: 16
+)
+Annotation.create!(
+  body: "gravitational constant = 6.67408 × 10-11 m3 kg-1 s-2",
+	author_id: "1",
+	article_id: "2",
+  selection_start: 522,
+  selection_length: 22
+)
+Annotation.create!(
+  body: "Institute of Electrical and Electronics Engineers",
+	author_id: "4",
+	article_id: "3",
+  selection_start: 1303,
+  selection_length: 4
+)
+Annotation.create!(
+  body: "Probably would have been better off as mechanical engineers.",
+	author_id: "2",
+	article_id: "3",
+  selection_start: 1034,
+  selection_length: 20
+)
+Annotation.create!(
+  body: "To say the least!",
+	author_id: "1",
+	article_id: "3",
+  selection_start: 433,
+  selection_length: 165
+)
+Annotation.create!(
+  body: "Amber in Greek, as the article states",
+	author_id: "1",
+	article_id: "4",
+  selection_start: 549,
+  selection_length: 8
+)
+Annotation.create!(
+  body: "The force of electromanetisim",
+	author_id: "2",
+	article_id: "4",
+  selection_start: 72,
+  selection_length: 21
+)
+Annotation.create!(
+  body: "Articles on the other three fundamental interactions are coming soon!",
+	author_id: "1",
+	article_id: "4",
+  selection_start: 295,
+  selection_length: 80
+)
+Annotation.create!(
+  body: "ECMAScript (or ES) is a trademarked scripting-language specification standardized by Ecma International in ECMA-262 and ISO/IEC 16262. Well-known implementations of the language, such as JavaScript, JScript and ActionScript have come into wide use for client-side scripting on the Web.",
+	author_id: "1",
+	article_id: "5",
+  selection_start: 117,
+  selection_length: 10
+)
+Annotation.create!(
+  body: "Meaning, it's awesome.",
+	author_id: "1",
+	article_id: "5",
+  selection_start: 260,
+  selection_length: 169
+)
+Annotation.create!(
+  body: "In a reduced version that can be run but not changed.",
+	author_id: "1",
+	article_id: "6",
+  selection_start: 136,
+  selection_length: 8
+)
 
 Improvement.create!(
   body: "Inaccurate description",
@@ -256,6 +383,71 @@ Improvement.create!(
 
 Improvement.create!(
   body: "I like this explanation",
+	user_id: "1",
+	annotation_id: "8",
+)
+
+Improvement.create!(
+  body: "Needs more detail",
+	user_id: "1",
+	annotation_id: "9",
+)
+Improvement.create!(
+  body: "Too dense.",
+	user_id: "1",
+	annotation_id: "10",
+)
+
+Improvement.create!(
+  body: "I like this explanation",
+	user_id: "1",
+	annotation_id: "11",
+)
+
+
+Improvement.create!(
+  body: "Inaccurate description",
+	user_id: "1",
+	annotation_id: "12",
+)
+
+Improvement.create!(
+  body: "This is too complex",
 	user_id: "3",
+	annotation_id: "13",
+)
+
+Improvement.create!(
+  body: "Need more detail",
+	user_id: "1",
+	annotation_id: "14",
+)
+
+Improvement.create!(
+  body: "Do you have a source for this?",
+	user_id: "4",
+	annotation_id: "15",
+)
+
+Improvement.create!(
+  body: "This is misleading",
+	user_id: "3",
+	annotation_id: "4",
+)
+
+Improvement.create!(
+  body: "Great explanation!",
+	user_id: "4",
 	annotation_id: "3",
+)
+Improvement.create!(
+  body: "Can you expand on this, please?",
+	user_id: "1",
+	annotation_id: "2",
+)
+
+Improvement.create!(
+  body: "Thanks!",
+	user_id: "3",
+	annotation_id: "16",
 )

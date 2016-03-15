@@ -45,7 +45,7 @@ var AnnotationForm = React.createClass({
 
 	postBtn: function(session) {
 		if (session.length === 0) {
-			return <div className='errPost'>Login to create an annotation!</div>;
+			return <div className='errPost'><a href='./session/new'>Login to create an annotation!</a></div>;
 		} else {
 			return (
 				<input

@@ -46,7 +46,7 @@ var ImprovementForm = React.createClass({
 	},
 	postBtn: function(session) {
 		if (session.length === 0) {
-			return <div className='errPost'>Login to suggest an improvement!</div>;
+			return <div className='errPost'><a href='./session/new'>Login to suggest an improvement!</a></div>;
 		} else {
 			return (
 				<input

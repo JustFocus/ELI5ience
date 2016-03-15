@@ -25295,7 +25295,11 @@
 				return React.createElement(
 					'div',
 					{ className: 'errlogin' },
-					'Login to create an article!'
+					React.createElement(
+						'a',
+						{ href: './session/new' },
+						'Login to create an article!'
+					)
 				);
 			} else {
 				return React.createElement('input', {
@@ -32329,7 +32333,11 @@
 				return React.createElement(
 					'div',
 					{ className: 'errPost' },
-					'Login to post a comment!'
+					React.createElement(
+						'a',
+						{ href: './session/new' },
+						'Login to post a comment!'
+					)
 				);
 			} else {
 				return React.createElement('input', { className: 'btn btn-xs btn-success comment-post-btn',
@@ -32533,7 +32541,11 @@
 				return React.createElement(
 					'div',
 					{ className: 'errPost' },
-					'Login to create an annotation!'
+					React.createElement(
+						'a',
+						{ href: './session/new' },
+						'Login to create an annotation!'
+					)
 				);
 			} else {
 				return React.createElement('input', {
@@ -32777,7 +32789,11 @@
 				return React.createElement(
 					'div',
 					{ className: 'errPost' },
-					'Login to suggest an improvement!'
+					React.createElement(
+						'a',
+						{ href: './session/new' },
+						'Login to suggest an improvement!'
+					)
 				);
 			} else {
 				return React.createElement('input', {

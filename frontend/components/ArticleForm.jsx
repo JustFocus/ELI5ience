@@ -63,7 +63,7 @@ var ArticleForm = React.createClass({
 	},
 	createBtn: function(session){
 		if (session.length === 0) {
-			return <div className='errlogin'>Login to create an article!</div>;
+			return <div className='errlogin'><a href='./session/new'>Login to create an article!</a></div>;
 		} else {
 			return (
 				<input

@@ -1,5 +1,7 @@
 <% action = (from_user) ? users_url : session_url %>
+<% other_action = (!from_user) ? new_user_url : new_session_url %>
 <% button_text = (from_user) ? "Create Account" : "Log In"%>
+<% other_text = (!from_user) ? "Create Account" : "Log In"%>
 <% header = (from_user) ? "" : "" %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top" style="height: 52px">
@@ -19,7 +21,11 @@
 </header>
 
 <div class="container">
-	<div class="create-login-cont">
+
+
+
+	<h4 class="create-login-cont index-title"> <%= button_text %>! or <%= link_to other_text, other_action %>
+		<div class="login-box">
 		<form class="form-signin" action="<%= action %>" method="POST">
 			<h2 class="form-signin-heading"><%= header %></h2>
 			<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
@@ -32,6 +38,8 @@
 				name="user[username]"
 				value="<%=@user.username%>">
 
+			<br>
+
 			<% if from_user %>
 				<label for="inputExpertise" class="sr-only">Expertise
 				</label>
@@ -42,6 +50,7 @@
 					required autofocus
 					name="user[expertise]"
 					value="<%=@user.expertise%>">
+					<br>
 			<% end %>
 
 			<label for="inputPassword" class="sr-only">Password
@@ -67,6 +76,7 @@
 
 		</form>
 	</div>
+</h4>
 </div>
 
 <% if flash[:errors] && !current_user %>
