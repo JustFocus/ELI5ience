@@ -65,6 +65,6 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 - Twitter bootstrap used for styling.
 
 
-[#Original Design Docs][ogdocs]
+#[Original Design Docs][ogdocs]
 
 [ogdocs]: ./docs/ogdocs.md
