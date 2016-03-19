@@ -17,11 +17,11 @@
 * [API endpoints][api-endpoints]
 * [DB schema][schema]
 
-[views]: ./docs/views.md
-[components]: ./docs/components.md
-[stores]: ./docs/stores.md
-[api-endpoints]: ./docs/api-endpoints.md
-[schema]: ./docs/schema.md
+[views]: ./views.md
+[components]: ./components.md
+[stores]: ./stores.md
+[api-endpoints]: ./api-endpoints.md
+[schema]: ./schema.md
 
 ## Implementation Timeline
 
@@ -112,12 +112,12 @@ the API.
 - [ ] Pagination / infinite scroll for Articles Index
 - [ ] File upload for annotations and articles
 
-[phase-one]: ./docs/phases/phase1.md
-[phase-two]: ./docs/phases/phase2.md
-[phase-three]: ./docs/phases/phase3.md
-[phase-four]: ./docs/phases/phase4.md
-[phase-five]: ./docs/phases/phase5.md
-[phase-six]: ./docs/phases/phase6.md
-[phase-seven]: ./docs/phases/phase7.md
-[phase-eight]: ./docs/phases/phase8.md
-[phase-nine]: ./docs/phases/phase9.md
+[phase-one]: ./phases/phase1.md
+[phase-two]: ./phases/phase2.md
+[phase-three]: ./phases/phase3.md
+[phase-four]: ./phases/phase4.md
+[phase-five]: ./phases/phase5.md
+[phase-six]: ./phases/phase6.md
+[phase-seven]: ./phases/phase7.md
+[phase-eight]: ./phases/phase8.md
+[phase-nine]: ./phases/phase9.md
