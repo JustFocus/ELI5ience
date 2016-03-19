@@ -12,9 +12,9 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 
 ##Main Features
 - Annotate articles by selecting text on the article page
-  ![Annotating articles](./docs/ELI5Annotation.png)
+  ![Annotating articles](./ELI5Annotation.png)
   - Protections to prevent users from annotating over existing annotations. Screenshot and code demonstrating overlap protection below.
-  ![Overlap Protection](./docs/ELI5Overlap.png)
+  ![Overlap Protection](./ELI5Overlap.png)
   ```javascript
     uniqueSelection: function(text, startIdx) {
       var endIdx = startIdx + text.length;
@@ -51,8 +51,8 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
     }
   },
 ```
-  ![Annotating articles](./docs/ELI5Login.png)
-  ![Annotating articles](./docs/ELI5Allow.png)
+  ![Annotating articles](./ELI5Login.png)
+  ![Annotating articles](./ELI5Allow.png)
 - Create and delete articles
 - Sign Up/Login account management with user profiles
 
@@ -61,10 +61,10 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
 ##Additional Features
 - Custom authentication in rails
 - Session management on backend with frontend reference for tailored UX
-![Annotating articles](./docs/ELI5Allow.png)
+![Annotating articles](./ELI5Allow.png)
 - Twitter bootstrap used for styling.
 
 
 #[Original Design Docs][ogdocs]
 
-[ogdocs]: ./docs/ogdocs.md
+[ogdocs]: ./ogdocs.md
