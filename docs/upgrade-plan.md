@@ -35,8 +35,8 @@ Phase 1 - Legacy baseline and acceptance suite
 *   Record the exact JSON response shapes of every `/api` endpoint as the starting point for the new API contract.
 *   If Rails 4.2 refuses to boot on available images, write the specs from the code reading and run them first against the Phase 2/3 app instead. Don't sink time into reviving the legacy stack.
 
-Phase 2 - Rails 8 backend (branch `rails8`)
--------------------------------------------
+Phase 2 - Rails 8 backend (done)
+-------------------------------
 
 **Skeleton:**
 
