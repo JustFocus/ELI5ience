@@ -7,16 +7,16 @@ target the legacy app now and the rebuilt app later. See `docs/test-plan.md`
 ## Running against legacy
 
 The suite does not start the app. Start it first per `docker/legacy/README.md`
-so it is serving on `http://localhost:3000`, then from this directory:
+so it is serving on `http://localhost:3001`, then from this directory:
 
 ```sh
 npm install
-APP_ENV=legacy BASE_URL=http://localhost:3000 npm test
+APP_ENV=legacy npm test
 ```
 
 - `APP_ENV` (default `legacy`) selects route shapes (`support/routes.ts`) and the
   visual baseline folder (`__screenshots__/<APP_ENV>/`).
-- `BASE_URL` (default `http://localhost:3000`) is the app under test.
+- `BASE_URL` (default `http://localhost:3001` for legacy, `http://localhost:3000` for modern) is the app under test.
 - `npm run test:smoke` runs only the `@smoke` tagged specs.
 - `npm run typecheck` runs `tsc --noEmit`.
 

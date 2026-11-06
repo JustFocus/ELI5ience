@@ -8,7 +8,10 @@ if (APP_ENV !== 'legacy' && APP_ENV !== 'modern') {
   throw new Error(`APP_ENV must be "legacy" or "modern", got "${APP_ENV}"`);
 }
 
-const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
+// Legacy runs on 3001 (docker/legacy), the new app on 3000.
+const BASE_URL =
+  process.env.BASE_URL ??
+  (APP_ENV === 'legacy' ? 'http://localhost:3001' : 'http://localhost:3000');
 const isCI = !!process.env.CI;
 
 export default defineConfig({

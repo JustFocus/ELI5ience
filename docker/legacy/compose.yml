@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: eli5
       POSTGRES_PASSWORD: eli5
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eli5"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U eli5"]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -20,4 +20,4 @@ services:
     environment:
       DATABASE_URL: postgres://eli5:eli5@db:5432/ELI5ience_development
     ports:
-      - "3000:3000"
+      - "${LEGACY_PORT:-3001}:3000"
