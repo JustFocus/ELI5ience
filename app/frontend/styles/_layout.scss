@@ -1,0 +1,72 @@
+@use "variables" as *;
+
+// Server-rendered navbar and footer (app/views/layouts/application.html.erb).
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.site-navbar {
+  --bs-navbar-padding-y: 0;
+  min-height: 52px;
+  background-color: $navbar-bg;
+  border-bottom: 1px solid $navbar-border;
+
+  .navbar-brand {
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+
+    img {
+      display: block;
+    }
+  }
+}
+
+.site-nav-links {
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 2px;
+
+  .nav-link {
+    --bs-nav-link-color: #{$link-color};
+    --bs-nav-link-hover-color: #{$link-hover-color};
+    padding: 0;
+    line-height: 18px;
+  }
+
+  form {
+    margin: 0;
+  }
+
+  // Sign Out sits under the welcome link, like the legacy btn-xs.
+  .btn-sm {
+    --bs-btn-padding-y: 0;
+    --bs-btn-padding-x: 0.4rem;
+    --bs-btn-color: #ccc;
+    --bs-btn-border-color: #666;
+    --bs-btn-hover-bg: #333;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-border-color: #888;
+    line-height: 18px;
+  }
+}
+
+.site-footer {
+  flex-shrink: 0;
+  padding: 0.5rem 0;
+  background-color: rgb(85 85 85 / 90%);
+  color: $footer-text;
+
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .footer-name {
+    font-weight: bold;
+  }
+}

@@ -1,0 +1,71 @@
+@use "variables" as *;
+
+// Home page: jumbotron and article cards.
+.jumbotron {
+  margin-bottom: 30px;
+  padding: 48px 0 40px;
+  background-color: $panel-bg;
+  color: $panel-text;
+
+  .jumbotron-title {
+    margin-bottom: 0.5rem;
+    font-size: 3.9375rem; // 63px
+    color: $panel-text;
+  }
+
+  .jumbotron-subtitle {
+    margin-bottom: 1rem;
+    font-size: 1.3125rem; // 21px
+    font-weight: 300;
+    color: $muted-text;
+  }
+}
+
+.article-card {
+  height: 100%;
+  background-color: $panel-bg;
+  color: $panel-text;
+  border: 1px solid $panel-border;
+  border-radius: 5px;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .article-card-title {
+    margin-bottom: 10px;
+    font-size: 1.875rem;
+    color: $panel-text;
+  }
+
+  .article-card-excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 10px;
+    font-size: 0.8125rem;
+  }
+
+  .comment-count {
+    margin: auto 0 10px;
+    font-weight: bold;
+    color: $subtle-text;
+  }
+
+  .btn {
+    align-self: flex-start;
+  }
+}
+
+.article-grid {
+  margin-bottom: 3rem;
+}
+
+.status-message {
+  padding: 1rem 0 3rem;
+  color: $panel-text;
+}

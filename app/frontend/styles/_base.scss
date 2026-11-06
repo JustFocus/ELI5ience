@@ -1,0 +1,66 @@
+@use "variables" as *;
+
+// Annotation highlight colors. The article page (a later step) uses only these
+// custom properties, so the highlight can be retuned in one place. Legacy was
+// dim blue on black (low contrast); these are chosen for >= 4.5:1 on #111.
+:root {
+  --eli-panel-bg: #{$panel-bg};
+  --eli-panel-text: #{$panel-text};
+  --eli-panel-border: #{$panel-border};
+  --eli-muted-text: #{$muted-text};
+  --eli-accent: #{$primary};
+
+  --eli-annotation-color: #cfe6ff;
+  --eli-annotation-bg: rgb(66 139 202 / 28%);
+  --eli-annotation-underline: #6cb2f5;
+  --eli-annotation-hover-bg: rgb(66 139 202 / 48%);
+  --eli-annotation-active-color: #fff;
+  --eli-annotation-active-bg: rgb(240 173 78 / 38%);
+  --eli-annotation-active-underline: #f0ad4e;
+  --eli-focus-ring: #8fc4ff;
+}
+
+html {
+  // Black behind everything, so overscroll or short pages never show white.
+  background-color: $space-black;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-color: transparent;
+  isolation: isolate;
+}
+
+// Saturn backdrop on a fixed layer behind the page. A fixed `background-attachment`
+// on body left a white band below short pages in the legacy app.
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: $space-black url("../images/crescentsaturn_cassini_big.jpg") no-repeat center center / cover;
+}
+
+.site-main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--eli-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

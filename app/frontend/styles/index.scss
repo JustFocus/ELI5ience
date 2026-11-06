@@ -1,0 +1,7 @@
+// Theme entry, forwarded by app/frontend/entrypoints/theme.scss.
+// One partial per area; add new ones here.
+@use "./bootstrap";
+@use "base";
+@use "layout";
+@use "auth";
+@use "home";

@@ -1,17 +1,19 @@
-<h1>Log In</h1>
+<div class="container">
+  <section class="auth-card" aria-labelledby="auth-heading">
+    <h1 id="auth-heading" class="auth-heading">Log In</h1>
 
-<%= form_with url: session_path do |form| %>
-  <div>
-    <%= form.label :username, "Username" %>
-    <%= form.text_field :username, value: @username, required: true, autofocus: true, autocomplete: "username", maxlength: 30 %>
-  </div>
-  <div>
-    <%= form.label :password, "Password" %>
-    <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72 %>
-  </div>
-  <%= form.submit "Log In" %>
-<% end %>
+    <%= form_with url: session_path, class: "auth-form" do |form| %>
+      <div class="mb-3">
+        <%= form.label :username, "Username", class: "visually-hidden" %>
+        <%= form.text_field :username, value: @username, required: true, autofocus: true, autocomplete: "username", maxlength: 30, placeholder: "Username", class: "form-control" %>
+      </div>
+      <div class="mb-3">
+        <%= form.label :password, "Password", class: "visually-hidden" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, placeholder: "Password", class: "form-control" %>
+      </div>
+      <%= form.submit "Log In", class: "btn btn-primary" %>
+    <% end %>
 
-<%= button_to "Log In as Guest", guest_session_path %>
-
-<p>or <%= link_to "Create Account", new_user_path %></p>
+    <%= button_to "Log In as Guest", guest_session_path, class: "btn btn-light", form_class: "auth-guest" %>
+  </section>
+</div>

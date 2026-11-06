@@ -81,6 +81,16 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      # Request tests render the SPA shell, so vite_rails builds the frontend on demand.
+      - name: Install frontend packages
+        run: npm ci
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -88,3 +98,34 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
         run: bin/rails db:test:prepare test
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm test
+
+      - name: Build
+        run: npm run build

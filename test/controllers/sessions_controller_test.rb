@@ -16,7 +16,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "logged out navbar" do
     get root_path
-    assert_select "h1", "Welcome to ELI5ience!"
+    assert_select "main #root"
     assert_select "nav a", "Log In / Guest"
     assert_select "nav a", "Create Account"
     assert_select "nav button", false

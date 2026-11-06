@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { login, loginAsGuest, logout, signOutControl } from '../support/auth';
 import { routes } from '../support/routes';
-import { GUEST_USER, SEED_USERS } from '../support/seed';
+import { GUEST_USER } from '../support/seed';
 
 // Fills and submits the server-rendered sign-up form (users/new). The page
 // stays on the form after success in legacy, so callers assert logged-in state
@@ -31,11 +31,15 @@ test('sign up creates a logged-in session for a new user', async ({ page }) => {
   await expect(signOutControl(page)).toBeVisible();
 });
 
-test('log in with seeded credentials shows the welcome link', async ({ page }) => {
-  const engineer = SEED_USERS[1];
-  await login(page, engineer.username, engineer.password);
+// Uses an account created by the test: the seed personas have random
+// passwords (db/seeds.rb), only the guest password is known.
+test('log in with an existing account shows the welcome link', async ({ page }) => {
+  const username = uniqueUsername();
+  await signUp(page, username, 'Testing Expertise', 'secret123');
+  await logout(page);
+  await login(page, username, 'secret123');
 
-  await expect(page.getByRole('link', { name: `Welcome, ${engineer.username}`, exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: `Welcome, ${username}`, exact: true })).toBeVisible();
   await expect(signOutControl(page)).toBeVisible();
 });
 
@@ -73,13 +77,9 @@ test('logging out returns to a logged-out navbar', async ({ page }) => {
   await expect(signOutControl(page)).toHaveCount(0);
 });
 
-// Known defect (AGENTS.md: "Sign-out crashes (reset_session_token! vs
-// reset_token!)"). SessionsController#destroy calls reset_session_token!, which
-// does not exist as written. On the legacy stack it does not raise, it silently
-// does nothing, so the server-side session token is never rotated and a session
-// cookie copied before sign-out still authenticates afterwards. Remove test.fail
-// once sign-out revokes the session on the server.
-test.fail('a session cookie copied before sign-out no longer authenticates', async ({ page, context, browser }) => {
+// Regression test for the legacy defect where sign-out never rotated the
+// server-side session, so a cookie copied before sign-out kept authenticating.
+test('a session cookie copied before sign-out no longer authenticates', async ({ page, context, browser }) => {
   await loginAsGuest(page);
   const sessionCookies = await context.cookies();
   await logout(page);
@@ -98,10 +98,8 @@ test.fail('a session cookie copied before sign-out no longer authenticates', asy
   await replay.close();
 });
 
-// Known defect (AGENTS.md: "username is not unique"). The users table has no
-// unique index on username and the model has no uniqueness validation, so a
-// duplicate sign-up is accepted. Remove test.fail once usernames are unique.
-test.fail('sign up with an existing username is rejected', async ({ page }) => {
+// Regression test for the legacy defect where usernames were not unique.
+test('sign up with an existing username is rejected', async ({ page }) => {
   // Create the first account here rather than reusing a seed name, so a
   // legacy run that accepts the duplicate does not leave an extra guest_user row.
   const username = uniqueUsername();

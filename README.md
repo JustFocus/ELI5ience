@@ -11,18 +11,35 @@ ELI5ience was built with a Ruby on Rails backend, and a React.js frontend. It is
 The host needs only Docker (with the compose plugin). Do not install Ruby on the host: all Ruby and Rails commands run through `docker compose`.
 
 ```sh
-docker compose up                             # db:prepare, then Rails on http://localhost:3000 (health check: /up)
+docker compose up                             # db:prepare, then Rails on http://localhost:3000 plus the Vite dev server (hot reload); health check: /up
+docker compose run --rm app bin/rails db:seed # seed data (idempotent)
 docker compose run --rm app bin/rails db:test:prepare test    # tests
 docker compose run --rm app bin/rubocop       # lint
 docker compose run --rm app bin/brakeman      # static security scan
 docker compose run --rm app bin/bundler-audit # gem vulnerability audit
 docker compose run --rm app bin/rails console # any other Rails command
-docker compose down                           # stop (keeps the database and gem volumes; add -v to wipe them)
+docker compose down                           # stop (keeps the database, gem and node_modules volumes; add -v to wipe them)
 ```
 
-- Stack: Ruby 4.0, Rails 8.1, Postgres 18. Gems live in a named volume, so the first run is slower.
+- Stack: Ruby 4.0, Rails 8.1, Postgres 18, Node 24 (see `.node-version`). Gems and `node_modules` live in named volumes, so the first run is slower. The compose entrypoint reinstalls npm packages when `package-lock.json` changes.
+- `docker compose up` also runs the Vite dev server (`bin/dev` starts both). Edits under `app/frontend/` hot reload in the browser. Host ports are `APP_PORT` (Rails, default 3000) and `VITE_PORT` (Vite, default 3036), e.g. `APP_PORT=3041 VITE_PORT=3042 docker compose -p mine up`.
 - `config/master.key` is not committed. Development and tests do not need it; production does (`RAILS_MASTER_KEY`).
 - The legacy app (for the e2e baseline) runs separately on port 3001; see `docker/legacy/README.md` on the `legacy-baseline` tag.
+
+### Frontend
+
+The frontend (React 19, TypeScript, Vite, TanStack Query, React Router, Bootstrap 5 via Sass) is in `app/frontend/`. The npm scripts can run on the host (Node 24) or in the container (`docker compose run --rm app npm run lint`):
+
+```sh
+npm ci              # install packages
+npm run dev         # Vite dev server alone (docker compose up already runs it)
+npm run build       # production build into public/vite (also run by rails assets:precompile)
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm test            # vitest (jsdom + React Testing Library)
+```
+
+The e2e suite is separate: see `e2e/README.md`.
 
 [website]: http://www.eli5ience.com/
 

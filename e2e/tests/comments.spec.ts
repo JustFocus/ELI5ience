@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { loginAsGuest } from '../support/auth';
+import { viewArticleControl } from '../support/home';
 import { routes } from '../support/routes';
 import { GUEST_USER, SEED_ARTICLE_TITLES } from '../support/seed';
 
@@ -27,11 +28,7 @@ function commentItem(page: Page, text: string) {
 // comments in the legacy app, so specs never rely on that route.
 async function openArticle(page: Page, title: string): Promise<void> {
   await page.goto(routes.home());
-  await page
-    .getByRole('heading', { name: title, exact: true })
-    .locator('xpath=..')
-    .getByRole('button', { name: 'View article' })
-    .click();
+  await viewArticleControl(page, title).click();
   await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
   // The article view refetches its data a few times as it mounts, and the legacy
   // comment form clears whatever the user has typed each time the view re-renders.
