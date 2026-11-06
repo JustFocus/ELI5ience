@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import { loginAsGuest } from '../support/auth';
+import { createArticleControl, viewArticleControl } from '../support/home';
 import { routes } from '../support/routes';
 import { SEED_ARTICLE_TITLES } from '../support/seed';
 
@@ -28,13 +29,9 @@ test.describe('articles', () => {
   test('View article opens the article with its title, author and body', async ({ page }) => {
     await page.goto(routes.home());
 
-    // Each card is a heading followed by its own "View article" button, so the
-    // button is found through the card heading.
-    await page
-      .getByRole('heading', { name: SEED_ARTICLE_TITLE, exact: true })
-      .locator('xpath=..')
-      .getByRole('button', { name: 'View article' })
-      .click();
+    // Each card is a heading followed by its own "View article" control, so the
+    // control is found through the card heading.
+    await viewArticleControl(page, SEED_ARTICLE_TITLE).click();
 
     await expect(page.getByRole('heading', { name: SEED_ARTICLE_TITLE, level: 1 })).toBeVisible();
     // The author also appears on comments, so scope to the "Submitted by" line.
@@ -55,7 +52,7 @@ test.describe('articles', () => {
 
     await loginAsGuest(page);
     await page.goto(routes.home());
-    await page.getByRole('button', { name: /Create article/ }).click();
+    await createArticleControl(page).click();
 
     await page.getByRole('textbox', { name: 'Title', exact: true }).fill(title);
     await page.getByRole('textbox', { name: 'Body', exact: true }).fill(body);

@@ -1,7 +1,7 @@
 ELI5ience agent guide
 =====================
 
-ELI5ience is a RapGenius-style site for making hard science articles understandable. Users post articles, select passages of article text to attach "explain like I'm five" annotations, suggest improvements on annotations, and comment on articles. Built in 2016 (App Academy capstone), last deployed on Heroku. It is now being modernized and redeployed - see `docs/upgrade-plan.md` for the plan and current phase, and `docs/test-plan.md` for what must be tested at each layer. Update this file as phases land; sections marked **(legacy)** describe the pre-upgrade code and should be rewritten when that code is replaced.
+ELI5ience is a RapGenius-style site for making hard science articles understandable. Users post articles, select passages of article text to attach "explain like I'm five" annotations, suggest improvements on annotations, and comment on articles. Built in 2016 (App Academy capstone), last deployed on Heroku. It is now being modernized and redeployed - see `docs/upgrade-plan.md` for the plan and current phase, and `docs/test-plan.md` for what must be tested at each layer. Update this file as phases land.
 
 Domain
 ------
@@ -29,18 +29,27 @@ Core user flows
 2.  Article page: body on the left with annotated passages highlighted as links; right panel shows a tooltip, the selected annotation (with its improvements), or the new-annotation form; comments below.
 3.  Select text in the body -> if it does not overlap an existing annotation, the new-annotation form opens for that range (logged-in users only).
 4.  User profile page lists the user's articles; owners can create and delete articles.
-5.  Sign up / log in / log out are server-rendered Rails pages, not part of the SPA.
+5.  Sign up / log in / log out are server-rendered Rails pages, not part of the SPA. The SPA routes are `/`, `/articles/new`, `/articles/:id`, `/articles/:id/annotations/:annotation_id` and `/users/:id`.
 
-Architecture (legacy)
----------------------
+Architecture
+------------
 
-The backend described below has been removed and replaced by a Rails 8 skeleton (Phase 2, in progress: models, schema, seeds, auth pages and `GET /api/v1/me` exist so far; API controllers are next). The old seed data now lives in `db/seeds.rb`. The frontend description still applies to `frontend/` until Phase 3.
+*   Rails 8.1 + Postgres. Auth pages (login, signup, guest login, logout) are server-rendered ERB (`SessionsController`, `UsersController`, `app/views/layouts/application.html.erb` with the navbar and footer). JSON API under `/api/v1` (contract: `docs/api.md`).
+*   SPA shell: `SpaController#show` renders `app/views/spa/show.html.erb` (an empty `<div id="root">` plus the Vite tags inside the layout's `<main>`). Client routes are listed explicitly in `config/routes.rb` (no catch-all) and must be kept in sync with `app/frontend/App.tsx`. The SPA reads the current user from `GET /api/v1/me`; never inline user data in the HTML.
+*   Frontend lives in `app/frontend/` (vite_rails; `~/` aliases it in imports; config in `config/vite.json`, `vite.config.ts`, `vitest.config.ts`). Sprockets is gone; Propshaft only serves leftovers in `app/assets`.
+    *   `entrypoints/application.tsx` (React mount: QueryClientProvider, BrowserRouter) and `entrypoints/theme.scss` (stylesheet loaded by the layout for every page, including the server-rendered ones).
+    *   `App.tsx` - the route table. `pages/` - one component per route, named `<Name>Page.tsx`; `ArticleShowPage`, `ArticleFormPage` and `UserProfilePage` are placeholders to fill in. `components/` - shared components (`ArticleCard`, `LoadingState`/`ErrorState`). Put custom hooks in `hooks/`.
+    *   `api/` - `request()` fetch wrapper (same-origin, JSON, `X-CSRF-Token` from the meta tag on non-GET, `ApiError` with `status`/`code`/`message`/`details`, 204 -> `undefined`) and the typed `api` object with one function per endpoint. `types/api.ts` - every shape from `docs/api.md`. Update both when the API changes.
+    *   `queries/` - the only place components get server data: query hooks (`useMe`, `useArticles`, `useArticle(id)`, `useUser(id)`), mutation hooks that patch or invalidate the cache per the documented keys (`queries/keys.ts`), and `createQueryClient` (a 401 on a mutation redirects to `/session/new`). Pages call these hooks, never `fetch` or `api` directly.
+    *   `styles/` - Sass: `_variables.scss` (legacy palette + Bootstrap overrides), `_bootstrap.scss` (only the Bootstrap modules and utilities in use; add what you need), one partial per area (`_layout`, `_auth`, `_home`, ...) forwarded in `index.scss`. Annotation highlight colors are CSS custom properties (`--eli-annotation-*`) in `_base.scss`. Images go in `images/` (referenced from SCSS, or from ERB with `vite_image_tag`).
+    *   Tests are colocated (`*.test.ts(x)`), use Vitest + React Testing Library, mock `fetch` with `vi.stubGlobal`, and use `test/render.tsx` (`renderWithProviders`, `jsonResponse`, fixtures that follow `docs/api.md`).
+*   Conventions: function components and hooks, strict TypeScript (no `any`), real `<a>`/`<Link>` for navigation and `<button>` only for actions, semantic headings, `role="status"`/`role="alert"` for loading and errors. Run `npm run lint && npm run typecheck && npm test` before committing. The Vite dev server runs inside `docker compose up` (`bin/dev`). Rails tests build the frontend once on demand (`test_helper.rb`), so `node_modules` must exist (the compose entrypoint installs it).
+*   Playwright acceptance suite in `e2e/` (own package.json); it needs a seeded DB and a running app.
 
-*   Rails 4.2.3 + Postgres. HTML controllers handle auth only (`SessionsController`, `UsersController`); `StaticPagesController#root` serves the shell page that mounts the SPA.
-*   JSON API under `/api` (`config/routes.rb`, `app/controllers/api/`, jbuilder views in `app/views/api/`). `GET /api/articles` returns every article with nested comments, annotations and improvements; the frontend refetches it after almost every mutation.
-*   Frontend: React 0.14 + Flux + react-router 1 (hash URLs like `/#/articles/3`) in `frontend/`, built by webpack 1 into the committed `app/assets/javascripts/bundle.js`, then served through Sprockets. Styling is Bootstrap 3 plus `app/assets/stylesheets/application.css.sass` (dark space theme).
-*   Auth: hand-rolled session-token in `app/controllers/application_controller.rb` and `app/models/user.rb`. CSRF for API writes works only because `jquery_ujs` injects `X-CSRF-Token` into jQuery AJAX - replacing jQuery must preserve this.
-*   Tests in `test/` are empty generator stubs with fixtures that do not load. There are no frontend tests.
+Legacy frontend (`frontend/`, deleted at the end of Phase 3)
+------------------------------------------------------------
+
+Reference only; do not port its style. React 0.14 + Flux + react-router 1 with hash URLs. Its CSS is on the `legacy-baseline` tag (`app/assets/stylesheets/`).
 
 Known legacy defects (do not port them)
 ---------------------------------------
