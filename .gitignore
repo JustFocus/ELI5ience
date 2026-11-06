@@ -30,3 +30,18 @@ key.txt*
 
 # Build output
 /public/assets
+
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+
+
+# Rails
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+/public/assets
+/coverage
+
+# Rails master key stays local
+/config/*.key

@@ -1,0 +1,6 @@
+#!/bin/bash
+# Entrypoint for Dockerfile.dev: make sure gems are installed, then run the command.
+set -e
+bundle check > /dev/null 2>&1 || bundle install
+rm -f tmp/pids/server.pid
+exec "$@"
