@@ -1,0 +1,70 @@
+@use "variables" as *;
+
+// Article form (ArticleFormPage) and its fields (components/forms/FormField).
+// The panel matches the profile panels in _profile.scss.
+.form-page {
+  max-width: 600px;
+  margin: 3rem auto;
+}
+
+.form-panel {
+  background-color: $panel-bg;
+  border: 1px solid $panel-border;
+  border-radius: $border-radius;
+  color: $panel-text;
+
+  .form-panel-title {
+    margin: 0;
+    padding: 10px 15px;
+    border-bottom: 1px solid $panel-border;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: $panel-text;
+  }
+
+  // The form element is the panel body.
+  .form-panel-body {
+    padding: 15px;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    margin-bottom: 0.25rem;
+    color: $panel-text;
+  }
+
+  .form-control {
+    border-color: $panel-border;
+
+    &::placeholder {
+      color: $subtle-text;
+      opacity: 1;
+    }
+  }
+
+  textarea.form-control {
+    resize: vertical;
+  }
+
+  .form-field-error {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: #f7a8a4; // lighter than $danger so it reads on the dark panel
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .form-login-prompt {
+    color: $link-color;
+  }
+}

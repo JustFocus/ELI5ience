@@ -1,0 +1,80 @@
+@use "variables" as *;
+
+// User profile page (UserProfilePage). Legacy look: a narrow centered column of
+// two dark panels, see e2e/__screenshots__/legacy/visual.spec.ts/profile.png.
+.profile-page {
+  max-width: 440px;
+  margin: 50px auto 3rem;
+
+  > .alert {
+    margin-top: 1rem;
+  }
+}
+
+.profile-panel {
+  background-color: $panel-bg;
+  border: 1px solid $panel-border;
+  border-radius: $border-radius;
+  color: $panel-text;
+
+  & + & {
+    margin-top: 20px;
+  }
+}
+
+.profile-panel-title {
+  margin: 0;
+  padding: 8px 15px 9px;
+  border-bottom: 1px solid $panel-border;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.1;
+  color: $panel-text;
+}
+
+// The "User Info:" heading has no rule under it, unlike the articles heading.
+.profile-panel-details > .profile-panel-title {
+  border-bottom: 0;
+}
+
+.profile-details {
+  margin: 0;
+  padding: 9px 0 32px;
+  list-style: none;
+
+  li {
+    margin: 0 23px 0 15px;
+    padding: 10px 15px;
+    border-bottom: 1px dotted $subtle-text;
+  }
+}
+
+.profile-panel-body {
+  padding: 15px;
+}
+
+.profile-actions {
+  margin-bottom: 0.75rem;
+}
+
+.profile-empty {
+  margin: 0;
+  color: $muted-text;
+}
+
+.profile-article-list {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.profile-article-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .btn {
+    flex-shrink: 0;
+  }
+}
