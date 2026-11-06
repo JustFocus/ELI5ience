@@ -9,10 +9,12 @@ Domain
 Authoritative schema: `db/schema.rb`. Older design docs in `docs/` (schema, API, components, phases) are historical and may be stale.
 
 *   **User** - username, expertise (free-text credential like "Astrophysicist"), bcrypt password. Owns everything below.
-*   **Article** - title, plain-text body, optional image link, `locked` flag (unused). Owned via `author_id`.
-*   **Annotation** - belongs to an article; anchors to the body by character offsets `selection_start` + `selection_length` into the plain-text `body`. Owned via `author_id`. Annotations must not overlap each other.
-*   **Improvement** - short suggestion attached to an annotation. Owned via `user_id`.
-*   **Comment** - attached to an article. Owned via `user_id`.
+*   **Article** - title, plain-text body (stored with `\n` line endings), optional http(s) image link. Immutable once posted (no edit endpoint).
+*   **Annotation** - belongs to an article; anchors to the body by `selection_start` + `selection_length` in UTF-16 code units. Must be in bounds and must not overlap other annotations (touching is allowed). Create via `Annotation.create_serialized!`, which locks the article row.
+*   **Improvement** - short suggestion attached to an annotation.
+*   **Comment** - attached to an article.
+
+Every owned record has `user_id` (no `author_id`, `locked` or `background_link`). Foreign keys cascade on delete. Validation limits, offset rules and error messages are specified in `docs/api.md`; shared test vectors are in `docs/annotation_vectors.json`.
 
 Invariants worth preserving through any rewrite:
 
@@ -32,7 +34,7 @@ Core user flows
 Architecture (legacy)
 ---------------------
 
-The backend described below has been removed and replaced by a Rails 8 skeleton (Phase 2, in progress: only the User model, auth pages and `GET /api/v1/me` exist so far). `db/legacy_seeds.rb` holds the old seed data (users already ported to `db/seeds.rb`; articles and the rest are not). The frontend description still applies to `frontend/` until Phase 3.
+The backend described below has been removed and replaced by a Rails 8 skeleton (Phase 2, in progress: models, schema, seeds, auth pages and `GET /api/v1/me` exist so far; API controllers are next). The old seed data now lives in `db/seeds.rb`. The frontend description still applies to `frontend/` until Phase 3.
 
 *   Rails 4.2.3 + Postgres. HTML controllers handle auth only (`SessionsController`, `UsersController`); `StaticPagesController#root` serves the shell page that mounts the SPA.
 *   JSON API under `/api` (`config/routes.rb`, `app/controllers/api/`, jbuilder views in `app/views/api/`). `GET /api/articles` returns every article with nested comments, annotations and improvements; the frontend refetches it after almost every mutation.

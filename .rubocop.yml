@@ -6,8 +6,3 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
-
-AllCops:
-  Exclude:
-    # Legacy data dump, ported to db/seeds.rb in a later step, then deleted.
-    - db/legacy_seeds.rb

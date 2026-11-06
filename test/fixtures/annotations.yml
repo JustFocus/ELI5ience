@@ -1,0 +1,13 @@
+engine:
+  article: rockets
+  user: ada
+  selection_start: 2
+  selection_length: 13
+  body: A machine that pushes things.
+
+vacuum:
+  article: rockets
+  user: guest
+  selection_start: 20
+  selection_length: 10
+  body: Stored fuel.
