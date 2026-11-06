@@ -9,6 +9,37 @@ Decisions made:
 *   **Frontend:** keep the SPA, port to modern React + Vite.
 *   **Data:** fresh start with seed data. No legacy data migration, so the schema can be cleaned up freely.
 
+Status and next steps (as of 2026-11-06)
+----------------------------------------
+
+All work is on branch `modernize` (not yet merged to `master` or pushed). The legacy app is tagged `legacy-baseline`.
+
+**Done:**
+
+*   Phases 0-2.
+*   Phase 3 steps a-c: Vite/React foundation, home, article page with annotations/improvements/comments, article form, profile.
+
+**Verified state:**
+
+*   165 Rails tests (98.9% coverage), 108 Vitest tests, lint/typecheck/build, rubocop and brakeman are all clean.
+*   e2e: all 37 functional specs pass on the rebuilt app, and all 45 pass on legacy (legacy defect specs are `test.fail(IS_LEGACY)`).
+
+**Next, Phase 3 final step (one agent):**
+
+1.  Generate and review modern visual baselines (`e2e/__screenshots__/modern/`) against the legacy ones. The visual project currently has no modern baselines, so run functional specs with `--project=chromium --no-deps` until then.
+2.  Fix button text contrast: legacy used white on green/blue, and Bootstrap 5 auto-switched to dark text. Darken the button colors so white text meets 4.5:1.
+3.  Remove Propshaft and the unused `app/assets` leftovers, delete legacy `frontend/`, and drop the legacy notes from AGENTS.md.
+4.  Add `@vitest/coverage-v8` to devDependencies and enforce 100% branch coverage on `app/frontend/lib/` in CI.
+5.  Small UX nits: singular headings ("1 Annotation Improvement"), and clear server 422 field errors when the field is edited.
+
+**Then Phase 4 (deploy):** the GCP e2-micro VM and static IP `34.41.85.118` are reserved (see below). Needs from the owner: SSH access for a new deploy key, and the DNS A record for `eli5ience.com`.
+
+**Running things locally:**
+
+*   Rails tests: `docker compose run --rm app bin/rails db:test:prepare test`.
+*   Legacy app for e2e: run from the `../eli5ience-legacy` worktree (`git worktree add ../eli5ience-legacy legacy-baseline` if missing). See `docker/legacy/README.md`.
+*   `db:reset` fails while the app container is running (open connections). Stop the app first, or use `bin/rails db:seed:replant`.
+
 Strategy: rebuild on a fresh Rails 8 skeleton, don't step through the upgrades
 ---------------------------------------------------------------------------
 
@@ -84,8 +115,8 @@ Phase 2 - Rails 8 backend (done)
 *   Real fixtures.
 *   CI on GitHub Actions: rubocop, brakeman, `bundler-audit`, and tests.
 
-Phase 3 - Frontend on React 19 + Vite (branch off `rails8`)
------------------------------------------------------------
+Phase 3 - Frontend on React 19 + Vite (steps a-c done)
+-----------------------------------------------------
 
 **Tooling:**
 
