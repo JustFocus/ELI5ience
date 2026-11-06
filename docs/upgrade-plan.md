@@ -100,6 +100,16 @@ Phase 3 - Frontend on React 19 + Vite (branch off `rails8`)
 *   Move to Bootstrap 5 via cssbundling/Vite, or plain CSS. Recommendation: Bootstrap 5, since the markup already uses its vocabulary.
 *   Turn the animate.css excerpt into a few CSS animations.
 
+**Legacy visual defects to fix** (seen in the `e2e/__screenshots__/legacy/` baselines):
+
+*   The fixed footer covers the bottom row of home cards and the end of the comments box. Make it a normal footer, or reserve space for it.
+*   Full-page views show a white band below the footer, because the background uses `fixed` attachment. The background must cover the whole page.
+*   Annotated text is low contrast (dim blue on black), and a clicked annotation gets a hard white focus box per line. Use a clear highlight and a tasteful `:focus-visible` style.
+*   Improvements repeat the author's expertise twice (`ImprovementIndex.jsx`).
+*   The improvements panel is narrower than, and offset from, the annotation panel.
+*   The tooltip element has duplicate `id` attributes.
+*   Article cover images are hotlinked from `res.cloudinary.com`. Decide whether to keep hotlinking them or copy the seed images into the app, so seeds and visual tests don't depend on a third-party host.
+
 **Annotation selection rewrite:**
 
 *   Compute offsets from the DOM `Range` relative to the body container, not with `indexOf`, so repeated phrases anchor correctly.
