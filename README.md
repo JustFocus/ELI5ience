@@ -1,13 +1,29 @@
 # ELI5ience
 
 - [Website Link][website]
-- [Heroku link][heroku]
 
 A science focused app for annotating difficult to understand articles. Based on RapGenius.
 
-ELI5ience was built with a Ruby on Rails backend, and a React.js frontend.
+ELI5ience was built with a Ruby on Rails backend, and a React.js frontend. It is being modernized (Rails 8 backend, rebuilt frontend); see `docs/upgrade-plan.md`.
 
-[heroku]: eli5ience.herokuapp.com
+## Development
+
+The host needs only Docker (with the compose plugin). Do not install Ruby on the host: all Ruby and Rails commands run through `docker compose`.
+
+```sh
+docker compose up                             # db:prepare, then Rails on http://localhost:3000 (health check: /up)
+docker compose run --rm app bin/rails test    # tests
+docker compose run --rm app bin/rubocop       # lint
+docker compose run --rm app bin/brakeman      # static security scan
+docker compose run --rm app bin/bundler-audit # gem vulnerability audit
+docker compose run --rm app bin/rails console # any other Rails command
+docker compose down                           # stop (keeps the database and gem volumes; add -v to wipe them)
+```
+
+- Stack: Ruby 4.0, Rails 8.1, Postgres 18. Gems live in a named volume, so the first run is slower.
+- `config/master.key` is not committed. Development and tests do not need it; production does (`RAILS_MASTER_KEY`).
+- The legacy stack under `docker/legacy` also uses port 3000, so run only one stack at a time.
+
 [website]: http://www.eli5ience.com/
 
 ##Main Features

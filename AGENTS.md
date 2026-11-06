@@ -32,6 +32,8 @@ Core user flows
 Architecture (legacy)
 ---------------------
 
+The backend described below has been removed and replaced by an empty Rails 8 skeleton (Phase 2, in progress: no models, auth or API yet). `db/legacy_seeds.rb` holds the old seed data until it is ported. The frontend description still applies to `frontend/` until Phase 3.
+
 *   Rails 4.2.3 + Postgres. HTML controllers handle auth only (`SessionsController`, `UsersController`); `StaticPagesController#root` serves the shell page that mounts the SPA.
 *   JSON API under `/api` (`config/routes.rb`, `app/controllers/api/`, jbuilder views in `app/views/api/`). `GET /api/articles` returns every article with nested comments, annotations and improvements; the frontend refetches it after almost every mutation.
 *   Frontend: React 0.14 + Flux + react-router 1 (hash URLs like `/#/articles/3`) in `frontend/`, built by webpack 1 into the committed `app/assets/javascripts/bundle.js`, then served through Sprockets. Styling is Bootstrap 3 plus `app/assets/stylesheets/application.css.sass` (dark space theme).
@@ -50,4 +52,4 @@ Known legacy defects (do not port them)
 Development environment
 -----------------------
 
-The host has Docker and Node but no Ruby or Postgres. Run Ruby, Rails and the database through Docker; do not install Ruby on the host. Commands and setup will live in the README once Phase 1 of the upgrade lands.
+The host has Docker and Node but no Ruby or Postgres. **All Ruby, Rails and database commands run through `docker compose`** (for example `docker compose run --rm app bin/rails test`); never install Ruby on the host. Commands are in the README "Development" section. Linters and scanners (`bin/rubocop`, `bin/brakeman`, `bin/bundler-audit`) must stay clean; CI is `.github/workflows/ci.yml`.

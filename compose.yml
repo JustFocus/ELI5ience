@@ -1,0 +1,38 @@
+# Development environment. See README.md for commands.
+# Host port 3000 is shared with docker/legacy: run only one stack at a time.
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    environment:
+      HOME: /tmp
+      DATABASE_URL: postgres://postgres:postgres@db:5432
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  bundle:
