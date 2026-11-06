@@ -1,12 +1,15 @@
 ENV["RAILS_ENV"] ||= "test"
 
 require "simplecov"
-# No minimum coverage is enforced yet.
-SimpleCov.start "rails"
+# docs/test-plan.md: 95% line coverage on the backend.
+SimpleCov.start "rails" do
+  minimum_coverage line: 95
+end
 
 require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"
+require_relative "test_helpers/api_test_helper"
 
 module ActiveSupport
   class TestCase
@@ -24,6 +27,9 @@ module ActiveSupport
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
+
+    # Login rate limiting counts in the in-memory cache; keep tests independent.
+    setup { Rails.cache.clear }
 
     # Add more helper methods to be used by all tests here...
   end

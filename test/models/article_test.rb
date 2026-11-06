@@ -87,4 +87,38 @@ class ArticleTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::NotNullViolation) { build(title: nil).save!(validate: false) }
     assert_raises(ActiveRecord::NotNullViolation) { build(body: nil).save!(validate: false) }
   end
+
+  test "excerpt returns short bodies unchanged with no ellipsis" do
+    assert_equal "Short body", build(body: "Short body").excerpt
+    assert_equal "a" * 200, build(body: "a" * 200).excerpt
+  end
+
+  test "excerpt truncates at 200 codepoints and appends an ellipsis" do
+    assert_equal "#{"a" * 200}...", build(body: "a" * 201).excerpt
+  end
+
+  test "excerpt never splits a surrogate pair at the boundary" do
+    body = "#{"a" * 199}😀tail"
+    excerpt = build(body: body).excerpt
+    assert_equal "#{"a" * 199}😀...", excerpt
+    assert excerpt.valid_encoding?
+    assert_equal "#{"a" * 199}😀", build(body: "#{"a" * 199}😀").excerpt
+    assert_equal "#{"a" * 198}😀😀...", build(body: "#{"a" * 198}😀😀x").excerpt
+  end
+
+  test "excerpt collapses newlines, strips trailing whitespace, then appends the ellipsis" do
+    assert_equal "one two three", build(body: "one\n\ntwo\nthree").excerpt
+    assert_equal "#{"a" * 198}...", build(body: "#{"a" * 198}\n\nzzz").excerpt
+    assert_equal "word...", build(body: "word#{" " * 196}zzzz").excerpt
+  end
+
+  test "counter cache tracks comments" do
+    article = build.tap(&:save!)
+    assert_difference -> { article.reload.comments_count }, 2 do
+      2.times { Comment.create!(article: article, user: users(:ada), body: "hi") }
+    end
+    assert_difference -> { article.reload.comments_count }, -1 do
+      article.comments.first.destroy!
+    end
+  end
 end

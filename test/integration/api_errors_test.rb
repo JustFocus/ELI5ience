@@ -50,7 +50,7 @@ class ApiErrorsTest < ActionDispatch::IntegrationTest
   end
 
   def log_in
-    post "/session", params: { username: "ada", password: "password123" }
+    sign_in_as users(:ada)
   end
 
   test "unknown api route returns 404 json for GET and POST" do
