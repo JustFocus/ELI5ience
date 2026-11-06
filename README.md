@@ -22,7 +22,7 @@ docker compose down                           # stop (keeps the database and gem
 
 - Stack: Ruby 4.0, Rails 8.1, Postgres 18. Gems live in a named volume, so the first run is slower.
 - `config/master.key` is not committed. Development and tests do not need it; production does (`RAILS_MASTER_KEY`).
-- The legacy stack under `docker/legacy` also uses port 3000, so run only one stack at a time.
+- The legacy app (for the e2e baseline) runs separately on port 3001; see `docker/legacy/README.md` on the `legacy-baseline` tag.
 
 [website]: http://www.eli5ience.com/
 

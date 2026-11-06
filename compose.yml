@@ -1,5 +1,6 @@
 # Development environment. See README.md for commands.
-# Host port 3000 is shared with docker/legacy: run only one stack at a time.
+# The legacy stack (docker/legacy) runs on host port 3001, so both can run at once.
+name: eli5ience
 services:
   db:
     image: postgres:18
