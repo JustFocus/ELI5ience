@@ -2,6 +2,7 @@ class Article < ApplicationRecord
   TITLE_MAX = 200
   BODY_MAX = 50_000
   IMAGE_LINK_MAX = 2048
+  EXCERPT_LENGTH = 200
 
   belongs_to :user
   has_many :annotations, -> { order(:selection_start, :id) }, dependent: :destroy
@@ -20,5 +21,14 @@ class Article < ApplicationRecord
   # Length in UTF-16 code units, the unit of JS String#length and annotation offsets.
   def body_utf16_length
     body.to_s.encode("UTF-16LE").bytesize / 2
+  end
+
+  # First 200 codepoints of body (Ruby slices by codepoint, so a surrogate pair
+  # is never split), newlines collapsed to single spaces, trailing whitespace
+  # stripped, "..." only when the body was longer. See docs/api.md.
+  def excerpt
+    text = body.to_s
+    excerpt = text[0, EXCERPT_LENGTH].gsub(/\n+/, " ").rstrip
+    text.length > EXCERPT_LENGTH ? "#{excerpt}..." : excerpt
   end
 end
