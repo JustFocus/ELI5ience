@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
-import { loginAsGuest } from '../support/auth';
+import { loginAsGuest, signOutControl } from '../support/auth';
 import { IS_LEGACY, legacyRetry } from '../support/legacy';
 import { routes } from '../support/routes';
 import { selectText } from '../support/selection';
@@ -56,7 +56,7 @@ async function signUp(page: Page, username: string, expertise: string): Promise<
     page.getByRole('button', { name: 'Create Account', exact: true }).click(),
   ]);
   await page.goto(routes.home());
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toBeVisible();
+  await expect(signOutControl(page)).toBeVisible();
 }
 
 /** Sign up a fresh user and create an article owned by them. Returns its id. */
