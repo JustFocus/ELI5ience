@@ -31,5 +31,12 @@ key.txt*
 # Build output
 /public/assets
 
+# Rails
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+/coverage
+
 # Claude Code agent worktrees
 /.claude/worktrees/
