@@ -1,0 +1,10 @@
+simpler:
+  annotation: engine
+  user: guest
+  body: Maybe say it more simply.
+
+older:
+  annotation: engine
+  user: ada
+  body: Earlier suggestion.
+  created_at: <%= 1.day.ago.to_fs(:db) %>

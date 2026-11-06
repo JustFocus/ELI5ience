@@ -58,6 +58,29 @@ class UserTest < ActiveSupport::TestCase
     assert_not User.authenticate_by_credentials("nobody", "password123")
   end
 
+  test "owns articles, annotations, improvements and comments" do
+    ada = users(:ada)
+    assert_equal [ articles(:plain) ], ada.articles.to_a
+    assert_equal [ annotations(:engine) ], ada.annotations.to_a
+    assert_equal [ improvements(:older) ], ada.improvements.to_a
+    assert_equal [ comments(:first) ], ada.comments.to_a
+  end
+
+  test "destroying a user removes all their content and what hangs off it" do
+    guest = users(:guest)
+    assert_difference -> { Article.count } => -1, -> { Annotation.count } => -2, -> { Improvement.count } => -2,
+      -> { Comment.count } => -3 do
+      guest.destroy!
+    end
+    assert_empty Annotation.where(user: guest)
+  end
+
+  test "database cascades user deletion without callbacks" do
+    assert_difference -> { Article.count } => -1, -> { Annotation.count } => -2, -> { Comment.count } => -3 do
+      users(:guest).delete
+    end
+  end
+
   test "guest finds the seeded guest user" do
     assert_equal users(:guest), User.guest
   end

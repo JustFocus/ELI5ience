@@ -1,0 +1,15 @@
+first:
+  article: rockets
+  user: ada
+  body: Great article!
+
+second:
+  article: rockets
+  user: guest
+  body: Thanks.
+  created_at: <%= 1.day.from_now.to_fs(:db) %>
+
+on_plain:
+  article: plain
+  user: guest
+  body: Nice and short.

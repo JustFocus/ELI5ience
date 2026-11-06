@@ -7,6 +7,10 @@ class User < ApplicationRecord
 
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :articles, dependent: :destroy
+  has_many :annotations, dependent: :destroy
+  has_many :improvements, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   normalizes :username, with: ->(name) { name.strip }
   normalizes :expertise, with: ->(text) { text.strip.presence }
