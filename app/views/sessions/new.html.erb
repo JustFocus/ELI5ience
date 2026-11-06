@@ -1,0 +1,17 @@
+<h1>Log In</h1>
+
+<%= form_with url: session_path do |form| %>
+  <div>
+    <%= form.label :username, "Username" %>
+    <%= form.text_field :username, value: @username, required: true, autofocus: true, autocomplete: "username", maxlength: 30 %>
+  </div>
+  <div>
+    <%= form.label :password, "Password" %>
+    <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72 %>
+  </div>
+  <%= form.submit "Log In" %>
+<% end %>
+
+<%= button_to "Log In as Guest", guest_session_path %>
+
+<p>or <%= link_to "Create Account", new_user_path %></p>

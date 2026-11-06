@@ -12,7 +12,7 @@ The host needs only Docker (with the compose plugin). Do not install Ruby on the
 
 ```sh
 docker compose up                             # db:prepare, then Rails on http://localhost:3000 (health check: /up)
-docker compose run --rm app bin/rails test    # tests
+docker compose run --rm app bin/rails db:test:prepare test    # tests
 docker compose run --rm app bin/rubocop       # lint
 docker compose run --rm app bin/brakeman      # static security scan
 docker compose run --rm app bin/bundler-audit # gem vulnerability audit
