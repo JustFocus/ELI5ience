@@ -1,11 +1,13 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+engine:
+  article: rockets
+  user: ada
+  selection_start: 2
+  selection_length: 13
+  body: A machine that pushes things.
 
-# This model initially had no columns defined.  If you add columns to the
-# model remove the '{}' from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-#  column: value
+vacuum:
+  article: rockets
+  user: guest
+  selection_start: 20
+  selection_length: 10
+  body: Stored fuel.

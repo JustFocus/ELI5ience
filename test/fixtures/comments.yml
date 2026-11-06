@@ -1,11 +1,15 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+first:
+  article: rockets
+  user: ada
+  body: Great article!
 
-# This model initially had no columns defined.  If you add columns to the
-# model remove the '{}' from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-#  column: value
+second:
+  article: rockets
+  user: guest
+  body: Thanks.
+  created_at: <%= 1.day.from_now.to_fs(:db) %>
+
+on_plain:
+  article: plain
+  user: guest
+  body: Nice and short.

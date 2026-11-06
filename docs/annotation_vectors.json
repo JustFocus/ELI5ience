@@ -1,0 +1,25 @@
+{
+  "description": "Shared annotation validation vectors for Minitest (Annotation model) and Vitest (frontend overlap module). Offsets are UTF-16 code units. 'existing' and 'proposed' are [selection_start, selection_length]. 'valid' is the expected result; when false, 'error_field' is the key in error.details and 'reason' is a stable tag. Rules are checked in order (start, length, bounds, overlap) and the first failure is reported. Touching ranges (end == other start) are allowed. If 'body' is present, body_length equals its UTF-16 length (JS string .length).",
+  "vectors": [
+    {"name": "empty article, whole body", "body_length": 10, "existing": [], "proposed": [0, 10], "valid": true},
+    {"name": "start at zero, length one", "body_length": 10, "existing": [], "proposed": [0, 1], "valid": true},
+    {"name": "negative start", "body_length": 10, "existing": [], "proposed": [-1, 3], "valid": false, "error_field": "selection_start", "reason": "invalid_start"},
+    {"name": "zero length", "body_length": 10, "existing": [], "proposed": [2, 0], "valid": false, "error_field": "selection_length", "reason": "invalid_length"},
+    {"name": "negative length", "body_length": 10, "existing": [], "proposed": [5, -2], "valid": false, "error_field": "selection_length", "reason": "invalid_length"},
+    {"name": "ends exactly at body end", "body_length": 10, "existing": [], "proposed": [7, 3], "valid": true},
+    {"name": "runs one past body end", "body_length": 10, "existing": [], "proposed": [7, 4], "valid": false, "error_field": "selection_length", "reason": "out_of_bounds"},
+    {"name": "start at body end", "body_length": 10, "existing": [], "proposed": [10, 1], "valid": false, "error_field": "selection_length", "reason": "out_of_bounds"},
+    {"name": "touching: proposed starts where existing ends", "body_length": 20, "existing": [[0, 5]], "proposed": [5, 5], "valid": true},
+    {"name": "touching: proposed ends where existing starts", "body_length": 20, "existing": [[5, 5]], "proposed": [0, 5], "valid": true},
+    {"name": "overlaps by one unit at the end of existing", "body_length": 20, "existing": [[0, 5]], "proposed": [4, 5], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "overlaps by one unit at the start of existing", "body_length": 20, "existing": [[5, 5]], "proposed": [0, 6], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "proposed fully inside existing", "body_length": 20, "existing": [[2, 10]], "proposed": [4, 2], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "proposed fully contains existing", "body_length": 20, "existing": [[4, 2]], "proposed": [2, 10], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "identical range", "body_length": 20, "existing": [[3, 4]], "proposed": [3, 4], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "fits exactly in the gap between two existing", "body_length": 20, "existing": [[0, 5], [10, 5]], "proposed": [5, 5], "valid": true},
+    {"name": "one unit too long for the gap", "body_length": 20, "existing": [[0, 5], [10, 5]], "proposed": [5, 6], "valid": false, "error_field": "selection_start", "reason": "overlap"},
+    {"name": "after all existing, to end of body", "body_length": 20, "existing": [[0, 5], [10, 5]], "proposed": [15, 5], "valid": true},
+    {"name": "astral character counts as 2 units: whole body in bounds", "body": "a😀b", "body_length": 4, "existing": [], "proposed": [0, 4], "valid": true},
+    {"name": "astral character counts as 2 units: 5 units out of bounds", "body": "a😀b", "body_length": 4, "existing": [], "proposed": [0, 5], "valid": false, "error_field": "selection_length", "reason": "out_of_bounds"}
+  ]
+}

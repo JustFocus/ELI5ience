@@ -1,0 +1,46 @@
+// Bootstrap 5 via Sass, importing only the modules the app uses. Add a module
+// here when a component needs it (modal, badge, dropdown, ...).
+// Bootstrap 5.3 still uses @import internally, so that is what we use too.
+@import "variables";
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/forms/labels";
+@import "bootstrap/scss/forms/form-text";
+@import "bootstrap/scss/forms/form-control";
+@import "bootstrap/scss/forms/form-check";
+@import "bootstrap/scss/forms/validation";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/spinners";
+@import "bootstrap/scss/helpers/visually-hidden";
+@import "bootstrap/scss/helpers/stretched-link";
+@import "bootstrap/scss/helpers/text-truncation";
+
+// Generate only the utility classes the app uses (Bootstrap's full set is ~100 KB).
+// Add a key here when markup needs another utility class.
+$utilities: map-get-multiple(
+  $utilities,
+  (
+    "align-items", "align-self", "display", "flex", "flex-direction", "flex-grow", "flex-shrink", "flex-wrap",
+    "font-weight", "gap", "justify-content", "max-width", "opacity", "overflow", "position", "text-align",
+    "text-decoration", "width", "margin", "margin-x", "margin-y", "margin-top", "margin-end", "margin-bottom",
+    "margin-start", "padding", "padding-x", "padding-y", "padding-top", "padding-end", "padding-bottom",
+    "padding-start"
+  )
+);
+
+@import "bootstrap/scss/utilities/api";

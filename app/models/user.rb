@@ -1,52 +1,39 @@
-class User < ActiveRecord::Base
-	validates :username, :password_digest, :session_token, presence: true
-	validates :password, length: {minimum: 6, allow_nil: true}
+class User < ApplicationRecord
+  # Seeded demo account behind the "Log In as Guest" button (see db/seeds.rb).
+  GUEST_USERNAME = "guest_user"
 
-	has_many :articles,
-	foreign_key: "author_id",
-	dependent: :destroy
+  PASSWORD_MIN_LENGTH = 8
+  USERNAME_FORMAT = /\A[A-Za-z0-9_]+\z/
 
-	has_many :annotations,
-	foreign_key: "author_id",
-	dependent: :destroy
+  has_secure_password
+  has_many :sessions, dependent: :destroy
+  has_many :articles, dependent: :destroy
+  has_many :annotations, dependent: :destroy
+  has_many :improvements, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
-	has_many :comments,
-	dependent: :destroy
+  normalizes :username, with: ->(name) { name.strip }
+  normalizes :expertise, with: ->(text) { text.strip.presence }
 
-	has_many :improvements,
-	dependent: :destroy
+  validates :username,
+    length: { in: 3..30 },
+    format: { with: USERNAME_FORMAT, message: "may only contain letters, digits and underscores" },
+    uniqueness: { case_sensitive: false }
+  validates :password, length: { minimum: PASSWORD_MIN_LENGTH }, allow_nil: true
 
-	attr_reader :password
+  # Case-insensitive username lookup. A missing user still pays for a bcrypt
+  # hash so response time does not reveal whether the username exists.
+  def self.authenticate_by_credentials(username, password)
+    user = find_by("lower(username) = ?", username.to_s.strip.downcase)
+    if user
+      user.authenticate(password.to_s)
+    else
+      new(password: password.to_s)
+      false
+    end
+  end
 
-	after_initialize :ensure_session_token
-
-	def self.find_by_credentials(username, password)
-		user = User.find_by(username: username)
-		return nil unless user && user.valid_password?(password)
-		user
-	end
-
-	def password=(password)
-		@password = password
-		self.password_digest = BCrypt::Password.create(password)
-	end
-
-	def valid_password?(password)
-		BCrypt::Password.new(self.password_digest).is_password?(password)
-	end
-
-	def is_password?(password)
-		BCrypt::Password.new(self.password_digest).is_password?(password)
-	end
-
-	def reset_token!
-		self.session_token = SecureRandom.urlsafe_base64
-		self.save!
-		self.session_token
-	end
-
-	def ensure_session_token
-		self.session_token ||= SecureRandom.urlsafe_base64
-	end
-
+  def self.guest
+    find_by(username: GUEST_USERNAME)
+  end
 end

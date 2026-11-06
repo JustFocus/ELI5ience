@@ -1,18 +1,36 @@
 Rails.application.routes.draw do
-  resources :users, only: [:create, :new]
-  resource :session, only: [:create, :new, :destroy]
+  resource :session, only: %i[ new create destroy ]
+  resource :guest_session, only: :create
+  resources :users, only: %i[ new create ]
 
-  namespace :api, defaults: {format: :json} do
-    # resources :users, only: [:create, :update, :new]
-    # resources :session, only: [:create, :destroy, :new]
-    resources :session, only: [:index]
-    resources :users, only: [:show]
-    resources :articles
-    resources :comments, only: [:create, :destroy, :show]
-    resources :annotations, only: [:create, :destroy, :show]
-    resources :improvements, only: [:create, :destroy, :show]
+  namespace :api do
+    namespace :v1, defaults: { format: :json } do
+      get "me", to: "me#show"
+      resources :users, only: :show
+      resources :articles, only: %i[ index show create destroy ] do
+        resources :annotations, only: :create
+        resources :comments, only: :create
+      end
+      resources :annotations, only: :destroy do
+        resources :improvements, only: :create
+      end
+      resources :improvements, only: :destroy
+      resources :comments, only: :destroy
+      # Unknown /api/v1 paths get the JSON error shape, not the HTML 404 page.
+      match "*unmatched", to: "base#route_not_found", via: :all
+    end
   end
 
-  root "static_pages#root"
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
 
+  # SPA shell: every client-side route is listed explicitly (no catch-all), so
+  # /api, /session, /users/new, /up and assets can never be shadowed. Keep in
+  # sync with the <Route>s in app/frontend/App.tsx.
+  root "spa#show"
+  get "articles/new", to: "spa#show"
+  get "articles/:id", to: "spa#show", constraints: { id: /\d+/ }
+  get "articles/:id/annotations/:annotation_id", to: "spa#show", constraints: { id: /\d+/, annotation_id: /\d+/ }
+  get "users/:id", to: "spa#show", constraints: { id: /\d+/ }
 end

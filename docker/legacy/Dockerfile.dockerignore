@@ -1,0 +1,8 @@
+.git
+.claude
+e2e
+docs
+docker
+log/*
+tmp
+node_modules

@@ -1,0 +1,16 @@
+{
+  "name": "eli5ience-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright acceptance suite for ELI5ience (legacy and rebuilt app)",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

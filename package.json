@@ -1,47 +1,39 @@
 {
-  "name": "ELI5ience",
-  "version": "1.0.0",
-  "description": "ELI5 annotated articles!",
-  "main": "package.json.js",
-  "directories": {
-    "test": "test"
-  },
+  "name": "eli5ience",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "./node_modules/.bin/webpack"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JustFocus/ELI5ience.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JustFocus/ELI5ience/issues"
-  },
-  "homepage": "https://github.com/JustFocus/ELI5ience#readme",
-  "devDependencies": {
-    "babel-core": "^6.2.0",
-    "babel-loader": "^6.2.0",
-    "babel-preset-react": "^6.1.18",
-    "webpack": "^1.12.2"
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
-    "flux": "^2.1.1",
-    "history": "1.13.x",
-    "jquery": "^2.1.4",
-    "react": "^0.14.2",
-    "react-addons-linked-state-mixin": "^0.14.2",
-    "react-dom": "^0.14.2",
-    "react-router": "1.0.2",
-    "webpack": "^1.12.2",
-    "babel-core": "^6.2.0",
-    "babel-loader": "^6.2.0",
-    "babel-preset-react": "^6.1.18"
+    "@tanstack/react-query": "^5.106.1",
+    "bootstrap": "^5.3.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^7.18.5"
   },
-  "engines": {
-  "node": "4.1.1",
-  "npm": "2.1.x"
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "jsdom": "^29.1.1",
+    "sass": "^1.108.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.6",
+    "vite-plugin-ruby": "^5.2.6",
+    "vitest": "^4.1.12"
   }
 }

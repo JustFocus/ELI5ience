@@ -1,30 +1,66 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <title><%= content_for(:title) || "ELI5ience" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="ELI5ience">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-  <%= javascript_include_tag 'application' %>
+    <%= yield :head %>
 
-  <title>ELI5ience</title>
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-</head>
-<body>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
 
-  <%= flash[:errors].join("<br>").html_safe if flash[:errors] %>
+    <%# Theme stylesheet (Bootstrap + app styles) from app/frontend, shared by server-rendered pages and the SPA. %>
+    <%= vite_client_tag %>
+    <%= vite_stylesheet_tag "theme.scss" %>
+  </head>
 
-  <%= yield %>
-  <footer class="navbar navbar-fixed-bottom">
-    <p>
-      <a class="footer-github" href="https://github.com/JustFocus">
-				<%= image_tag('GitHub_Logo.png', size: "80x32", alt: "Checkout my GitHub!")  %>
-			</a> 
-      <span class='footer-name'>
-        2016 Colin McMahon
-      </span>
-    </p>
-  </footer>
+  <body>
+    <header class="site-header">
+      <nav class="navbar navbar-dark site-navbar" aria-label="Main">
+        <div class="container">
+          <%= link_to root_path, class: "navbar-brand" do %>
+            <%= vite_image_tag "images/planet-saturn.png", alt: "ELI5ience", width: 50, height: 50 %>
+          <% end %>
+          <ul class="navbar-nav site-nav-links">
+            <% if authenticated? %>
+              <%# Profile pages are SPA routes. %>
+              <li class="nav-item"><%= link_to "Welcome, #{current_user.username}", "/users/#{current_user.id}", class: "nav-link" %></li>
+              <li class="nav-item"><%= button_to "Sign Out", session_path, method: :delete, class: "btn btn-sm btn-outline-secondary" %></li>
+            <% else %>
+              <li class="nav-item"><%= link_to "Log In / Guest", new_session_path, class: "nav-link" %></li>
+              <li class="nav-item"><%= link_to "Create Account", new_user_path, class: "nav-link" %></li>
+            <% end %>
+          </ul>
+        </div>
+      </nav>
+    </header>
 
+    <main class="site-main">
+      <% if flash[:alert] || flash[:notice] %>
+        <div class="container">
+          <%= tag.div(flash[:alert], role: "alert", class: "alert alert-danger flash-alert") if flash[:alert] %>
+          <%= tag.div(flash[:notice], role: "status", class: "alert alert-info flash-notice") if flash[:notice] %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
 
-</body>
+    <footer class="site-footer">
+      <div class="container">
+        <a class="footer-github" href="https://github.com/JustFocus">
+          <%= vite_image_tag "images/GitHub_Logo.png", alt: "Check out my GitHub!", width: 80, height: 32 %>
+        </a>
+        <span class="footer-name">2016 Colin McMahon</span>
+      </div>
+    </footer>
+  </body>
 </html>

@@ -1,30 +1,23 @@
 class SessionsController < ApplicationController
+  allow_unauthenticated_access only: %i[ new create ]
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: "Too many login attempts. Try again later." }
 
-	def new
-	 @user = User.new
+  def new
+  end
 
-	 render :new
-	end
+  def create
+    @username = params[:username].to_s
+    if user = User.authenticate_by_credentials(@username, params[:password])
+      start_new_session_for user
+      redirect_to after_authentication_url
+    else
+      flash.now[:alert] = "Invalid username or password."
+      render :new, status: :unprocessable_content
+    end
+  end
 
-	def create
-		user = User.find_by_credentials(
-			params[:user][:username],
-			params[:user][:password]
-		)
-		if user
-			sign_in(user)
-			redirect_to(:root)
-		else
-			flash.now[:errors] = ["Invalid username or password"]
-			@user = User.new
-	 	 	render :new
-		end
-	end
-
-	def destroy
-		current_user.reset_session_token!
-	  session[:session_token] = nil
-	  redirect_to root_url
-	end
-
+  def destroy
+    terminate_session
+    redirect_to new_session_path, status: :see_other
+  end
 end

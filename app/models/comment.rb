@@ -1,7 +1,10 @@
-class Comment < ActiveRecord::Base
-	validates :body, :user_id, :article_id, presence: true
+class Comment < ApplicationRecord
+  BODY_MAX = 2000
 
-	belongs_to :user
+  belongs_to :article, counter_cache: true
+  belongs_to :user
 
-	belongs_to :article
+  normalizes :body, with: ->(text) { text.strip }
+
+  validates :body, presence: true, length: { maximum: BODY_MAX }
 end

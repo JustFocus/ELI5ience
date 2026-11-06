@@ -1,9 +1,10 @@
-class Improvement < ActiveRecord::Base
+class Improvement < ApplicationRecord
+  BODY_MAX = 2000
 
-	validates :body, :user_id, :annotation_id, presence: true
+  belongs_to :annotation
+  belongs_to :user
 
-	belongs_to :user
+  normalizes :body, with: ->(text) { text.strip }
 
-	belongs_to :annotation
-
+  validates :body, presence: true, length: { maximum: BODY_MAX }
 end
