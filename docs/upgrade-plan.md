@@ -136,7 +136,18 @@ Phase 3 - Frontend on React 19 + Vite (branch off `rails8`)
 Phase 4 - Production deploy with Kamal
 --------------------------------------
 
-*   Provision a VPS (Hetzner or DigitalOcean, about 2 vCPU / 4 GB).
+*   **Sizing: bare minimum.** This is a toy site with almost no traffic; it previously ran on Heroku's free tier. Target a single 1 GB RAM server, ideally free:
+    *   Preferred: Google Cloud e2-micro free tier (1 GB, US regions).
+    *   Alternatives: Oracle Cloud Always Free (watch the idle-instance reclaim rule), AWS Lightsail 1 GB (~$7/mo), or Hetzner CX23 (~EUR 6/mo, EU).
+    *   The owner picks the provider.
+*   **Memory budget** (about 400-600 MB total):
+    *   One Puma process (`WEB_CONCURRENCY=1`, 3 threads).
+    *   Solid Queue inside Puma (`SOLID_QUEUE_IN_PUMA`); no separate job container.
+    *   Postgres tuned small (`shared_buffers` ~32 MB, low `max_connections`).
+    *   kamal-proxy.
+    *   A 1-2 GB swap file on the host.
+*   Images are built in CI and only pulled by the server, so no build happens on the 1 GB box.
+*   Backups go to a free object storage tier (Backblaze B2 or Cloudflare R2).
 *   Set up a container registry (GHCR). The domain is `eli5ience.com`, which the owner still holds.
 *   `config/deploy.yml`:
     *   Web role behind kamal-proxy with Let's Encrypt.
