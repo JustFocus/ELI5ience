@@ -32,7 +32,7 @@ Core user flows
 Architecture (legacy)
 ---------------------
 
-The backend described below has been removed and replaced by an empty Rails 8 skeleton (Phase 2, in progress: no models, auth or API yet). `db/legacy_seeds.rb` holds the old seed data until it is ported. The frontend description still applies to `frontend/` until Phase 3.
+The backend described below has been removed and replaced by a Rails 8 skeleton (Phase 2, in progress: only the User model, auth pages and `GET /api/v1/me` exist so far). `db/legacy_seeds.rb` holds the old seed data (users already ported to `db/seeds.rb`; articles and the rest are not). The frontend description still applies to `frontend/` until Phase 3.
 
 *   Rails 4.2.3 + Postgres. HTML controllers handle auth only (`SessionsController`, `UsersController`); `StaticPagesController#root` serves the shell page that mounts the SPA.
 *   JSON API under `/api` (`config/routes.rb`, `app/controllers/api/`, jbuilder views in `app/views/api/`). `GET /api/articles` returns every article with nested comments, annotations and improvements; the frontend refetches it after almost every mutation.
