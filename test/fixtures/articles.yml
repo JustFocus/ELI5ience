@@ -3,8 +3,10 @@ rockets:
   title: Rocket Engines
   body: "A rocket engine uses stored propellant.\nIt works in a vacuum."
   image_link: https://example.com/rocket.jpg
+  comments_count: 2
 
 plain:
   user: ada
   title: Plain Article
   body: Short body with no image.
+  comments_count: 1
