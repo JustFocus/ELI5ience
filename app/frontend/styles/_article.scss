@@ -1,0 +1,235 @@
+@use "variables" as *;
+
+// Article page: header box, body, annotation panel and comments.
+// Highlight colors come from the --eli-annotation-* custom properties in _base.scss.
+
+$well-border: rgb(128 128 128 / 40%);
+
+.art-page {
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+
+.well {
+  margin-bottom: 20px;
+  padding: 19px;
+  background-color: $panel-bg;
+  color: $panel-text;
+  border: 1px solid $well-border;
+  border-radius: 4px;
+}
+
+.art-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 20px;
+  min-height: 182px;
+
+  .art-details-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  h1 {
+    margin: 20px 0 0;
+    font-size: 2.25rem; // 36px
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .art-details-meta {
+    margin: 0;
+  }
+
+  .art-details-image {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    width: 116px;
+    height: 145px;
+    object-fit: cover;
+    border: 1px solid $well-border;
+    border-radius: 4px;
+  }
+}
+
+// Body left, panel right, same width. Stacked on small screens.
+.art-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 20px;
+  align-items: start;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.art-body {
+  font-size: 0.875rem; // 14px, as legacy
+  line-height: 1.45;
+  white-space: pre-wrap; // keeps the newlines annotation offsets count
+  overflow-wrap: anywhere;
+}
+
+.ann-link {
+  padding: 0 1px;
+  color: var(--eli-annotation-color);
+  background-color: var(--eli-annotation-bg);
+  border-bottom: 1px solid var(--eli-annotation-underline);
+  border-radius: 2px;
+  text-decoration: none;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+
+  &:hover {
+    background-color: var(--eli-annotation-hover-bg);
+    color: var(--eli-annotation-active-color);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--eli-focus-ring);
+    outline-offset: 1px;
+  }
+
+  &[aria-current="true"] {
+    color: var(--eli-annotation-active-color);
+    background-color: var(--eli-annotation-active-bg);
+    border-bottom-color: var(--eli-annotation-active-underline);
+  }
+}
+
+.art-panel {
+  position: sticky;
+  top: 72px; // below the sticky navbar
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+
+  .panel-hint {
+    margin: 0;
+  }
+
+  .panel-notice {
+    margin: 0 0 15px;
+    padding: 8px 12px;
+    color: #f5d9a3;
+    background-color: rgb(240 173 78 / 14%);
+    border-left: 3px solid #f0ad4e;
+    border-radius: 3px;
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
+
+  .annotation-text {
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .annotation-by {
+    margin-bottom: 20px;
+
+    .btn {
+      margin-left: 8px;
+    }
+  }
+
+  .selected-text {
+    margin: 0 0 20px;
+    max-height: 9rem;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.byline-expertise {
+  color: $muted-text;
+}
+
+// Heading with a rule under it, used for the improvement and comment counts.
+.panel-heading-small {
+  margin: 0 0 12px;
+  padding-bottom: 2px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  border-bottom: 1px solid $panel-border;
+}
+
+.improv-sec {
+  // Fills the panel exactly: no extra width or offset (legacy narrowed it to 85%).
+  margin: 0;
+}
+
+.body-form {
+  margin-bottom: 15px;
+
+  .body-form-field {
+    background-color: $panel-bg;
+    color: $panel-text;
+    border-color: $panel-border;
+    resize: vertical;
+
+    &::placeholder {
+      color: $muted-text;
+    }
+  }
+
+  .body-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+}
+
+.form-error {
+  margin: 8px 0 0;
+  color: #ff8b88;
+}
+
+.login-prompt {
+  margin: 0 0 15px;
+}
+
+.authored-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.authored-item {
+  padding: 10px 0 10px 15px;
+
+  .authored-item-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    color: $muted-text;
+  }
+
+  .authored-item-body {
+    margin: 8px 0 6px 10px;
+    color: $panel-text;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .authored-item-date {
+    display: block;
+    margin-left: 10px;
+    font-size: 0.6875rem;
+    color: #8a8a8a;
+  }
+}
+
+.comment-sec {
+  margin-top: 5px;
+  padding: 25px 35px 15px;
+}
