@@ -1,5 +1,6 @@
 import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
 import { loginAsGuest } from '../support/auth';
+import { IS_LEGACY, legacyRetry } from '../support/legacy';
 import { routes } from '../support/routes';
 import { selectText } from '../support/selection';
 
@@ -30,14 +31,13 @@ function annotationPanel(page: Page): Locator {
  * the body appears.
  */
 async function openAnnotation(page: Page, passage: string, bodyText: string | RegExp) {
-  let attempt = 0;
-  await expect(async () => {
+  await legacyRetry(async (attempt) => {
     // A legacy render exception ("Cannot read properties of undefined") can
     // leave React in a broken state until the page is reloaded.
-    if (attempt++ > 0) await page.reload();
+    if (attempt > 0) await page.reload();
     await page.getByRole('link', { name: passage, exact: true }).click();
-    await expect(annotationPanel(page)).toContainText(bodyText, { timeout: 2000 });
-  }).toPass();
+    await expect(annotationPanel(page)).toContainText(bodyText, IS_LEGACY ? { timeout: 2000 } : {});
+  });
 }
 
 function uniqueName(prefix: string): string {

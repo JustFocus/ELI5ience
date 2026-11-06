@@ -1,5 +1,6 @@
 import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
 import { loginAsGuest } from '../support/auth';
+import { IS_LEGACY, isApiPath, legacyRetry } from '../support/legacy';
 import { routes } from '../support/routes';
 import { selectText } from '../support/selection';
 
@@ -61,14 +62,13 @@ async function createOpenAnnotation(page: Page, username: string): Promise<numbe
  * the body appears.
  */
 async function openAnnotation(page: Page, passage = 'Alpha beta', bodyText = 'First two letters.') {
-  let attempt = 0;
-  await expect(async () => {
+  await legacyRetry(async (attempt) => {
     // A legacy render exception ("Cannot read properties of undefined") can
     // leave React in a broken state until the page is reloaded.
-    if (attempt++ > 0) await page.reload();
+    if (attempt > 0) await page.reload();
     await page.getByRole('link', { name: passage, exact: true }).click();
-    await expect(annotationPanel(page)).toContainText(bodyText, { timeout: 2000 });
-  }).toPass();
+    await expect(annotationPanel(page)).toContainText(bodyText, IS_LEGACY ? { timeout: 2000 } : {});
+  });
 }
 
 /**
@@ -80,7 +80,7 @@ async function openAnnotation(page: Page, passage = 'Alpha beta', bodyText = 'Fi
 async function settle(page: Page, write: () => Promise<void>, method: 'DELETE') {
   await Promise.all([
     page.waitForResponse(
-      (r) => r.request().method() === method && new URL(r.url()).pathname.startsWith('/api/improvements'),
+      (r) => r.request().method() === method && isApiPath(r.url(), 'improvements'),
     ),
     write(),
   ]);
@@ -97,11 +97,10 @@ async function settle(page: Page, write: () => Promise<void>, method: 'DELETE') 
 async function postImprovement(page: Page, text: string) {
   const panel = annotationPanel(page);
   const response = page.waitForResponse(
-    (r) => r.request().method() === 'POST' && new URL(r.url()).pathname.startsWith('/api/improvements'),
+    (r) => r.request().method() === 'POST' && isApiPath(r.url(), 'improvements'),
   );
-  let attempt = 0;
-  await expect(async () => {
-    if (attempt++ > 0) {
+  await legacyRetry(async (attempt) => {
+    if (attempt > 0) {
       await page.reload();
       await openAnnotation(page);
     }
@@ -110,12 +109,12 @@ async function postImprovement(page: Page, text: string) {
     await page.waitForLoadState('networkidle');
     await panel.getByPlaceholder('Add an improvement...').fill(text);
     await Promise.all([
-      page.waitForRequest((r) => r.method() === 'POST' && r.url().includes('/api/improvements'), {
+      page.waitForRequest((r) => r.method() === 'POST' && isApiPath(r.url(), 'improvements'), {
         timeout: 2000,
       }),
       panel.getByRole('button', { name: 'Post' }).click(),
     ]);
-  }).toPass();
+  });
   await response;
   await page.reload();
   await openAnnotation(page);
