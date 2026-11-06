@@ -142,6 +142,7 @@ Phase 4 - Production deploy with Kamal
         *   The boot disk must be **standard persistent disk** (the console defaults to balanced, which is not free), 30 GB or less.
         *   Free egress is 1 GB/month, which is plenty for this site.
         *   Confirm whether the external IPv4 address is charged at setup time.
+    *   Reserved static external IP: `34.41.85.118` (the VM must be in the same region as the IP). Point the `eli5ience.com` A record at it.
     *   Fallback if GCP does not work out: AWS Lightsail 1 GB (~$7/mo).
 *   **Memory budget** (about 400-600 MB total):
     *   One Puma process (`WEB_CONCURRENCY=1`, 3 threads).

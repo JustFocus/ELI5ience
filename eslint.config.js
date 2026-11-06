@@ -7,6 +7,8 @@ export default tseslint.config(
   {
     ignores: [
       "node_modules/",
+      // Local agent worktrees (full repo copies), never part of this project.
+      ".claude/",
       "public/",
       "tmp/",
       "coverage/",

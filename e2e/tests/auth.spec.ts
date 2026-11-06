@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { login, loginAsGuest, logout, signOutControl } from '../support/auth';
+import { IS_LEGACY } from '../support/legacy';
 import { routes } from '../support/routes';
 import { GUEST_USER } from '../support/seed';
 
@@ -36,6 +37,7 @@ test('sign up creates a logged-in session for a new user', async ({ page }) => {
 test('log in with an existing account shows the welcome link', async ({ page }) => {
   const username = uniqueUsername();
   await signUp(page, username, 'Testing Expertise', 'secret123');
+  await page.goto(routes.home());
   await logout(page);
   await login(page, username, 'secret123');
 
@@ -80,6 +82,7 @@ test('logging out returns to a logged-out navbar', async ({ page }) => {
 // Regression test for the legacy defect where sign-out never rotated the
 // server-side session, so a cookie copied before sign-out kept authenticating.
 test('a session cookie copied before sign-out no longer authenticates', async ({ page, context, browser }) => {
+  test.fail(IS_LEGACY, 'legacy defect: sign-out never rotates the session token');
   await loginAsGuest(page);
   const sessionCookies = await context.cookies();
   await logout(page);
@@ -100,6 +103,7 @@ test('a session cookie copied before sign-out no longer authenticates', async ({
 
 // Regression test for the legacy defect where usernames were not unique.
 test('sign up with an existing username is rejected', async ({ page }) => {
+  test.fail(IS_LEGACY, 'legacy defect: usernames are not unique');
   // Create the first account here rather than reusing a seed name, so a
   // legacy run that accepts the duplicate does not leave an extra guest_user row.
   const username = uniqueUsername();

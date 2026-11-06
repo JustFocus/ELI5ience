@@ -1,10 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { login } from '../support/auth';
 import { routes } from '../support/routes';
 import { SEED_ARTICLE_TITLES, SEED_ARTICLE_TITLES_BY_AUTHOR, SEED_USER_IDS, SEED_USERS } from '../support/seed';
 
 const ENGINEER = SEED_USERS[1];
-const CS_PRO = SEED_USERS[2];
 
 // Checks the profile lists exactly the seeded titles that user authored: each
 // seeded title appears once if owned and never otherwise.
@@ -68,8 +66,10 @@ test('logged-out visitor sees articles but no Delete buttons', async ({ page }) 
 });
 
 test('logged-in non-owner sees articles but no Delete buttons on another user\'s profile', async ({ page }) => {
-  await login(page, CS_PRO.username, CS_PRO.password);
-  await expect(page.getByRole('link', { name: `Welcome, ${CS_PRO.username}`, exact: true })).toBeVisible();
+  const username = `e2e_np_${Date.now().toString(36)}`;
+  await signUp(page, username, 'Onlooker', 'secret123');
+  await page.goto(routes.home());
+  await expect(page.getByRole('link', { name: `Welcome, ${username}`, exact: true })).toBeVisible();
 
   await page.goto(routes.user(SEED_USER_IDS[ENGINEER.username]));
   await expect(page.getByRole('link', { name: SEED_ARTICLE_TITLES_BY_AUTHOR[ENGINEER.username][0], exact: true })).toBeVisible();

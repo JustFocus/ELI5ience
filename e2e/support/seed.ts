@@ -3,11 +3,13 @@
 
 export interface SeedUser {
   username: string;
-  password: string;
   expertise: string;
 }
 
-export const GUEST_USER: SeedUser = {
+// Only the guest has a known password. The rebuilt app seeds the persona
+// accounts with random passwords (their legacy passwords are public in git
+// history), so specs never log in as a persona; sign up a fresh user instead.
+export const GUEST_USER: SeedUser & { password: string } = {
   username: 'guest_user',
   password: 'guestguest',
   expertise: 'Jet Propulsion',
@@ -18,17 +20,14 @@ export const SEED_USERS: readonly SeedUser[] = [
   GUEST_USER,
   {
     username: 'EngineerGuy',
-    password: 'engiguy',
     expertise: 'Electrical Engineering',
   },
   {
     username: 'CSPro',
-    password: 'computerscience',
     expertise: 'Computer Science',
   },
   {
     username: 'TheRocketeer',
-    password: 'getmeahelmet',
     expertise: 'Rocket Science',
   },
 ];

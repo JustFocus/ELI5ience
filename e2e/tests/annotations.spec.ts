@@ -144,7 +144,8 @@ test.describe('seed annotations (read only)', () => {
 
   // Known legacy defect (docs/api.md legacy-vs-v1 table, AGENTS.md flow 2):
   // deep links to an annotation URL do not open the annotation.
-  test.fail('deep link to an annotation URL shows the annotation', async ({ page }) => {
+  test('deep link to an annotation URL shows the annotation', async ({ page }) => {
+    test.fail(IS_LEGACY, 'legacy defect: deep links do not open the annotation');
     await page.goto(routes.annotation(SEED_ARTICLE_ID, 1));
     await expect(articleBody(page)).toContainText('A rocket engine is a type of jet engine');
     await expect(annotationPanel(page)).toContainText(OBERTH_BODY);
@@ -230,7 +231,8 @@ test.describe('creating and deleting annotations', () => {
 
   // Known legacy defect (AGENTS.md "New annotations use body.indexOf(selection)"):
   // selecting the second occurrence of a repeated phrase anchors to the first.
-  test.fail('annotating the second occurrence of a repeated phrase anchors to it', async ({ page }) => {
+  test('annotating the second occurrence of a repeated phrase anchors to it', async ({ page }) => {
+    test.fail(IS_LEGACY, 'legacy defect: offsets come from indexOf (first occurrence)');
     await createOwnArticle(page, uniqueName('ann'), 'Ornithologist');
     await annotate(page, 'Since they', 'Second one only.', 1);
     const link = page.getByRole('link', { name: 'Since they', exact: true });
@@ -249,7 +251,8 @@ test.describe('creating and deleting annotations', () => {
 
   // Known legacy defect (docs/api.md "Touching ranges are allowed"): legacy
   // rejects an annotation that exactly touches an existing one.
-  test.fail('an annotation touching an existing one is allowed', async ({ page }) => {
+  test('an annotation touching an existing one is allowed', async ({ page }) => {
+    test.fail(IS_LEGACY, 'legacy defect: touching ranges are rejected');
     await createOwnArticle(page, uniqueName('ann'), 'Ornithologist');
     await annotate(page, 'Alpha beta', 'First.');
     await expect(page.getByRole('link', { name: 'Alpha beta', exact: true })).toBeVisible();
