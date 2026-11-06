@@ -137,9 +137,12 @@ Phase 4 - Production deploy with Kamal
 --------------------------------------
 
 *   **Sizing: bare minimum.** This is a toy site with almost no traffic; it previously ran on Heroku's free tier. Target a single 1 GB RAM server, ideally free:
-    *   Preferred: Google Cloud e2-micro free tier (1 GB, US regions).
-    *   Alternatives: Oracle Cloud Always Free (watch the idle-instance reclaim rule), AWS Lightsail 1 GB (~$7/mo), or Hetzner CX23 (~EUR 6/mo, EU).
-    *   The owner picks the provider.
+    *   **Chosen: Google Cloud e2-micro free tier** (x86, 1 GB RAM). To stay free:
+        *   The VM must be in `us-west1`, `us-central1` or `us-east1`.
+        *   The boot disk must be **standard persistent disk** (the console defaults to balanced, which is not free), 30 GB or less.
+        *   Free egress is 1 GB/month, which is plenty for this site.
+        *   Confirm whether the external IPv4 address is charged at setup time.
+    *   Fallback if GCP does not work out: AWS Lightsail 1 GB (~$7/mo).
 *   **Memory budget** (about 400-600 MB total):
     *   One Puma process (`WEB_CONCURRENCY=1`, 3 threads).
     *   Solid Queue inside Puma (`SOLID_QUEUE_IN_PUMA`); no separate job container.
