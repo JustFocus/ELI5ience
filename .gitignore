@@ -40,3 +40,8 @@ key.txt*
 
 # Claude Code agent worktrees
 /.claude/worktrees/
+
+# Vite build output
+/public/vite
+/public/vite-dev
+/public/vite-test

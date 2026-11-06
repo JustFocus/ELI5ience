@@ -1,0 +1,33 @@
+// Server-rendered login and sign-up pages (app/views/sessions, app/views/users).
+.auth-card {
+  width: 300px;
+  max-width: 100%;
+  margin: 19vh auto 3rem;
+  color: #ddd;
+
+  .auth-heading {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+
+  .auth-form {
+    margin-top: 1.5rem;
+
+    .form-control {
+      padding: 0.4375rem 0.75rem;
+    }
+  }
+
+  // The guest form is its own form (a POST), pulled up beside the Log In button.
+  .auth-guest {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -2rem; // pull up beside the Log In button (a 2rem tall .btn)
+  }
+
+  .errors {
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+  }
+}

@@ -1,0 +1,3 @@
+// Stylesheet entrypoint, loaded by the Rails layout for every page
+// (server-rendered auth pages and the SPA). Source lives in app/frontend/styles/.
+@use "../styles";
