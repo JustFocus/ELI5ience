@@ -147,14 +147,13 @@ Phase 4 - Production deploy with Kamal
     *   kamal-proxy.
     *   A 1-2 GB swap file on the host.
 *   Images are built in CI and only pulled by the server, so no build happens on the 1 GB box.
-*   Backups go to a free object storage tier (Backblaze B2 or Cloudflare R2).
+*   **No backups.** The site's data has no value. Recovery means redeploying with a fresh database volume and running `db:seed` to restore the baseline content. `db:seed` must stay idempotent and runs on every deploy.
 *   Set up a container registry (GHCR). The domain is `eli5ience.com`, which the owner still holds.
 *   `config/deploy.yml`:
     *   Web role behind kamal-proxy with Let's Encrypt.
     *   Postgres 18 accessory with a persistent volume.
     *   Secrets via `.kamal/secrets` sourced from a password manager or ENV, never committed.
     *   `force_ssl`, a health check at `/up`, and log level `info`.
-*   Back up the database: scheduled `pg_dump` to object storage.
 *   GitHub Actions deploys on merge to `master` after CI passes.
 *   Smoke-test production with the Playwright suite pointed at the live URL.
 *   Update the README links and screenshots.

@@ -74,7 +74,7 @@ Visual baselines: generated from the legacy app in Phase 1 and committed under `
 
 *   **Post-deploy smoke:** a tagged subset of the E2E suite (`@smoke`: home loads, article renders, guest login works) runs against production after every Kamal deploy, read-only except for the guest session.
 *   The `/up` health check is verified by kamal-proxy before traffic switches.
-*   A backup restore drill is scripted once: restore the latest `pg_dump` into a scratch container and run the smoke suite against it.
+*   No backup or restore testing: the data has no value. Rebuilding from seeds is covered by the seeds idempotency test (layer 2) and the post-deploy smoke run.
 
 CI (GitHub Actions)
 -------------------
@@ -106,4 +106,4 @@ Sequencing summary
 | 1 | Playwright acceptance suite passing on legacy (known bugs marked `test.fail()`) plus legacy visual baselines |
 | 2 | Model, request and auth Minitest suite; CI with lint, security and backend; E2E API-shape checks |
 | 3 | Vitest unit and component tests; full E2E passing on the rebuild with `test.fail()` markers removed; new visual baselines |
-| 4 | `@smoke` subset in the deploy pipeline; restore drill |
+| 4 | `@smoke` subset in the deploy pipeline |
