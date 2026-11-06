@@ -1,29 +1,31 @@
-<h1>Create Account</h1>
+<div class="container">
+  <section class="auth-card" aria-labelledby="auth-heading">
+    <h1 id="auth-heading" class="auth-heading">Create Account</h1>
 
-<% if @user.errors.any? %>
-  <div role="alert" class="errors">
-    <ul>
-      <% @user.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+    <% if @user.errors.any? %>
+      <div role="alert" class="alert alert-danger errors">
+        <ul class="mb-0">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
-<%= form_with model: @user do |form| %>
-  <div>
-    <%= form.label :username, "Username" %>
-    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", minlength: 3, maxlength: 30 %>
-  </div>
-  <div>
-    <%= form.label :expertise, "Expertise" %>
-    <%= form.text_field :expertise, placeholder: "Eg: Engineering", autocomplete: "off" %>
-  </div>
-  <div>
-    <%= form.label :password, "Password" %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: User::PASSWORD_MIN_LENGTH, maxlength: 72 %>
-  </div>
-  <%= form.submit "Create Account" %>
-<% end %>
-
-<p>or <%= link_to "Log In / Guest", new_session_path %></p>
+    <%= form_with model: @user, class: "auth-form" do |form| %>
+      <div class="mb-3">
+        <%= form.label :username, "Username", class: "visually-hidden" %>
+        <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", minlength: 3, maxlength: 30, placeholder: "Username", class: "form-control" %>
+      </div>
+      <div class="mb-3">
+        <%= form.label :expertise, "Expertise", class: "visually-hidden" %>
+        <%= form.text_field :expertise, placeholder: "Eg: Engineering", autocomplete: "off", class: "form-control" %>
+      </div>
+      <div class="mb-3">
+        <%= form.label :password, "Password", class: "visually-hidden" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: User::PASSWORD_MIN_LENGTH, maxlength: 72, placeholder: "Password", class: "form-control" %>
+      </div>
+      <%= form.submit "Create Account", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+</div>

@@ -11,6 +11,10 @@ require "rails/test_help"
 require_relative "test_helpers/session_test_helper"
 require_relative "test_helpers/api_test_helper"
 
+# Build the frontend once, before the parallel workers fork. Otherwise every
+# worker that renders the SPA shell would race to build into public/vite-test.
+ViteRuby.commands.build
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

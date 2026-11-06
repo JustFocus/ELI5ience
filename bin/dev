@@ -1,2 +1,18 @@
-#!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+#!/usr/bin/env bash
+# Development server: Rails plus the Vite dev server (hot reload) in one process
+# group. Arguments are passed to `rails server`. Used by `docker compose up`.
+set -e
+
+pids=()
+cleanup() { kill "${pids[@]}" 2>/dev/null || true; }
+trap cleanup EXIT
+trap 'exit 143' TERM INT
+
+# Host and port come from config/vite.json; VITE_RUBY_HOST / VITE_RUBY_PORT override them (compose sets both).
+npx vite dev --strictPort &
+pids+=($!)
+./bin/rails server "$@" &
+pids+=($!)
+
+# Exit (and so stop the other) as soon as either process dies.
+wait -n

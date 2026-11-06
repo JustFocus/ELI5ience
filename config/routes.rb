@@ -25,5 +25,12 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  root "home#show"
+  # SPA shell: every client-side route is listed explicitly (no catch-all), so
+  # /api, /session, /users/new, /up and assets can never be shadowed. Keep in
+  # sync with the <Route>s in app/frontend/App.tsx.
+  root "spa#show"
+  get "articles/new", to: "spa#show"
+  get "articles/:id", to: "spa#show", constraints: { id: /\d+/ }
+  get "articles/:id/annotations/:annotation_id", to: "spa#show", constraints: { id: /\d+/, annotation_id: /\d+/ }
+  get "users/:id", to: "spa#show", constraints: { id: /\d+/ }
 end
