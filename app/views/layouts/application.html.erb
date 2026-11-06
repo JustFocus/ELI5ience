@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Eli5ience" %></title>
+    <title><%= content_for(:title) || "ELI5ience" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Eli5ience">
+    <meta name="application-name" content="ELI5ience">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -26,7 +26,8 @@
     <nav aria-label="Main">
       <%= link_to "ELI5ience", root_path %>
       <% if authenticated? %>
-        <span>Welcome, <%= current_user.username %></span>
+        <%# Profile pages are SPA routes (Phase 3). %>
+        <%= link_to "Welcome, #{current_user.username}", "/users/#{current_user.id}" %>
         <%= button_to "Sign Out", session_path, method: :delete %>
       <% else %>
         <%= link_to "Log In / Guest", new_session_path %>

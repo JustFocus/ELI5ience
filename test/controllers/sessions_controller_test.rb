@@ -29,7 +29,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert cookies[:session_id].present?
     follow_redirect!
-    assert_select "nav span", "Welcome, ada"
+    assert_select "nav a[href=?]", "/users/#{users(:ada).id}", "Welcome, ada"
     assert_select "nav form[action='/session'] button", "Sign Out"
   end
 
@@ -43,7 +43,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       post session_path, params: { username: "ada", password: "nope-nope" }
     end
     assert_response :unprocessable_content
-    assert_select "[role=alert]", "Incorrect username or password."
+    assert_select "[role=alert]", "Invalid username or password."
     assert_select "input[name=username][value=ada]"
     assert_no_match "nope-nope", response.body
     assert_nil cookies[:session_id].presence
@@ -52,7 +52,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "login with unknown user fails the same way" do
     post session_path, params: { username: "ghost", password: "password123" }
     assert_response :unprocessable_content
-    assert_select "[role=alert]", "Incorrect username or password."
+    assert_select "[role=alert]", "Invalid username or password."
   end
 
   test "logout ends the session and destroys the Session row" do

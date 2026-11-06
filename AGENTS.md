@@ -46,7 +46,7 @@ Known legacy defects (do not port them)
 ---------------------------------------
 
 *   No server-side auth or ownership checks on any API endpoint.
-*   Sign-out crashes (`reset_session_token!` vs `reset_token!`); `api/improvements#show` and `#create` are broken; username is not unique.
+*   Sign-out never rotates the server-side session token (it calls a nonexistent `reset_session_token!`, which silently returns nil), so a cookie copied before logout still authenticates. `api/improvements#show` and `#create` are broken; username is not unique.
 *   New annotations use `body.indexOf(selection)`, so selecting a repeated phrase anchors to its first occurrence.
 *   `image_link` is rendered as an unvalidated `href` (stored XSS via `javascript:` URLs).
 *   Old secrets were committed in early history; they are dead and were removed from the tree, not from history. Never add secrets to the repo; use Rails credentials or ENV.

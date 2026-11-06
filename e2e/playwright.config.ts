@@ -43,9 +43,19 @@ export default defineConfig({
       animations: 'disabled',
     },
   },
+  // Visual specs compare against baselines of the freshly seeded DB, so they
+  // run first as their own project; functional specs (which create data)
+  // depend on it and run afterwards. Reset the DB before each full run.
   projects: [
     {
+      name: 'visual',
+      testMatch: /visual\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'chromium',
+      testIgnore: /visual\.spec\.ts/,
+      dependencies: ['visual'],
       use: { ...devices['Desktop Chrome'] },
     },
   ],

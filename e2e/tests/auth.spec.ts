@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { login, loginAsGuest, logout } from '../support/auth';
+import { login, loginAsGuest, logout, signOutControl } from '../support/auth';
 import { routes } from '../support/routes';
 import { GUEST_USER, SEED_USERS } from '../support/seed';
 
@@ -28,7 +28,7 @@ test('sign up creates a logged-in session for a new user', async ({ page }) => {
 
   await page.goto(routes.home());
   await expect(page.getByRole('link', { name: `Welcome, ${username}`, exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toBeVisible();
+  await expect(signOutControl(page)).toBeVisible();
 });
 
 test('log in with seeded credentials shows the welcome link', async ({ page }) => {
@@ -36,17 +36,17 @@ test('log in with seeded credentials shows the welcome link', async ({ page }) =
   await login(page, engineer.username, engineer.password);
 
   await expect(page.getByRole('link', { name: `Welcome, ${engineer.username}`, exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toBeVisible();
+  await expect(signOutControl(page)).toBeVisible();
 });
 
 test('wrong password shows an error and leaves the visitor logged out', async ({ page }) => {
   await login(page, GUEST_USER.username, 'not-the-password');
 
-  await expect(page.getByText('Invalid username or password', { exact: true })).toBeVisible();
+  await expect(page.getByText(/^Invalid username or password\.?$/)).toBeVisible();
 
   await page.goto(routes.home());
   await expect(page.getByRole('link', { name: 'Log In / Guest', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toHaveCount(0);
+  await expect(signOutControl(page)).toHaveCount(0);
 });
 
 test('Log In as Guest signs in the guest user', async ({ page }) => {
@@ -61,7 +61,7 @@ test('logged-out navbar offers login and create-account links', async ({ page })
 
   await expect(page.getByRole('link', { name: 'Log In / Guest', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Create Account', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toHaveCount(0);
+  await expect(signOutControl(page)).toHaveCount(0);
 });
 
 test('logging out returns to a logged-out navbar', async ({ page }) => {
@@ -70,7 +70,7 @@ test('logging out returns to a logged-out navbar', async ({ page }) => {
 
   await expect(page.getByRole('link', { name: 'Log In / Guest', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Create Account', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toHaveCount(0);
+  await expect(signOutControl(page)).toHaveCount(0);
 });
 
 // Known defect (AGENTS.md: "Sign-out crashes (reset_session_token! vs

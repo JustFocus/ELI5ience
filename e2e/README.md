@@ -6,8 +6,7 @@ target the legacy app now and the rebuilt app later. See `docs/test-plan.md`
 
 ## Running against legacy
 
-The suite does not start the app. Start it first per `docker/legacy/README.md`
-so it is serving on `http://localhost:3001`, then from this directory:
+The suite does not start the app. The legacy code only exists at the `legacy-baseline` tag, so run it from a separate worktree per `docker/legacy/README.md` (serving on `http://localhost:3001`), then from this directory:
 
 ```sh
 npm install
@@ -20,8 +19,7 @@ APP_ENV=legacy npm test
 - `npm run test:smoke` runs only the `@smoke` tagged specs.
 - `npm run typecheck` runs `tsc --noEmit`.
 
-The suite expects a freshly seeded database (`db/seeds.rb`). Specs assert on the
-constants in `support/seed.ts`.
+The suite expects a freshly seeded database (`db/seeds.rb`); reset it before every full run (legacy: `docker compose -f docker/legacy/compose.yml restart web` in the legacy worktree). Visual specs run first as their own Playwright project, because functional specs create data that would change the screenshots. Specs assert on the constants in `support/seed.ts`.
 
 ## Updating visual baselines
 

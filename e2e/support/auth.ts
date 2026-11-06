@@ -1,14 +1,22 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { routes } from './routes';
 
 // Auth helpers. Locators follow the accessible names used by the login form
 // (app/views/shared/_user_form.html.erb): labelled text inputs and submit
-// buttons. Sign Out is a navbar link (app/views/shared/_navbar.html.erb).
+// buttons. See signOutControl for the Sign Out link/button difference.
+
+// Sign Out is a link in the legacy navbar and a button (form POST) in the
+// rebuilt app; match either so specs work against both.
+export function signOutControl(page: Page): Locator {
+  return page
+    .getByRole('link', { name: 'Sign Out', exact: true })
+    .or(page.getByRole('button', { name: 'Sign Out', exact: true }));
+}
 
 export async function loginAsGuest(page: Page): Promise<void> {
   await page.goto(routes.login());
   await page.getByRole('button', { name: 'Log In as Guest', exact: true }).click();
-  await expect(page.getByRole('link', { name: 'Sign Out', exact: true })).toBeVisible();
+  await expect(signOutControl(page)).toBeVisible();
 }
 
 export async function login(page: Page, username: string, password: string): Promise<void> {
@@ -19,5 +27,5 @@ export async function login(page: Page, username: string, password: string): Pro
 }
 
 export async function logout(page: Page): Promise<void> {
-  await page.getByRole('link', { name: 'Sign Out', exact: true }).click();
+  await signOutControl(page).click();
 }

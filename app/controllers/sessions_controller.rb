@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
       start_new_session_for user
       redirect_to after_authentication_url
     else
-      flash.now[:alert] = "Incorrect username or password."
+      flash.now[:alert] = "Invalid username or password."
       render :new, status: :unprocessable_content
     end
   end

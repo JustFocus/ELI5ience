@@ -8,7 +8,7 @@ class GuestSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal users(:guest), Session.last.user
     assert_redirected_to root_path
     follow_redirect!
-    assert_select "nav span", "Welcome, guest_user"
+    assert_select "nav a", "Welcome, guest_user"
   end
 
   test "missing guest account redirects to login with an alert" do

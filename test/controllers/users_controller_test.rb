@@ -17,7 +17,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to root_path
     follow_redirect!
-    assert_select "span", "Welcome, newbie"
+    assert_select "nav a", "Welcome, newbie"
     assert_equal "Botanist", User.find_by!(username: "newbie").expertise
   end
 
