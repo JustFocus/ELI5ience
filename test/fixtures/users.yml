@@ -1,0 +1,15 @@
+<% digest = BCrypt::Password.create("password123", cost: BCrypt::Engine::MIN_COST) %>
+
+guest:
+  username: guest_user
+  expertise: Jet Propulsion
+  password_digest: <%= digest %>
+
+ada:
+  username: ada
+  expertise: Physicist
+  password_digest: <%= digest %>
+
+no_expertise:
+  username: plain_jane
+  password_digest: <%= digest %>

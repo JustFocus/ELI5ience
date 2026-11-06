@@ -23,6 +23,21 @@
   </head>
 
   <body>
-    <%= yield %>
+    <nav aria-label="Main">
+      <%= link_to "ELI5ience", root_path %>
+      <% if authenticated? %>
+        <span>Welcome, <%= current_user.username %></span>
+        <%= button_to "Sign Out", session_path, method: :delete %>
+      <% else %>
+        <%= link_to "Log In / Guest", new_session_path %>
+        <%= link_to "Create Account", new_user_path %>
+      <% end %>
+    </nav>
+
+    <main>
+      <%= tag.div(flash[:alert], role: "alert", class: "flash-alert") if flash[:alert] %>
+      <%= tag.div(flash[:notice], role: "status", class: "flash-notice") if flash[:notice] %>
+      <%= yield %>
+    </main>
   </body>
 </html>

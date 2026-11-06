@@ -1,0 +1,29 @@
+<h1>Create Account</h1>
+
+<% if @user.errors.any? %>
+  <div role="alert" class="errors">
+    <ul>
+      <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @user do |form| %>
+  <div>
+    <%= form.label :username, "Username" %>
+    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", minlength: 3, maxlength: 30 %>
+  </div>
+  <div>
+    <%= form.label :expertise, "Expertise" %>
+    <%= form.text_field :expertise, placeholder: "Eg: Engineering", autocomplete: "off" %>
+  </div>
+  <div>
+    <%= form.label :password, "Password" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: User::PASSWORD_MIN_LENGTH, maxlength: 72 %>
+  </div>
+  <%= form.submit "Create Account" %>
+<% end %>
+
+<p>or <%= link_to "Log In / Guest", new_session_path %></p>
