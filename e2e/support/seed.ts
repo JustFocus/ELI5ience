@@ -43,3 +43,21 @@ export const SEED_ARTICLE_TITLES: readonly string[] = [
   'JavaScript',
   'Just-in-time compilation',
 ];
+
+// Database ids of the seeded users. Users are created in insertion order on a
+// freshly seeded database, so ids are 1-based in the order of SEED_USERS.
+export const SEED_USER_IDS: Readonly<Record<string, number>> = {
+  guest_user: 1,
+  EngineerGuy: 2,
+  CSPro: 3,
+  TheRocketeer: 4,
+};
+
+// Seeded article titles grouped by author username, from the author_id of each
+// Article.create! in db/seeds.rb. TheRocketeer authors no seeded articles.
+export const SEED_ARTICLE_TITLES_BY_AUTHOR: Readonly<Record<string, readonly string[]>> = {
+  guest_user: ['Rocket Engines', 'Specific Impulse'],
+  EngineerGuy: ['Electrical Engineering', 'Electromagnetism'],
+  CSPro: ['JavaScript', 'Just-in-time compilation'],
+  TheRocketeer: [],
+};
