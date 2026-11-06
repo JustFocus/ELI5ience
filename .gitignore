@@ -14,3 +14,19 @@
 
 #Ignore node_modules
 /node_modules/
+
+# OS / editor / debugger junk
+.DS_Store
+.byebug_history
+
+# Secrets - never commit keys or env files
+*.pem
+*.key
+key.txt*
+.env
+.env.*
+/config/master.key
+/config/credentials/*.key
+
+# Build output
+/public/assets

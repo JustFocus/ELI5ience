@@ -74,14 +74,6 @@ var ArticleForm = React.createClass({
 			);
 		}
 	},
-	cloudinaryData: function() {
-		return {
-			api_key: 487765971445433,
-			timestamp: Date.now(),
-			signature: 'J5-QYdGfmi8sXKMqhJ3RsQ0ngik',
-			callback: 'https://www.eli5ience.com/api/articles'
-		};
-	},
 	render: function(){
     return (
 			<div>

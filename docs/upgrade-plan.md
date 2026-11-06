@@ -1,0 +1,148 @@
+ELI5ience modernization plan
+============================
+
+Goal: a secure, tested, modern ELI5ience redeployed to production, ready for new features.
+
+Decisions made:
+
+*   **Deploy:** Kamal 2 to a VPS (Docker, kamal-proxy with automatic TLS, Postgres as a Kamal accessory).
+*   **Frontend:** keep the SPA, port to modern React + Vite.
+*   **Data:** fresh start with seed data. No legacy data migration, so the schema can be cleaned up freely.
+
+Strategy: rebuild on a fresh Rails 8 skeleton, don't step through the upgrades
+---------------------------------------------------------------------------
+
+The app is small: 5 models, 7 API controllers, about 12 React components, and zero real tests. A stepwise 4.2 -> 5.0 -> ... -> 8.0 upgrade would mean keeping Ruby 2.3-era toolchains working at every hop, and it would carry forward defaults, config and bugs we intend to delete anyway. Instead:
+
+1.  Capture the legacy app's behavior and look as an executable reference: a Playwright acceptance suite (see `docs/test-plan.md`) that passes on legacy and becomes the gate for the rebuild.
+2.  Generate a fresh Rails 8 app (Ruby 3.4) in place on a branch and port the domain onto it deliberately, with tests.
+3.  Rewrite the frontend on React 19 against a clean API contract.
+
+The git history is kept, so the port is still a reviewable diff against the old code.
+
+Phase 0 - Security triage and repo hygiene (done)
+-------------------------------------------------
+
+*   Deleted the committed private key, New Relic config, dead Cloudinary code, `.DS_Store` files, `.byebug_history`, stray files, and duplicate assets. Extended `.gitignore` to cover them.
+*   The leaked credentials are confirmed inactive or dead, so git history is intentionally not rewritten.
+*   The committed `bundle.js` and its map still contain the old Cloudinary values. They are kept for the Phase 1 legacy baseline and are deleted in Phase 3.
+
+Phase 1 - Legacy baseline and acceptance suite
+----------------------------------------------------------
+
+*   Use a `ruby:2.3` + Postgres 9.x docker compose file that boots the unmodified legacy app and runs `db:seed`. It goes in the scratch area and is not committed long term. The committed `bundle.js` means Node 4 is not needed.
+*   Write the Playwright acceptance suite in `e2e/` (see `docs/test-plan.md`, layer 1). It covers every flow in `AGENTS.md`, marks known legacy bugs as `test.fail()`, and captures visual baselines of each page and state as the pixel reference for Phase 3. This phase is no longer throwaway: the suite is kept permanently.
+*   Record the exact JSON response shapes of every `/api` endpoint as the starting point for the new API contract.
+*   If Rails 4.2 refuses to boot on available images, write the specs from the code reading and run them first against the Phase 2/3 app instead. Don't sink time into reviving the legacy stack.
+
+Phase 2 - Rails 8 backend (branch `rails8`)
+-------------------------------------------
+
+**Skeleton:**
+
+*   `rails new` in place, using Ruby 3.4, Rails 8, Postgres, Propshaft, Puma + Thruster, Minitest, RuboCop (rails-omakase), Brakeman, and the generated Dockerfile and Kamal config.
+*   Solid Queue, Cache and Cable, configured for Postgres if needed.
+*   Docker compose dev environment: `app` + `postgres`. All commands run through it, and the README documents them.
+
+**Schema** (new migrations, bigint keys, real FKs, NOT NULL, indexes):
+
+*   Rename ownership columns to one convention: `author_id` -> `user_id` everywhere, or the reverse. Recommendation: `user_id`.
+*   Add a unique index on `lower(username)`.
+*   Make `articles.body` NOT NULL.
+*   Validate annotation offsets: within the body bounds, and no overlap with other annotations on the same article. Enforce this server-side in the model, not only in the browser.
+
+**Auth:**
+
+*   Use the Rails 8 authentication generator: `has_secure_password`, a `Session` model with one row per device, signed cookie, and `rate_limit` on login.
+*   Keep login and signup as server-rendered pages, restyled to match.
+*   Keep the guest login.
+*   Signup gets a uniqueness check and a sensible password length.
+
+**Authorization:**
+
+*   Use `before_action :require_authentication` on all API writes.
+*   Scope ownership via `Current.user.articles.find(...)` and similar, so other users' records return 404.
+*   This is small enough that a gem like Pundit is unnecessary.
+
+**API** (`/api/v1`, jbuilder):
+
+*   Write the contract down in `docs/api.md` before the frontend work starts.
+*   Article index returns summaries only; article show returns nested annotations, improvements and comments.
+*   Mutations return the created or updated resource.
+*   Errors use one consistent JSON shape with proper status codes (401/403/404/422).
+*   CSRF via the meta tag plus an `X-CSRF-Token` header from `fetch`.
+*   Validate `image_link` as http(s) only.
+
+**Fix or drop every legacy defect listed in `AGENTS.md`.** Do not port unrouted or dead actions.
+
+**Seeds:** port `db/seeds.rb` to use associations instead of hardcoded ids, and keep the content.
+
+**Tests:**
+
+*   Model tests for validations and annotation overlap.
+*   Request tests for every endpoint, including unauthenticated and non-owner cases.
+*   Real fixtures.
+*   CI on GitHub Actions: rubocop, brakeman, `bundler-audit`, and tests.
+
+Phase 3 - Frontend on React 19 + Vite (branch off `rails8`)
+-----------------------------------------------------------
+
+**Tooling:**
+
+*   `vite_rails`, TypeScript, React 19 with function components and hooks.
+*   React Router 7 with browser history (`/articles/3`, not `/#/`). Rails serves the SPA shell for client routes via a catch-all.
+*   TanStack Query for server state, replacing Flux stores, refetch-everything, and the races.
+*   A small `fetch` wrapper that sends the CSRF header and handles errors. No jQuery.
+
+**Styling:**
+
+*   Keep the dark space theme and layout, matching the Phase 1 screenshots.
+*   Move to Bootstrap 5 via cssbundling/Vite, or plain CSS. Recommendation: Bootstrap 5, since the markup already uses its vocabulary.
+*   Turn the animate.css excerpt into a few CSS animations.
+
+**Annotation selection rewrite:**
+
+*   Compute offsets from the DOM `Range` relative to the body container, not with `indexOf`, so repeated phrases anchor correctly.
+*   Show an explicit message when a selection overlaps an existing annotation.
+*   Make `/articles/:id/annotations/:annId` deep links open the annotation.
+
+**Cleanup:**
+
+*   Delete the old `frontend/`, the webpack config, the committed bundle, Sprockets leftovers, and the CoffeeScript and SCSS stubs.
+*   Replace the root `package.json` with the Vite setup.
+
+**Tests:**
+
+*   Vitest for the selection and offset logic.
+*   Playwright E2E for every flow in `AGENTS.md`: guest login, create article, annotate, improvement, comment, owner-only deletes, logout.
+*   Visual comparison against the Phase 1 screenshots.
+
+Phase 4 - Production deploy with Kamal
+--------------------------------------
+
+*   Provision a VPS (Hetzner or DigitalOcean, about 2 vCPU / 4 GB).
+*   Set up a container registry (GHCR). The domain is `eli5ience.com`, which the owner still holds.
+*   `config/deploy.yml`:
+    *   Web role behind kamal-proxy with Let's Encrypt.
+    *   Postgres 17 accessory with a persistent volume.
+    *   Secrets via `.kamal/secrets` sourced from a password manager or ENV, never committed.
+    *   `force_ssl`, a health check at `/up`, and log level `info`.
+*   Back up the database: scheduled `pg_dump` to object storage.
+*   GitHub Actions deploys on merge to `master` after CI passes.
+*   Smoke-test production with the Playwright suite pointed at the live URL.
+*   Update the README links and screenshots.
+
+Phase 5 - New features
+----------------------
+
+Out of scope until Phase 4 is live. Bring feature ideas once the foundation is in place. Phase 2 tests and the API contract are designed to make that cheap.
+
+Subagent strategy
+-----------------
+
+*   **Phase 0:** main agent.
+*   **Phase 1:** main agent boots the legacy stack. Then parallel agents write E2E specs, split by flow (auth + profile, articles + comments, annotations + improvements).
+*   **Phase 2:** one agent for the skeleton, schema and auth. Then parallel agents in separate git worktrees for (a) API controllers + request tests and (b) seeds + CI. Merge via the main agent.
+*   **Phase 3:** starts once `docs/api.md` is stable. Parallel worktree agents for (a) shell, routing and API client, (b) article index/show and annotation selection, (c) comments, improvements and profile. Then one agent for Playwright E2E and visual QA.
+*   **Phase 4:** main agent with the user, since it needs credentials and a server.
+*   Every agent works on a branch or worktree, runs lint and tests before handing back, and the main agent reviews diffs (`/code-review`) before merging.
