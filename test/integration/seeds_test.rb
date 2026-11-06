@@ -7,6 +7,6 @@ class SeedsTest < ActiveSupport::TestCase
 
     assert_equal %w[CSPro EngineerGuy TheRocketeer guest_user].sort, User.pluck(:username).sort
     assert User.guest.authenticate("guestguest")
-    assert User.find_by!(username: "EngineerGuy").authenticate("engiguy")
+    assert_not User.find_by!(username: "EngineerGuy").authenticate("engiguy"), "persona accounts must not keep their public legacy passwords"
   end
 end

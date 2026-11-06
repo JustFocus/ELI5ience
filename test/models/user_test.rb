@@ -61,9 +61,4 @@ class UserTest < ActiveSupport::TestCase
   test "guest finds the seeded guest user" do
     assert_equal users(:guest), User.guest
   end
-
-  test "legacy seed passwords satisfy the minimum length" do
-    assert_equal 7, %w[guestguest engiguy computerscience getmeahelmet].map(&:length).min
-    assert_equal 7, User::PASSWORD_MIN_LENGTH
-  end
 end

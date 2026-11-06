@@ -52,4 +52,4 @@ Known legacy defects (do not port them)
 Development environment
 -----------------------
 
-The host has Docker and Node but no Ruby or Postgres. **All Ruby, Rails and database commands run through `docker compose`** (for example `docker compose run --rm app bin/rails test`); never install Ruby on the host. Commands are in the README "Development" section. Linters and scanners (`bin/rubocop`, `bin/brakeman`, `bin/bundler-audit`) must stay clean; CI is `.github/workflows/ci.yml`.
+The host has Docker and Node but no Ruby or Postgres. **All Ruby, Rails and database commands run through `docker compose`** (for example `docker compose run --rm app bin/rails db:test:prepare test`); never install Ruby on the host. Commands are in the README "Development" section. Linters and scanners (`bin/rubocop`, `bin/brakeman`, `bin/bundler-audit`) must stay clean; CI is `.github/workflows/ci.yml`.

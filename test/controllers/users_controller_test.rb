@@ -28,7 +28,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     messages = css_select("[role=alert] li").map(&:text)
     assert_includes messages, "Username has already been taken"
-    assert_includes messages, "Password is too short (minimum is 7 characters)"
+    assert_includes messages, "Password is too short (minimum is 8 characters)"
     assert_select "input[type=password][value]", false
     assert_no_match "sh0rt", response.body
   end

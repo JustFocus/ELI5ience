@@ -2,9 +2,7 @@ class User < ApplicationRecord
   # Seeded demo account behind the "Log In as Guest" button (see db/seeds.rb).
   GUEST_USERNAME = "guest_user"
 
-  # The shortest legacy seed password ("engiguy") is 7 characters, so the
-  # minimum cannot be higher without invalidating a seeded account.
-  PASSWORD_MIN_LENGTH = 7
+  PASSWORD_MIN_LENGTH = 8
   USERNAME_FORMAT = /\A[A-Za-z0-9_]+\z/
 
   has_secure_password
