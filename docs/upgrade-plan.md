@@ -15,7 +15,7 @@ Strategy: rebuild on a fresh Rails 8 skeleton, don't step through the upgrades
 The app is small: 5 models, 7 API controllers, about 12 React components, and zero real tests. A stepwise 4.2 -> 5.0 -> ... -> 8.0 upgrade would mean keeping Ruby 2.3-era toolchains working at every hop, and it would carry forward defaults, config and bugs we intend to delete anyway. Instead:
 
 1.  Capture the legacy app's behavior and look as an executable reference: a Playwright acceptance suite (see `docs/test-plan.md`) that passes on legacy and becomes the gate for the rebuild.
-2.  Generate a fresh Rails 8 app (Ruby 3.4) in place on a branch and port the domain onto it deliberately, with tests.
+2.  Generate a fresh Rails 8 app (Ruby 4.0, Rails 8.1) in place on a branch and port the domain onto it deliberately, with tests.
 3.  Rewrite the frontend on React 19 against a clean API contract.
 
 The git history is kept, so the port is still a reviewable diff against the old code.
@@ -40,7 +40,7 @@ Phase 2 - Rails 8 backend (branch `rails8`)
 
 **Skeleton:**
 
-*   `rails new` in place, using Ruby 3.4, Rails 8, Postgres, Propshaft, Puma + Thruster, Minitest, RuboCop (rails-omakase), Brakeman, and the generated Dockerfile and Kamal config.
+*   Done (step 1): `rails new` in place with Ruby 4.0, Rails 8.1, Postgres 18, Propshaft, Puma + Thruster, Minitest, RuboCop (rails-omakase), Brakeman, bundler-audit, SimpleCov, the generated Dockerfile, Kamal config and CI.
 *   Solid Queue, Cache and Cable, configured for Postgres if needed.
 *   Docker compose dev environment: `app` + `postgres`. All commands run through it, and the README documents them.
 
@@ -124,7 +124,7 @@ Phase 4 - Production deploy with Kamal
 *   Set up a container registry (GHCR). The domain is `eli5ience.com`, which the owner still holds.
 *   `config/deploy.yml`:
     *   Web role behind kamal-proxy with Let's Encrypt.
-    *   Postgres 17 accessory with a persistent volume.
+    *   Postgres 18 accessory with a persistent volume.
     *   Secrets via `.kamal/secrets` sourced from a password manager or ENV, never committed.
     *   `force_ssl`, a health check at `/up`, and log level `info`.
 *   Back up the database: scheduled `pg_dump` to object storage.
