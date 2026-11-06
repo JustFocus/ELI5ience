@@ -30,3 +30,6 @@ key.txt*
 
 # Build output
 /public/assets
+
+# Claude Code agent worktrees
+/.claude/worktrees/
