@@ -110,6 +110,12 @@ Phase 3 - Frontend on React 19 + Vite (branch off `rails8`)
 *   The tooltip element has duplicate `id` attributes.
 *   Article cover images are hotlinked from `res.cloudinary.com`. Decide whether to keep hotlinking them or copy the seed images into the app, so seeds and visual tests don't depend on a third-party host.
 
+**Legacy behavior defects to fix** (found while writing the e2e suite):
+
+*   Opening `/articles/:id` directly, without going through home first, shows an empty comment list.
+*   The comment draft is cleared whenever the article view re-renders, so typing right after the page opens can be lost.
+*   The comment input is shown to logged-out visitors; only the Post button is swapped for the login prompt.
+
 **Annotation selection rewrite:**
 
 *   Compute offsets from the DOM `Range` relative to the body container, not with `indexOf`, so repeated phrases anchor correctly.
