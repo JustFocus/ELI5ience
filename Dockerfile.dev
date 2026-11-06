@@ -1,6 +1,14 @@
 # Development image for docker compose. Production uses ./Dockerfile.
 ARG RUBY_VERSION=4.0.9
+ARG NODE_VERSION=24
+FROM docker.io/library/node:$NODE_VERSION-slim AS node
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+# Node and npm for Vite (copied from the official image; keep NODE_VERSION in sync with .node-version).
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential curl git libpq-dev libyaml-dev pkg-config postgresql-client && \
@@ -12,12 +20,13 @@ ARG UID=1000
 ARG GID=1000
 RUN groupadd --gid $GID rails && \
     useradd --uid $UID --gid $GID --create-home --shell /bin/bash rails && \
-    mkdir -p /rails && chown rails:rails /rails /usr/local/bundle
+    mkdir -p /rails/node_modules && chown rails:rails /rails /rails/node_modules /usr/local/bundle
 
 USER rails
 WORKDIR /rails
 ENV BUNDLE_JOBS=4
 
-EXPOSE 3000
+# 3000: Rails, 3036: Vite dev server (hot reload).
+EXPOSE 3000 3036
 ENTRYPOINT ["/rails/bin/dev-entrypoint"]
-CMD ["bash", "-c", "bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"]
+CMD ["bash", "-c", "bin/rails db:prepare && exec bin/dev -b 0.0.0.0 -p 3000"]

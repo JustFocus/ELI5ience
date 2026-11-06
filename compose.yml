@@ -1,5 +1,6 @@
 # Development environment. See README.md for commands.
 # The legacy stack (docker/legacy) runs on host port 3001, so both can run at once.
+# Override host ports with APP_PORT (Rails, default 3000) and VITE_PORT (Vite, default 3036).
 name: eli5ience
 services:
   db:
@@ -27,11 +28,16 @@ services:
       DB_HOST: db
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      # The Vite dev server must be reachable from the browser on the same port Rails advertises.
+      VITE_RUBY_HOST: 0.0.0.0
+      VITE_RUBY_PORT: ${VITE_PORT:-3036}
     volumes:
       - .:/rails
       - bundle:/usr/local/bundle
+      - node_modules:/rails/node_modules
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
+      - "${VITE_PORT:-3036}:${VITE_PORT:-3036}"
     depends_on:
       db:
         condition: service_healthy
@@ -39,3 +45,4 @@ services:
 volumes:
   pgdata:
   bundle:
+  node_modules:

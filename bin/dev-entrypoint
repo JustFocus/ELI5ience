@@ -1,6 +1,14 @@
 #!/bin/bash
-# Entrypoint for Dockerfile.dev: make sure gems are installed, then run the command.
+# Entrypoint for Dockerfile.dev: make sure gems and npm packages are installed, then run the command.
 set -e
 bundle check > /dev/null 2>&1 || bundle install
+
+# node_modules lives in a named volume; reinstall when package-lock.json changes.
+lock_hash=$(sha256sum package-lock.json | cut -d' ' -f1)
+if [ "$(cat node_modules/.lock-hash 2>/dev/null)" != "$lock_hash" ]; then
+  npm ci --no-audit --no-fund
+  echo "$lock_hash" > node_modules/.lock-hash
+fi
+
 rm -f tmp/pids/server.pid
 exec "$@"
